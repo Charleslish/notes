@@ -1,0 +1,18 @@
+1。
+    行和缩进 空行
+    标识符
+    引号
+    多行语句（\来分隔）
+    同一行多条 用；
+    注释用# 多行注释用'''或"""
+    多变量赋值
+2.变量 
+    不能用数字开头 例：payrate pay_rate payRate
+    数字型int float bool 非数字型string list tuple dictionary set
+3.数据类型
+    用type()(不会把子类当父类)或者isinstance()
+    不可变：number string tuple
+    可变：list dictionary set
+    1.number 支持复数a+bj complex(a,b)
+    2.string str[begin:end]左闭右开 str[::-1]逆序 
+    3.
