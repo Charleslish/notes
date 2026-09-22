@@ -1,0 +1,33 @@
+The lesson built a student record one object at a time. In this activity, you will write the complete record 
+yourself: five objects, one for each of the four primitive types this course uses, plus one constant, each printed 
+to standard output.
+
+Apply the development process as you work: analyze the requirements, design the record on paper, implement it 
+in src/driver.cc, and repeat until the output matches exactly.
+
+Requirements
+Write your statements inside main in src/driver.cc. The include directive and the structure of main are provided.
+Declare and initialize, in this order: a bool holding true, a char holding 'B', an int holding 3, a double holding
+ 3.98, and a constexpr double constant holding 4.0.
+Every variable receives its value at its declaration, and every printed value is produced by inserting the 
+variable, not the literal, into the stream.
+Print each object's value on its own line, in declaration order, with nothing else on the line. Note what the 
+expected output shows: the stream prints a bool as 1, and it prints a whole-valued double without a decimal point.
+Your program must print nothing else.
+
+Expected output
+1
+B
+3
+3.98
+4
+
+Constraints
+Your code must compile with clang++ using the c++20 standard without errors under -Wall -Wextra -Werror 
+-pedantic. Every declared variable must be initialized and used; a declared-but-unused or uninitialized variable 
+fails the clear-code checks.
+
+The course naming conventions are enforced: variables are lowercase with underscores between words (for example, 
+credit_hours), and constants are named with a leading k followed by mixed case (for example, kMaxGpa).
+
+You may include only the following header: <iostream>.

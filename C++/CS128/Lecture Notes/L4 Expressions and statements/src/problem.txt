@@ -1,0 +1,61 @@
+Overview
+A course awards a base number of points, adds a fixed number of points for each bonus earned, subtracts penalties, 
+and decides honors eligibility from the result. Each of those steps is a single expression, and each one depends 
+on how its operators group.
+
+Write TotalPoints, RemainingPoints, and IsEligible, one for each grouping rule: precedence, associativity, and 
+the operands of &&.
+
+Functions to Implement
+int TotalPoints(int base, int bonus_count, int bonus_value);
+Returns the base points plus the points earned from the bonuses, where each of bonus_count bonuses is worth 
+bonus_value points.
+
+int RemainingPoints(int total, int first_penalty, int second_penalty);
+Returns what remains of total after both penalties are taken off it.
+
+bool IsEligible(bool is_open, int points, int threshold);
+Returns whether the term is open and the point total has reached the threshold.
+
+Precedence: TotalPoints adds the base to the points the bonuses are worth, so the multiplication is performed 
+before the addition. Adding first and multiplying afterward produces a different value for every input in which 
+bonus_value is not 1.
+
+Associativity: RemainingPoints takes both penalties off the total. Consider that 25 - 18 - 4 is 3 
+while 25 - (18 - 4) is 11.
+
+Both operands: IsEligible requires both conditions. A total equal to the threshold has reached it, and a term 
+that is not open is never eligible whatever the total.
+
+Examples
+Example 1: Multiplying before adding
+TotalPoints(180, 3, 12)  // returns 216
+TotalPoints(300, 0, 12)  // returns 300
+Example 2: Taking both penalties off the total
+RemainingPoints(25, 18, 4)  // returns 3
+RemainingPoints(90, 0, 35)  // returns 55
+Example 3: Requiring both conditions
+IsEligible(true, 300, 300)   // returns true
+IsEligible(false, 500, 300)  // returns false
+Constraints
+Write all three function bodies in src/solution.cc. includes/solution.hpp provides the declarations this activity 
+requires, and those declarations must not be changed. You may add functions of your own, provided you declare each 
+one in includes/solution.hpp as well as define it in src/solution.cc. A rule below that requires a definition to 
+contain a loop or a function call means that function's own definition, not a function it calls.
+Each function is a single return statement.
+None of the three reads input or prints anything. src/driver.cc calls all three with values you may change to 
+experiment, and is not graded.
+Ten of the hundred points are for clear code, two for each of five checks: the program compiles without warnings, 
+every variable you declare is initialized and used, each function stays within the course's size and complexity 
+limits, identifiers follow the course's naming conventions, and the code reads clearly. Readability and naming are 
+the two to watch. Give a number that carries a meaning a name rather than writing it as a literal, and spell a 
+constant you name kLikeThis. Ask a container empty() rather than comparing its size() with 0. Use a bool on its 
+own rather than comparing it with true or false, and do not use an int where a bool is meant.
+
+Compiled with clang++ under -std=c++20 -Wall -Wextra -Werror -pedantic. Function definitions belong in 
+src/solution.cc, not in the header. The tests are compiled with AddressSanitizer and UndefinedBehaviorSanitizer, 
+which diagnose memory errors and some forms of undefined behavior; neither detects every invalid operation.
+
+Allowed headers:
+"solution.hpp"
+<iostream>

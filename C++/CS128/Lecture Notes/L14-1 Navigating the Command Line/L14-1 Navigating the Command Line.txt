@@ -1,0 +1,80 @@
+L14 Navigating the Command Line
+    Working with files through a terminal
+        Linux environment with Bash as its shell
+        Read, create, copy, move, and remove files using the commands 
+    The prompt and the working directory
+        Bash displays a prompt when it is ready to read a command. 
+        A prompt can include information about the session, but its format is configurable.
+        [coder@localhost] ~ $
+            coder: The username---The user account for this shell session.
+            localhost: The hostname displayed for the development container in this example.
+            ~ : The current working directory. The displayed tilde abbreviates the home directory; 
+                    this part of the example prompt updates after cd changes directories.
+            $ : The prompt symbol---The character that ends the prompt. It marks where your typing begins. 
+                    It is not part of any command, and it is not something you type.
+        pwd
+            The prompt can abbreviate a pathname. 
+            To display the absolute pathname of the working directory, execute pwd
+            Here, pwd prints /home/coder, the directory abbreviated by ~ in the prompt
+    Listing directory entries
+        ls
+            With no pathname argument, it lists the current working directory and omits names that begin with a period.
+            Here, ls prints documents  mp-1  notes.txt  photos
+            By default, ls omits entries whose names begin with .
+        ls -a
+            To list all files, including hidden files, use the -a option.
+            Here, .  ..  .bashrc  .profile  .ssh  documents  mp-1  notes.txt  photo
+            . names the directory itself, and .. names its parent directory
+    Absolute and relative paths
+        An absolute pathname begins with / and starts at the root directory; 
+            /home/player/writing/office-hours.txt
+        a relative pathname starts from the current working directory. 
+            from /home/player/mp-1/src to /home/player/writing/office-hours.txt:
+            ../../writing/office-hours.txt
+    Changing the working directory
+        The command cd ~ changes the working directory to the home directory
+        The parent-directory component .. can appear with other components in a relative pathname.
+        Bash provides pathname completion to reduce typing
+            Tab completes a unique matching name;
+            The Up Arrow recalls earlier command lines so that you can edit or repeat them.
+            Ctrl+C discards a command line that has not been submitted.
+            The clear command clears the visible terminal display
+    Reading a file with cat
+        writes a file's contents to the terminal when given its pathname.
+        cat src/driver.cc
+            (prints contents to terminal)
+    Creating directories and files
+        The mkdir command creates a directory at the supplied pathname.
+            mkdir cs128 //creates a directory under /home/coder
+        The touch command creates an empty file when the supplied pathname does not exist
+            When the file already exists, touch updates its timestamps and preserves its contents.
+            touch cs128/todo.txt
+    Copying, moving, and renaming
+        The cp command copies a source file to a destination.(can also copy to a file of the same type)
+            cp notes.txt cs128/notes.txt
+            cp meow.txt woof.txt
+        To copy a directory and its contents, including nested directories, use the recursive option -r 
+            Without a recursive option, cp does not copy the directory
+            cp -r mp-1 mp-1-backup
+            If the destination were an existing directory, cp would instead place the copied mp-1 directory inside it
+        The mv command moves a file to a destination pathname or rename them
+            If the destination is an existing directory, mv places the file inside it under its existing name
+            mv howldy.txt mp-1 //move to mp-1
+            mv howldy.txt howdy.txt //rename
+    Removing files and directories
+        The rm command removes the named file without placing it in the desktop trash
+            rm mp-1-backup
+        The rmdir command removes an empty directory.
+            rmdir path
+    Running a program by its path
+        For external programs named without a slash, Bash searches directories specified by its PATH setting 
+            after checking the shell's own command definitions.
+    Summary
+        pwd, ls, ls -a, and cd let us identify, inspect, and change
+        cd path changes the working directory, cd ~ selects home, cd.. selects parent file
+        cat path to read file contents 
+        mv source destination to move or rename them
+        cp source destination to copy files
+        touch path creates an empty file if the pathname is absent
+        mkdir and touch to create directories and empty files
+        rm path and rmdir path to remove

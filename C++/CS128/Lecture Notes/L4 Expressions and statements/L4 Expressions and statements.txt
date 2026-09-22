@@ -1,0 +1,24 @@
+L4 Expressions and statements
+    && || !
+    Precedence: !, (unary -)	logical negation, negation
+                *, /, %	multiplication, division, remainder
+                +, (binary -)	addition, subtraction
+                <<	stream insertion
+                <, <=, >, >=	relational comparison
+                ==, !=	equality comparison
+                &&	logical and (conjunction)
+                ||	logical or (disjunction)
+                =	assignment
+    Associativity:
+        the arithmetic and relational operators are left-associative
+        Assignment is right-associative
+            int x = 0;
+            int y = 1;
+            x = y = 5;// 5 5 instead of 1 5
+    Grouping and order of evaluation: 
+        && evaluates its left operand first, and it evaluates its right operand only when the left operand produces true
+    Statements
+        An expression becomes a statement when a semicolon follows it, and the result is an expression statement.
+        A compound statement is a sequence of statements enclosed in braces {}
+        A semicolon on its own is a null statement (that does nothing)
+    Summary

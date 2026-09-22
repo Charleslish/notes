@@ -1,0 +1,47 @@
+Overview
+A greenhouse logger writes one temperature reading per line to a file. The sensor is not reliable: when it drops out 
+it writes a status word instead of a number, so a log holds lines like 21 and 19 alongside lines like offline. A line
+that does not begin with an integer carries no reading, and the analysis that follows must skip it and carry on with 
+the next line rather than stop at the first one.
+
+Write ReadReadings, which takes an input stream and returns the readings it holds, in order. The stream is the only 
+source: the function opens no file and prints nothing.
+
+Functions to Implement
+Function	Description
+std::vector<int> ReadReadings(std::istream& in)	
+Reads one reading per line from in. A line whose leading characters form an integer contributes that integer. 
+A line whose leading characters do not form an integer contributes nothing and is skipped in full. 
+Anything left on a line after its integer is discarded. 
+Returns the integers contributed, in the order the lines supplied them.
+
+Examples
+The stream holds	Returns	    Why
+"21\n19\n22\n"	{21, 19, 22}	Every line contributes.
+"21\noffline\n22\n"	{21, 22}	The second line contributes nothing, and the third is still read.
+"offline\ndown\n"	{}	No line contributes.
+"21C\n19\n"	{21, 19}	The first line begins with an integer, so it contributes 21; the C after it is discarded.
+"30 34\n19\n"	{30, 19}	The first line carries one reading; the 34 after it is discarded with the rest of the line.
+"-4\n21\n"	{-4, 21}	A reading below zero is still a reading.
+""	{}	A stream holding no lines contributes nothing.
+
+Constraints
+ReadReadings gathers the readings by repeating, so it contains a for-, while-, or do-statement.
+When a read of an integer does not succeed, ReadReadings returns the stream to a usable state and removes the 
+characters that stopped the read. 
+Both acts are required: the call that returns the state removes no characters, so a function that performs only that 
+one meets the same characters again on every later read.
+Read the integers from the stream directly. std::getline and the text-to-number conversions, among them std::stoi and 
+std::atoi, are not available.
+ReadReadings is iterative. No function in your solution calls itself.
+The last line of a stream is not always followed by a newline, and your function handles a stream that ends either way.
+Your header declares every function your source defines, and your source defines every function your header declares.
+Compiled with clang++ under -std=c++20 -Wall -Wextra -Werror -pedantic. Function definitions belong in 
+src/solution.cc, not in the header. The tests are compiled with AddressSanitizer and UndefinedBehaviorSanitizer, 
+which report memory errors and some forms of undefined behavior; neither detects every invalid operation.
+
+Allowed headers:
+"solution.hpp"
+<istream>
+<vector>
+<limits>

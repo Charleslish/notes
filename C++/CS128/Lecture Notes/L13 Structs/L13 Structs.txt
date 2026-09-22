@@ -1,0 +1,59 @@
+L13 Structs
+    struct
+    Data that belongs together
+        std::vector<unsigned int> assessment_ids{7, 8, 9};
+        std::vector<int> points{88, 91, 95};
+        it does not provide an association like map does
+    Defining a struct
+        struct Score {
+            unsigned int assessment_id;
+            int points;
+            bool is_late;
+        };
+        Score entry;
+        A type defined with struct is a class whose members are public by default. 
+            Here, public means that code outside the type definition can select these members.
+    Selecting a data member
+        with the dot operator
+            entry.assessment_id = 7;
+            entry.points = 88;
+    Uninitialized primitive members
+        Score entry//assessment_id, points, is_late are uninitialized
+    In-class member initializers
+        struct Score {
+            unsigned int assessment_id = 0;
+            int points = -1;
+            bool is_late = false;
+        };
+    Initializing by position
+        Score entry{7, 88, false};//override all three defaults when declaring
+    Initializing by name
+        designated initializer begins with a dot and the member name, followed by an equals sign and its initializer
+        Score entry{.assessment_id = 7, .points = 88};
+            they must still appear in declaration order
+    A struct inside a struct
+        struct Submission {
+            Score score;
+            unsigned int attempt = 1;
+        };
+        Submission sub{{7, 88, false}, 2};    
+    Copying struct objects
+        default copying
+            Score b = a;
+    A member that manages its own storage
+    A container of structs
+        std::vector<Score> log{{7, 88, false}, {9, 95, false}};
+    Structs and functions
+    Structured bindings for struct members
+        Score entry{7, 88, false};
+        auto [id_copy, points_copy, late_copy] = entry;
+        auto& [id_ref, points_ref, late_ref] = entry;
+        points_copy = 0;
+        points_ref = 100;
+        //entry.points=points_ref=100, points_copy=0
+    Operations the compiler does not supply
+        does not define equality
+        The author of a type chooses what equality should mean (write their own function)
+        The expression std::cout << entry is also rejected
+    Choosing a struct
+        Useful when several related values form one record that we want to store, pass, or return together

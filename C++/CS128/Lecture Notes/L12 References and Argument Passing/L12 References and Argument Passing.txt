@@ -1,0 +1,59 @@
+L12 References and Argument Passing
+    Another name for an object
+            int score = 4;
+            int& points = score;
+        declares points as a reference to that object
+        A reference provides an alternative name, or alias, for an existing object
+        Assignment never rebinds the reference.
+            int home = 4;
+            int away = 9;
+            int& posted = home;
+            posted = away;//home becomes 9
+    References to const
+        const int limit = 10;
+        const int& observed_limit = limit;  // valid: read-only access
+        int& editable_limit = limit;       // error: cannot bind int& to const int
+        int level = 4;
+        const int& view = level;
+        level = 9;//valid, view = 9
+        view = 10//error
+    Arguments and parameters
+        void Zero(int& n) pass by reference 
+        change n directly
+    Modifying arguments
+    Avoiding unnecessary copies
+        use const auto&
+        const avoid modification
+        & avoid copies
+    References in range-based for-statements
+        for (int& reading : readings) 
+            reading = 0;
+        for (const auto& reading : readings) 
+            std::cout << reading << std::endl;
+    Set and map elements
+        auto& id is also accepted over set: 
+            auto deduces const int from the element access, so id has type const int&. 
+            It does not provide a way to modify the set element. 
+            The familiar const auto& id states the read-only intent explicitly.
+        For std::map<std::string, int>, the element type is std::pair<const std::string, int>
+            We can modify the mapped value through reference, but not the key.
+    Reference lifetime and invalidation
+        If the lifetime ends while the reference remains, we have a dangling reference
+        A vector can replace its element storage while the vector object itself remains alive. 
+            Its size is the number of elements it holds; 
+            its capacity is the number of elements its current allocation can accommodate without reallocation
+            To make reallocation explicit, we will use a member function: reserve()
+                readings.reserve(requested_capacity) ensures a capacity of at least requested_capacity
+            readings.capacity() + 1 requests more than the current capacity, so a successful function call forces this case
+            std::vector<int> readings{4, 8, 15};
+            int& first = readings[0];
+            readings.reserve(readings.capacity() + 1); 
+            //The original element's lifetime ends, so first no longer refers to a live element.
+            first = 3;//error
+        Erasing an element shifts the elements after it toward the beginning of the vector. 
+            References at or after the erased element become invalid
+        Grow with resize() without reallocating 
+            remain valid.
+        Shrink with resize()
+            	References to removed elements become invalid; references to retained elements remain valid.
+            

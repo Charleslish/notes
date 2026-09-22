@@ -1,0 +1,118 @@
+L16 Input and Output Streams
+    Input and output streams
+        Recall that we use std::cout to write results and std::cin to read values entered at the terminal. 
+        Both are streams, objects through which a program receives or sends a sequence of characters.
+        The type std::ostream provides output operations, std::cout is an object of that type.
+            Inserting a value such as an int into the stream converts it to characters for output. 
+        The type std::istream provides input operations, and std::cin is an object of that type. 
+            Extracting into an int reads characters and attempts to convert them to an integer value
+        Use the insertion operator << to write a value to an output stream 
+        and the extraction operator >> to read into a variable from an input stream
+    What formatted extraction consumes
+        Extraction with >> performs a formatted read.
+        With the default settings, it first skips leading whitespace, including spaces, tabs, and newlines.
+            A successful read can consume only part of the available input.
+            It then reads characters according to the target type’s conversion rules
+        Leading whitespace is discarded before the value is read.
+            With ordinary decimal integer input, extracting 42abc into an int produces 42 and leaves a as the next character
+            Success therefore does not mean that the entire input matches the format the program expects.
+    Opening and checking file streams
+        Use std::ifstream to read from a file and std::ofstream to write to one
+            Include <fstream> to declare these file stream types
+            can specify a file name in the source, or receive that name as a command-line argument.
+        Opening a file can fail, for example if the input path does not exist or the program lacks permission to access it
+            With the default stream settings, this failure is recorded in the stream state rather than 
+            automatically stopping the program. Check the stream immediately after opening it.
+        std::ifstream readings("readings.txt");
+        if (!readings) {
+            std::cerr << "could not open readings.txt" << std::endl;
+            return 1;
+        }
+        The file stream closes its file when it is destroyed at the end of its scope, so this example needs no 
+            explicit closing operation
+            When writing a file before reading it back, place the output stream in its own scope so that it 
+            closes before the input stream is opened. (put {} around the stream)
+        Once the file is open, we need to read its values and check each extraction. 
+            If the number of values is not known in advance, the outcome of the next read can determine 
+            whether the loop continues.
+    Testing each read in the loop condition
+        For a file containing an unknown number of readings, continue only while another reading can be extracted successfully.
+        The extraction expression returns the stream. Used as a condition, the stream tests true when 
+            neither a formatting failure nor a serious stream error is recorded
+        Checking readings.eof() before reading asks whether an earlier operation encountered the end, 
+            not whether the next extraction will succeed. 
+            e.g. while (!in.eof()) {in >> lap_time} would consider "10 20\n" to have 3 readings because eof() turns true after 
+                we read \n into lap_time  (which fails)
+        Putting extraction in the condition handles both endings without processing a failed read.
+            use while (in >> x)
+    Checking stream state
+        good() is true when no state flags are set. 
+        eof() checks whether an operation encountered the end of the input
+            A successful extraction can encounter the end and set only the end-of-input flag: 
+                eof() is then true and good() false but fail() is false
+                reason that loop condition checks the extraction rather than requiring good() afterwards.
+        fail() checks for a formatting or extraction failure or a serious stream error
+            e.g. cin >> number but encounter a string
+            A conversion failure can set fail() without eof()
+        bad() checks specifically for a serious stream error.
+            bad() is true also has fail() true
+    Checking values against the input format
+        {
+            std::ofstream writer("rows.txt");
+            writer << "10 20 30" << std::endl << "40 50 abc 60" << std::endl;
+        }
+        std::ifstream rows("rows.txt");
+        int first = 0;int second = 0;
+        rows >> first >> second; // 10 20
+        rows >> first >> second; // 30 40
+        rows >> first >> second; // 50 0
+        If each line represents one record, validate that line rather than letting extractions consume fields from later lines. 
+        Successful conversion alone cannot detect every malformed record.
+            e.g. Reading a negative number into an unsigned int does not reliably reject it
+    Recovering from a failed extraction
+        After a formatting failure, further extractions do not resume normally until the stream state is reset
+        The member function clear() resets the stream’s state flags.
+        Resetting the state and discarding unwanted input are separate operations.
+            clear() permits another attempt but leaves its cause in the input
+            We also need an operation that advances past the unwanted characters.
+        Use ignore() to extract and discard characters without storing them in a target variable.
+            With no arguments, it discards up to one character. With a count, it discards up to that many
+            with a count and delimiter, it also stops after consuming the delimiter
+                To discard through the next newline, use ignore(std::numeric_limits<std::streamsize>::max(), '\n')
+                std::streamsize: the biggest size that stream accepts
+                Include <limits> to use std::numeric_limits.
+        Call clear() before ignore()
+            Otherwise, the failure state prevents ignore() from discarding the unwanted input. 
+        perform extraction where the loop can examine its failure before deciding what to do next.
+        while (in.good()) {
+        int value = 0;
+        in >> value;
+        if (in.bad())
+            break;
+        if (in.fail()) {
+            if (in.eof()) 
+                break;
+            in.clear();
+            in.ignore(std::numeric_limits<std::streamsize>::max(), '\n');
+            continue;
+        }
+        readings.push_back(value);
+    }
+    Writing to a file
+        Use std::ofstream and << to write values to a file,
+            std::ofstream again(kFileName);
+            again << kTuesday << std::endl;
+        Opening an existing file with the default std::ofstream mode truncates its contents before writing begins. 
+            it covered the original contents
+        To preserve existing contents and add output at the end, pass std::ios::app when opening the file. 
+            std::ofstream added(kFileName, std::ios::app);
+            added << kMonday << std::endl;
+        The output format also determines whether values can be read back accurately.
+            With the default floating-point format and precision, output uses six significant digits
+    Summary
+        Input streams convert characters to typed values, while output streams convert values to characters.
+        Check that opening succeeds, then use extracted values only when the operation supplying them succeeds. 
+        A loop with extraction in its condition handles an unknown number of values without processing a failed read. 
+        Stream-state flags help explain why reading stopped, 
+            but successful extraction does not establish that a record matches its required format. 
+        When writing, choose between truncating and appending, and use an output format suitable for the data that must be preserved.

@@ -1,0 +1,42 @@
+L11-1 Sets
+    std::sets
+    Collections of unique values
+        A vector is a sequence container
+        A std::set is an associative container
+            it stores elements of a single type and finds each by its value rather than by an index
+    Declaring a std::set
+        #include <set>
+        empty() size()
+        std::set<int> empty_run;
+        std::set<int> finish_ids {341, 298, 355};//size() = 3
+        std::set<int> ids {4, 7, 4};
+    Growing a set with insert()
+        container.insert(value)
+        set keeps sorted order, the element is placed by its value rather than at the end
+        if the set already holds the value, the set is unchanged
+    Testing membership with contains()
+        container.contains(value)
+
+        const std::set<char> kPunctuation {',', '!', '?', '.'};
+        std::string line("Howdy, World!");
+        unsigned int marks_found = 0;
+        for (unsigned int i = 0; i < line.size(); ++i) 
+            if (kPunctuation.contains(line[i])) 
+                marks_found += 1;
+        //marks_found = 2;
+    Traversing a set
+        A set cannot be traversed with normal for-statedment
+            it has no index for a loop variable to run through, and no subscript to reach an element with
+        use range-based for-statement
+        for (const auto& id : ids) //for each id in ids
+            std::set<int> ids {42, 7, 19};
+            for (const auto& id : ids) 
+                std::cout << id << " "; 
+            //7 19 42
+            const: only readable
+            auto: a placeholder for a type
+            &: no copy is made
+    Erasing by value
+        container.erase(value)
+            removes the element holding that value and produces 1
+            

@@ -1,0 +1,83 @@
+A library keeps returned books on a shelf and requested books on a hold cart. Implement PullHolds to transfer 
+requested titles from the shelf to the cart while preserving their order. The function modifies the caller's two 
+vectors and reads a set of requested titles.
+
+Functions to implement
+Signature	Description
+void PullHolds(std::vector<std::string>& shelf, std::vector<std::string>& hold_cart, const std::set<std::string>& 
+requested);
+Provided. Declared in the starter; you write the body. Removes from shelf every title requested holds and appends 
+it to hold_cart, in shelf order. The titles that stay keep the order they had, and whatever hold_cart held before 
+the function call is still there, ahead of the titles the function call appends. A title that appears twice on the 
+shelf is pulled twice. A shelf with no titles, and a request list with no titles, both leave the two vectors as 
+they were.
+When a named container is passed by value, the parameter receives a copy of its elements. Here, shelf and hold_cart 
+are non-const reference parameters, so operations through them modify the caller's vectors. The parameter requested 
+is a reference to const, which permits membership queries without copying the set.
+
+The arguments for shelf and hold_cart must be distinct vector objects. Their order in the function call determines 
+which vector supplies titles and which receives them. Both parameters have the same type, so the compiler cannot 
+detect an accidental exchange of those arguments.
+
+Visit titles in shelf order and use requested.contains(title) to determine whether a title has been requested. A 
+traversal of the set follows the set's ordering rather than the shelf's ordering. Using a membership query for each 
+shelf title lets the shelf determine the transfer order.
+
+The resulting cart must retain its original titles ahead of the transferred titles. The shelf must retain every 
+unrequested title in its original order. Consider both requirements when deciding how to update the vectors.
+
+A title matches only when the whole string is in the request set. Comparisons distinguish uppercase and lowercase 
+characters, so "Ubik" and "ubik" are different titles. If a requested title occurs more than once on the shelf, 
+transfer every occurrence.
+
+Examples
+Example 1: One requested title moves
+std::vector<std::string> shelf{"Dune", "Emma", "Ubik"};
+std::vector<std::string> hold_cart;
+PullHolds(shelf, hold_cart, {"Emma"});
+// shelf is now {"Dune", "Ubik"}, hold_cart is now {"Emma"}
+Example 2: The cart keeps what it already held, and the shelf can empty
+std::vector<std::string> shelf{"Ubik", "Dune"};
+std::vector<std::string> hold_cart{"Solaris"};
+PullHolds(shelf, hold_cart, {"Dune", "Ubik"});
+// shelf is now {}, hold_cart is now {"Solaris", "Ubik", "Dune"}
+Example 3: A requested title that is not on the shelf
+std::vector<std::string> shelf{"Emma"};
+std::vector<std::string> hold_cart;
+PullHolds(shelf, hold_cart, {"Ubik"});
+// shelf is still {"Emma"}, hold_cart is still {}
+Constraints
+Write the function body in src/solution.cc. includes/solution.hpp provides the declaration this activity requires, 
+and that declaration must not be changed. You may add functions of your own, provided you declare each one in 
+includes/solution.hpp as well as define it in src/solution.cc. A rule below that requires a definition to contain 
+a loop or a function call means that function's own definition, not a function it calls.
+PullHolds must contain a loop. This is enforced: a definition without a for-statement, while-statement, or 
+do-statement is rejected before any test runs.
+PullHolds asks the request list whether it holds a title with contains. This is enforced: a definition that makes 
+no function call to contains on a std::set is rejected before any test runs.
+PullHolds writes through both shelf and hold_cart. This is enforced: a definition that never writes through one of 
+those two parameters is rejected before any test runs.
+Declare the parameters std::vector<std::string>&, std::vector<std::string>&, and const std::set<std::string>&, as 
+the header does. The first two carry no const because the function is there to change the caller's vectors; the 
+third carries it because the function only reads the request list.
+No function may call itself.
+Use your own loops to process the elements. Library algorithms for sorting, searching, counting, copying, 
+transforming, removing, combining, or comparing ranges are not permitted. Do not use container member functions 
+that copy a whole range of elements in one operation.
+The function reads no input and prints nothing. src/driver.cc is not graded.
+Write code that compiles without warnings, initialize and use your variables, and follow the course naming 
+conventions. Name constants with kCamelCase, test whether a container is empty with empty(), and use Boolean 
+conditions directly.
+Each function is limited to 20 lines and a clang-tidy cognitive-complexity score of 7. This score increases 
+with branches, loops, and their nesting; the grader reports any excess. Use helper functions when needed, while 
+keeping the required traversal in the named function.
+Compile with clang++ using -std=c++20 -Wall -Wextra -Werror -pedantic. The run and test programs also use 
+-fsanitize=address,undefined -fno-sanitize-recover=all. These sanitizers detect some runtime errors and stop 
+execution when they report one. An execution without a report does not establish that the program is correct.
+Allowed headers:
+
+"solution.hpp"
+<set>
+<string>
+<vector>
+<iostream>

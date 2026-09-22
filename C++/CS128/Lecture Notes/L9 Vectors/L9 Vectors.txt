@@ -1,0 +1,44 @@
+L9 Vectors
+    Collections and containers
+        A container is an object that holds other objects, its elements, all of one type, under one name
+        std::vector and std::string
+    Declaring a std::vector, filling the type's default value
+        #include <vector>
+        std::vector<type>
+        const int kRacerCount = 4;
+        const int kTankCount = 3;
+        const double kFullTank = 1.0;
+        std::vector<int> split_times;
+        std::vector<int> finish_times {341, 298, 355};
+        std::vector<int> lap_counts(kRacerCount);
+        std::vector<double> fuel_levels(kTankCount, kFullTank);//size 3 filled with kFullTank
+    Growing a vector with push_back()
+        quiz_scores.push_back(84); //append 84 to quiz_scores
+    size() and subscripting
+        To find the number of elements, call size(), which is an unsigned int
+        To read or write one element, subscript the vector with []: planes[index]
+            index: 0 ~ size()-1
+        To test whether a vector holds no elements, call the member function empty()
+    Appending to a vector with an initial size
+        std::vector<int> lap_times(kLapCount); for a constant kLapCount = 3
+        it is initialized to the default value 0 and push_back does not write into those elements.
+        e.g. lap_times.push_back(341); lap_times.push_back(298); lap_times.push_back(355);
+        std::cout << lap_times.size() << std::endl;//6
+        std::cout << lap_times[0] << std::endl;//0 instead of 341
+    Out of range is undefined behavior
+        An index outside that range does not name an element: range error
+            it may produce a garbage value, crash, or silently corrupt a neighboring value
+    Traversing a vector
+        requires a loop, written as a for-statement
+            for (unsigned int i = 0; i < planes.size(); ++i) {
+                std::cout << planes[i] << std::endl;
+            }
+        An index is declared unsigned int to match the type that size() produces, which is size_t
+        an unsigned type has no value below 0, so subtracting past 0 wraps around to the type's largest value
+    Erasing an element
+        To erase the element at a known index, write bib_numbers.erase(bib_numbers.begin() + kIndexToErase)
+        Erasing leaves no empty position in the block
+    Passing a vector to a function
+        const std::vector<int>& tank_levels: no copy is made, and the function reads the caller's vector.
+    Comparing vectors
+        == returns true iff every pair of corresponding elements matches

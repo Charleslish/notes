@@ -1,0 +1,89 @@
+Overview
+A department runs its discussion sections from two records. The registrar's record stores one section name with 
+each netid it holds, and it is a std::map from a netid to a section name. The sign-up sheet is a vector of netids 
+in the order the students signed up. A netid the record does not hold is on no roster, and a section that draws 
+fewer than two students does not run.
+
+Write SectionRosters, which returns each section that runs and the netids on its roster.
+
+Functions to Implement
+std::map<std::string, std::vector<std::string>> SectionRosters(const std::vector<std::string>& signups, const 
+std::map<std::string, std::string>& assigned);
+Returns each section that runs and the netids on its roster, in sign-up order. A netid assigned holds no pair 
+for is on no roster, and a section whose roster holds fewer than two netids does not run and is not a key of the 
+result.
+A value that is a vector: The returned map's value type is a std::vector<std::string>, so one section has one 
+vector of netids. rosters[section].push_back(netid) appends a netid to that vector, and on a section the map 
+does not yet hold, [] first inserts a pair holding an empty vector. Creating the pair is exactly what building 
+a roster wants. Append to the stored vector through the map, as rosters[section].push_back(netid) does: a vector 
+copied into a variable of its own is a separate object, and changing it leaves the map unchanged.
+
+Two orders in one result: The sections come back in key order, because a map keeps its pairs sorted by key. 
+Each roster keeps its netids in sign-up order, because a vector records the order values were appended. Section 
+names and netids compare by character code, character by character, so case matters and every uppercase letter 
+precedes every lowercase letter.
+
+A read that never writes: assigned is declared reference to const because the function only reads it, and a const 
+map provides no []. Ask assigned.contains(netid) first, and read the section with assigned.at(netid). A netid the 
+record holds no pair for is on no roster.
+
+The sections that do not run: A section cannot be judged until every sign-up has been read, so the removing 
+happens afterward. A loop traversing a map must not erase from that map: traverse rosters, record in a std::set 
+the names of the sections whose roster holds fewer than two netids, and erase them in a second loop over that set.
+
+Nothing to do: A signups with no elements, and an assigned with no pairs, both produce a map with no pairs, and so 
+does a sign-up sheet on which every section draws one student.
+
+Examples
+Example 1: A section with one student does not run
+SectionRosters({"ada", "grace", "mary"},
+               {{"ada", "DIS1"}, {"grace", "DIS1"}, {"mary", "DIS2"}})
+// returns {{"DIS1", {"ada", "grace"}}}
+Example 2: A roster is in sign-up order
+SectionRosters({"zoe", "abe", "kit"},
+               {{"abe", "LAB2"}, {"kit", "LAB2"}, {"zoe", "LAB2"}})
+// returns {{"LAB2", {"zoe", "abe", "kit"}}}
+Example 3: An unassigned netid is on no roster, and every section may be cancelled
+SectionRosters({"ada", "ben"}, {{"ada", "DIS1"}})  // returns {}
+Constraints
+Write the function body in src/solution.cc. includes/solution.hpp provides the declaration this activity requires, 
+and that declaration must not be changed. You may add functions of your own, provided you declare each one in 
+includes/solution.hpp as well as define it in src/solution.cc. A rule below that requires a definition to contain 
+a loop or a function call means that function's own definition, not a function it calls.
+SectionRosters must contain a loop. This is enforced: a definition without a for-statement, while-statement, or 
+do-statement is rejected before any test runs.
+SectionRosters looks each netid up in the registrar's record with at() behind a contains() guard. This is enforced: 
+a definition that makes no function call to contains on a std::map, or none to at, is rejected before any test runs.
+SectionRosters builds each roster in a std::map whose value type is a std::vector<std::string>, reaching each 
+section's vector with [] or growing the map with insert. This is enforced: a definition that never subscripts a 
+std::map and makes no function call to insert on one is rejected before any test runs.
+SectionRosters records the names of the sections to remove in a std::set and erases them from the map in a loop 
+over that set. This is enforced: a definition that makes no function call to erase on a std::map inside a 
+range-based for-statement over a std::set is rejected before any test runs.
+A loop traversing a map must not erase from that map. This is enforced: an erase on a map inside a range-based 
+for-statement over that same map is rejected before any test runs.
+Declare the parameters const std::vector<std::string>& and const std::map<std::string, std::string>&, as the header 
+does, because the function only reads them.
+No function may call itself.
+Work with your own loops. Library functions that sort, search, count, remove from, combine, or compare a range 
+are rejected before any test runs. Membership is tested with the map's own membership test; its other lookup 
+members, and the map member functions this course does not cover, are rejected. A built-in array, and the string 
+member functions this course does not cover, are rejected as well.
+The function reads no input and prints nothing. src/driver.cc is not graded.
+Ten of the hundred points are for clear code, two for each of five checks: the program compiles without warnings, 
+every variable you declare is initialized and used, each function stays within the course's size and complexity 
+limits, identifiers follow the course's naming conventions, and the code reads clearly. Readability and naming are 
+the two to watch. Give a number that carries a meaning a name rather than writing it as a literal, and spell a 
+constant you name kLikeThis. Ask a container empty() rather than comparing its size() with 0. Use a bool on its 
+own rather than comparing it with true or false, and do not use an int where a bool is meant.
+Compiled with clang++ under -std=c++20 -Wall -Wextra -Werror -pedantic. Function definitions belong in 
+src/solution.cc, not in the header. The tests are compiled with AddressSanitizer and UndefinedBehaviorSanitizer, 
+which diagnose memory errors and some forms of undefined behavior; neither detects every invalid operation.
+Allowed headers:
+
+"solution.hpp"
+<map>
+<set>
+<string>
+<vector>
+<iostream>

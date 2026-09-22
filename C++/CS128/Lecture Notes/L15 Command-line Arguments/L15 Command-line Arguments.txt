@@ -1,0 +1,63 @@
+L15 Command-line Arguments
+    Supplying information when a program starts
+        The words supplied after the command name are its command-line arguments.
+    From a command line to an argument list
+        writing with ""
+        Writing "" supplies an empty argument.
+        The argument list also includes the invocation name, the name used to start the program
+            e.g. ./bin/exec
+    Receiving arguments in main
+        The second form of main
+            int main(int argc, char* argv[]) 
+                int argc: How many arguments arrived
+                    An int holding how many arguments the shell supplied, at least 1
+                char* argv[] 
+                    The arguments themselves
+                    The argument entries point to C-style strings
+            A pointer holds a value that can identify an object's location.
+                Each argument entry has type char*, a pointer to a character.
+            A C-style string stores its characters consecutively and ends with a null character
+                argv[argc] holds a null pointer, it is a sentinel marking the end of the list
+    Compiler warnings about unused parameters
+        -Wextra option enables warnings about unused named parameters
+    Comparing addresses and comparing text
+        Applying == to two pointer values instead compares their addresses    
+            ./bin/exec howdy howdy
+            argv[1] == argv[2] //false
+    Copying arguments into strings
+        std::vector<std::string> arguments;
+        for (int i = 0; i < argc; ++i) {
+            std::string argument(argv[i]);
+            arguments.push_back(argument);
+        }
+    Checking user arguments before using them
+        if (arguments.size() != 4) {
+            std::cerr << "Usage: " << arguments[0] << " \"Student Name\" Credits GPA" << std::endl;
+            return 1;
+        }
+        We write the program's results to std::cout and errors about its use to std::cerr, the standard error stream
+    Converting numeric text
+        The functions std::stoi and std::stod, declared in <string>, convert text to an int and a double
+            They can convert an initial part of an argument without consuming all of it. 
+                e.g. std::stoi("12abc") produces 12
+        When no conversion is possible, these functions throw an exception
+    Passing the converted arguments to functions
+        std::vector<std::string> ArgumentsAsStrings(int argc, char* argv[]) {
+            std::vector<std::string> arguments;
+            for (int i = 0; i < argc; ++i) {
+                std::string argument(argv[i]);
+                arguments.push_back(argument);
+            }
+            return arguments;
+        }
+        When a function must build a report as text, std::to_string, also declared in <string>, 
+            converts a numeric value to a string
+        Some reporting functions instead write to a stream supplied by the caller
+            std::ostream is the standard output-stream type, declared in <ostream>
+            std::ostream& parameter refers to a stream that the function can write to
+            the caller can pass std::cout or std::cerr to this function:
+                void WriteLine(std::ostream& out, const std::string& text) {
+                    out << text << std::endl;
+                }
+            Writing WriteLine(std::cerr, "Invalid arguments."); sends the message to standard error.
+            This lets its caller choose where each kind of output goes.

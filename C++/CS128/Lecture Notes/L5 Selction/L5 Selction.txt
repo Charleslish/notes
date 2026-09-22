@@ -1,0 +1,26 @@
+L5 Selection
+    if / else if / else
+        An if statement executes a single statement, its branch, only when its condition produces true
+        A branch is one statement, so several statements become a branch only by being made into one using braces
+            A compound statement is also a block, and a block bounds the scope of anything declared inside it.
+    Two mistakes the compiler accepts
+        std::cout << (3 < 2 < 1) << std::endl; // true as it interpret as (3<2)//0 , (0<1)//1
+        quiz_score == 70 || 90 // true as it interpret 90 as true
+    De Morgan's laws
+    The switch statement
+        switch (grade) {
+            case 'A':
+            case 'B':
+                std::cout << "passed with distinction" << std::endl;
+                break;
+            /*wrong: case 'A' || 'B':*/
+            case 'C':
+                std::cout << "passed" << std::endl;
+                break;
+            default:
+                std::cout << "not passed" << std::endl;
+                break;
+            }
+        A break statement leaves the switch, or else execution continues into the next label's statements(fall-through)
+    The ternary operator ?:
+        condition ? value_if_true : value_if_false

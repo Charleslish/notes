@@ -1,0 +1,60 @@
+Overview
+The greenhouse controller reports its water tank two ways: a float sensor measures liters, and a pressure sensor 
+measures depth in meters. Both reports are the same operation, a fill percent, computed from different data, 
+so the two functions share one name. This activity adds the drain schedule, and one more responsibility: you 
+write the header yourself.
+
+Write the two PercentFull overloads and MinutesUntilEmpty, and write the header that declares them.
+
+Functions to Implement
+int PercentFull(int level_liters, int capacity_liters);
+Returns the tank's fill percent from the float sensor, as a whole percent with the fraction discarded.
+int PercentFull(double level_meters, double tank_depth_meters);
+Returns the tank's fill percent from the pressure sensor, as a whole percent truncated toward zero with 
+static_cast<int>.
+int MinutesUntilEmpty(int level, int rate);
+Returns the whole minutes of draining, at rate liters per minute, until the tank is empty; a partly used minute 
+counts as a full minute, and an already empty tank needs 0 minutes. rate is always at least 1.
+Order of operations: Multiply before dividing. An integer division performed first discards the whole answer.
+
+Truncation, not rounding: The pressure-sensor overload truncates toward zero, so a value just under a whole 
+percent reports the lower one.
+
+One name, two functions: The two overloads differ in their parameter types, and that difference is what lets one 
+name serve both sensors. Each needs its own declaration in the header and its own definition in the source.
+
+Examples
+Example 1: The float sensor, in liters
+PercentFull(9, 16)  // returns 56
+PercentFull(6, 6)   // returns 100
+Example 2: The pressure sensor, in meters
+PercentFull(2.25, 4.0)  // returns 56, not 57
+PercentFull(1.1, 4.0)   // returns 27
+Example 3: Draining the tank
+MinutesUntilEmpty(18, 5)  // returns 4
+Constraints
+Write the header. includes/solution.hpp starts empty. Write the include guard first, then a declaration for every 
+function in the table above. All of this is enforced before any test runs: the guard's #ifndef and #define must 
+name the same macro and the header must survive being included twice; #pragma once is rejected; a header missing 
+any declaration, including either PercentFull overload, is rejected.
+Write the three definitions in src/solution.cc. A definition placed in the header is rejected, and both 
+PercentFull overloads must have their own definition: one overload serving both sensors through a conversion is 
+rejected. You may add functions of your own, provided you declare each one in includes/solution.hpp as well as 
+define it in src/solution.cc; a declaration you write and never define is rejected too. A rule below that requires 
+a definition to contain a loop or a function call means that function's own definition, not a function it calls.
+None of the three reads input or prints anything. src/driver.cc calls all three and does not compile until your 
+header declares them. It is not graded.
+Ten of the hundred points are for clear code, two for each of five checks: the program compiles without warnings, 
+every variable you declare is initialized and used, each function stays within the course's size and complexity 
+limits, identifiers follow the course's naming conventions, and the code reads clearly. Readability and naming are 
+the two to watch here. The percent scale is a number that carries a meaning, so a bare 100 in either PercentFull 
+body costs those points. Name it as a constant. Spell a constant you name kLikeThis. Ask a container empty() 
+rather than comparing its size() with 0. Use a bool on its own rather than comparing it with true or false, and 
+do not use an int where a bool is meant.
+Compiled with clang++ under -std=c++20 -Wall -Wextra -Werror -pedantic. The tests are compiled with 
+AddressSanitizer and UndefinedBehaviorSanitizer, which diagnose memory errors and some forms of undefined behavior; 
+neither detects every invalid operation.
+Allowed headers:
+
+"solution.hpp"
+<iostream>

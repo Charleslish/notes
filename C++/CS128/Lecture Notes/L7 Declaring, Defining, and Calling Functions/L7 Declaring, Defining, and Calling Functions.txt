@@ -1,0 +1,54 @@
+L7 Declaring, Defining, and Calling Functions
+    Functions
+        a return type, a name, a parameter list in parentheses, and a body in braces
+        int Area(int width, int height) {
+            return width * height;
+        }
+    Declarations, definitions, and the three files
+        C++ separates the declaration of a function from its definition.
+            A declaration states the return type, the name, and the parameter list, and ends with a semicolon. 
+                The name together with the parameter list (but not including the return type) is the function's signature
+                //声明，但是不提供具体实施方法
+            A definition repeats the return type and the function signature, then places the body between braces. 
+                Every definition is also a declaration
+                //提供具体实施方法
+        In this course a function is declared in a header file, 
+            e.g., functions.hpp, and is then defined in a corresponding source file, i.e., functions.cc. 
+            Source files that call our function must #include the header file with its declaration. 
+            3 files: .hpp(customer) .cc(kitchen) driver.cc(recipe)
+                .hpp: function delcaration here; interface
+                    #ifndef AVERAGE_HPP
+                    #define AVERAGE_HPP
+                    double AverageOfTwo(int a, int b);
+                    #endif
+                .cc: function definition here
+                    #include "average.hpp"
+                    double AverageOfTwo(int a, int b) {
+                        return (a + b) / 2.0;
+                    }
+                driver.cc: main function & implementation here
+                    #include "average.hpp"
+                    #include <iostream>
+                    int main() {
+                        double result = AverageOfTwo(3, 5);
+                        std::cout << result << std::endl;
+                    }
+    Calling a function: arguments and parameters
+        The parameters belong to the function; The arguments to the function specify the values that initialize our parameters
+    The call stack
+    Pass-by-value
+        changing the value stored in the parameter will not change the value stored in the function's argument
+    return
+        does 3 things at once: evaluates its expression, delivers that value to the call site, and ends the function call
+    The thread of execution
+    Declaration before use
+        a definition placed below main does not introduce the function's name before the thread of execution passes over main.
+    A function call that changes nothing
+        Pass-by-value has a famous consequence: functions does not change its caller's objects
+        Writing & between the type and the parameter's name makes the parameter a reference
+            void Swap(int& first, int& second) {
+                const int held = first;
+                first = second;
+                second = held;
+            }
+        const int& is a reference to const, which lets a function read its argument without copying it while forbidding modification.

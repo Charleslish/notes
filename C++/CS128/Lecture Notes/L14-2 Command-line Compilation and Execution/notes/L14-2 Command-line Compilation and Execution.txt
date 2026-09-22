@@ -1,0 +1,66 @@
+L14-2 Command-line Compilation and Execution
+    From source code to an executable
+        The source files and the executable are separate files.
+    The project files and working directory
+        mp-1/
+        |-- bin/
+        |-- includes/
+        |   `-- solution.hpp
+        `-- src/
+            |-- driver.cc
+            `-- solution.cc
+    Compiling and running the project
+        Each unquoted backslash immediately followed by a newline continues the same command on the next line
+        clang++ \
+        -std=c++20 \
+        -I ./includes \
+        -Wall \
+        -Wextra \
+        -Werror \
+        -pedantic \
+        -fsanitize=address,undefined \
+        -fno-sanitize-recover=all \
+        -g \
+        -o ./bin/exec \
+        ./src/driver.cc \
+        ./src/solution.cc
+        -std=c++20	Use the C++20 standard.
+        -I ./includes	Tell the compiler to look for header files in the ./includes directory.
+        -Wall	Enable common compiler warnings.
+        -Wextra	Enable additional compiler warnings.
+        -Werror	Treat warnings as errors, so warnings will prevent compilation from succeeding.
+        -pedantic	Enforce stricter compliance with the C++ standard.
+        -fsanitize=address,undefined	Enable AddressSanitizer and UndefinedBehaviorSanitizer to detect memory errors and undefined behavior.
+        -fno-sanitize-recover=all	Stop the program when a sanitizer error is detected instead of continuing execution.
+        -g	Include debugging information for debugging tools.
+        -o ./bin/exec	Specify the output executable file as ./bin/exec.
+        With these files and options, a successful build produces bin/exec without printing any warnings or error messages
+        Run that executable by writing its path as the command
+    What the compilation command does
+        1.compiler -> processes each source file -> translation unit
+        2.Compilation produces an object file
+            containing object code and information used during linking.
+        3.The linker combines the required object files and libraries into the executable
+    Compile-time errors and compiler warnings
+        A compile-time error is an error detected during compilation
+            missing semicolon, undeclared variable, supplying an incompatible type, etc
+        link-time error 
+            An error detected during linking, such as missing a required library or undefined symbol.
+    Run-time errors and sanitizer checks
+        Compilation does not detect every such error
+            Signed integer overflow is one example
+        The option -fsanitize=address,undefined adds instrumentation during compilation to detect selected errors during execution
+            AddressSanitizer checks for several memory errors, including some uses of references to objects that no longer exist
+            UndefinedBehaviorSanitizer checks for undefined behavior, such as using an uninitialized variable or dividing by zero
+        The option -g generates debugging information that helps debuggers and other tools relate executable code to source locations.
+    Recompiling after an edit
+        If we edit its source and run the existing executable without rebuilding, the executable still contains code from the earlier build.
+    Diagnosing command and path errors
+    Missing headers and definitions    
+    Summary
+        1. switch to the directory containing the project files
+            pd
+        2. compile the project files with the clang++ command
+            command.txt
+        3. run the executable
+            ./bin/exec

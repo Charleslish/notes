@@ -1,0 +1,14 @@
+L3 Type conversions
+    ((int)+(double)) = (double)
+    ((int)+(int)) = (int) by Truncation
+    implicit conversion: char and bool converts to int in arithmetic
+    explicit conversion: static_cast<type>(expression)
+    Widening and narrowing: int <-> double
+    char and bool in arithmetic
+        In an arithmetic expression, a char operand and a bool operand are each converted to int
+        e.g.
+            char letter_grade = 'B';//66 in ASCII, character encoding
+            std::cout << letter_grade + 1 << std::endl; // 67
+    Summary
+        static_cast<double>(sum) / 2 is 84.5
+        static_cast<double>(sum / 2) is 84

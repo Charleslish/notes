@@ -1,0 +1,54 @@
+Overview
+A gradebook is a vector of vectors with one row per student and one column per quiz, so gradebook[student][quiz] 
+is one student's score on one quiz. A row holds a score only for the quizzes a student has submitted, so a 
+student who has not submitted every quiz has a shorter row than the others. The scores are stored student by 
+student, but a report on the quizzes needs them quiz by quiz: every score on the first quiz, then every score 
+on the second quiz, and so on through the last quiz anyone has submitted.
+
+Write ScoresByQuiz, which returns the scores of gradebook quiz by quiz as a vector of vectors with one row per 
+quiz: row quiz of the result holds every score in column quiz of gradebook, from the first student who submitted 
+that quiz to the last.
+
+Functions to Implement
+std::vector<std::vector<int>> ScoresByQuiz(const std::vector<std::vector<int>>& gradebook);
+Returns the scores of gradebook quiz by quiz, one row per quiz, each row in student order.
+Rows and columns trade places: The result has one row for every column of gradebook, and the last column is the 
+last index of the longest row. The rows of gradebook may hold different numbers of elements. A row of gradebook 
+contributes to a column only when it holds an element at that index, so the rows of the result may differ in size 
+as well.
+
+Nothing to report: A gradebook with no rows, and a gradebook whose rows are all empty, both produce a vector of 
+vectors with no rows.
+
+Examples
+Example 1: Three students who have submitted four, two, and one quiz
+ScoresByQuiz({{88, 64, 95, 72}, {55, 79}, {96}})  // returns {{88, 55, 96}, {64, 79}, {95}, {72}}
+Example 2: The same three students in a different order
+ScoresByQuiz({{96}, {55, 79}, {88, 64, 95, 72}})  // returns {{96, 55, 88}, {79, 64}, {95}, {72}}
+Example 3: Two students who have submitted every quiz
+ScoresByQuiz({{88, 64, 95}, {55, 79, 72}})  // returns {{88, 55}, {64, 79}, {95, 72}}
+Constraints
+Write the definition in src/solution.cc. includes/solution.hpp provides the declaration this activity requires, 
+and that declaration must not be changed. You may add functions of your own, provided you declare each one in 
+includes/solution.hpp as well as define it in src/solution.cc. A rule below that requires a definition to contain 
+a loop or a function call means that function's own definition, not a function it calls.
+ScoresByQuiz must contain a loop. A submission without one is rejected before any test runs.
+No function may call itself.
+Build the result with your own loops. Library functions that copy, transform, rearrange, or search a range are 
+rejected before any test runs.
+The function reads no input and prints nothing. src/driver.cc is not graded.
+Ten of the hundred points are for clear code, two for each of five checks: the program compiles without warnings, 
+every variable you declare is initialized and used, each function stays within the course's size and complexity 
+limits, identifiers follow the course's naming conventions, and the code reads clearly. Readability and naming are 
+the two to watch. Give a number that carries a meaning a name rather than writing it as a literal, and spell a 
+constant you name kLikeThis. Ask a container empty() rather than comparing its size() with 0. Use a bool on its 
+own rather than comparing it with true or false, and do not use an int where a bool is meant.
+Compiled with clang++ under -std=c++20 -Wall -Wextra -Werror -pedantic. Function definitions belong in 
+src/solution.cc, not in the header. The tests are compiled with AddressSanitizer and UndefinedBehaviorSanitizer, 
+so a subscript past the end of a row, or a subscript that names a row the gradebook does not hold, is reported as 
+an error instead of quietly producing a number.
+Allowed headers:
+
+"solution.hpp"
+<vector>
+<iostream>

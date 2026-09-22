@@ -1,0 +1,12 @@
+Command reference
+The commands below are the ones needed for this activity. Interpret each relative pathname from the current 
+working directory.
+
+pwd prints the working directory's absolute pathname.
+ls lists a directory's visible entries; ls -a also includes hidden entries, . and ...
+cd path changes the working directory. cd .. selects its parent, and cd ~ selects home.
+cat path displays a file's contents.
+mv source destination moves or renames a file; cp source destination copies it. An existing destination 
+directory receives the file under its original name.
+touch path creates an empty file if the pathname is absent; it preserves the contents of an existing file.
+rm path removes a file. rmdir path removes an empty directory.

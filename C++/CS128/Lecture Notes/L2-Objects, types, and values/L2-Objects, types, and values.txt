@@ -1,0 +1,4 @@
+L2 Objects, types, and values
+    scope
+    constexpr double kPi = 3.14
+    const int

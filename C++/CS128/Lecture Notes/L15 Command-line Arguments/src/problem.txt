@@ -1,0 +1,91 @@
+Overview
+A laboratory records integer temperature readings for a named bench. Write functions that read the supplied 
+arguments, validate the readings, and report the highest reading.
+
+The project mp-6 is staged in /home/coder when you press Run. The workspace provides the source and header 
+files for this layout:
+
+mp-6/
+|-- bin/
+|-- includes/
+|   `-- solution.hpp
+`-- src/
+    |-- driver.cc
+    `-- solution.cc
+Implement the five functions declared in includes/solution.hpp by completing their bodies in src/solution.cc. 
+Leave the provided src/driver.cc unchanged. It converts the arguments with ArgumentsAsStrings and passes the 
+resulting vector to the reporting function.
+
+Functions to Implement
+Function	Contract
+std::vector<std::string> ArgumentsAsStrings(int argc, char* argv[])	Return one string for each of the argc 
+argument entries, in order, including the invocation name at index 0. Preserve spaces and empty arguments. 
+Do not include the null-pointer sentinel. The inputs have the form supplied to main; the tests may also supply 
+argc == 0, for which the result is an empty vector.
+std::string UsageMessage(const std::string& program_name)	Return "Usage: " followed by program_name and " 
+<bench> <reading> [reading ...]". Do not append a newline. Preserve the supplied name exactly.
+bool IsWholeNumber(const std::string& text)	Return true exactly when the text contains one or more decimal digits, 
+optionally preceded by one minus sign. Negative integers are accepted. Empty text, a lone minus sign, a plus sign, 
+whitespace, a decimal point, and other nondigit characters are rejected. Leading zeros are allowed. This function 
+checks the text format; it does not convert the value or check its range.
+int HighestReading(const std::vector<std::string>& readings)	Return the greatest numeric reading. The vector is 
+nonempty, every entry has the format accepted above, and each value fits in int. Convert before comparing. All 
+readings can be equal or negative.
+int ReportReadings(const std::vector<std::string>& arguments, std::ostream& out, std::ostream& err)	The vector 
+contains at least its invocation-name element. Require a bench name and at least one reading. If either is missing, 
+write UsageMessage(arguments.at(0)) and a newline to err, write nothing to out, and return a nonzero value. 
+Otherwise, treat element 1 as the bench name and the remaining elements as readings. Examine readings in order; 
+for the first invalid one, write its text followed by " is not a reading.\n" to err, write nothing to out, and 
+return a nonzero value. If all readings are valid, write the bench name, ": highest reading ", the greatest 
+reading, and a newline to out; write nothing to err and return 0. An empty bench name is accepted.
+The std::ostream& parameters refer to output streams. The provided driver passes std::cout for results and 
+std::cerr for errors, then returns the status from ReportReadings. Every reading with valid integer text 
+supplied by this activity fits in int; you do not need to handle numeric range exceptions.
+
+Examples
+[coder@localhost] ~/mp-6 $ ./bin/exec "Sixth Floor" 12 30 7
+Sixth Floor: highest reading 30
+[coder@localhost] ~/mp-6 $ ./bin/exec Sixth Floor 12 30 7
+Floor is not a reading.
+[coder@localhost] ~/mp-6 $ ./bin/exec "" 5
+: highest reading 5
+[coder@localhost] ~/mp-6 $ ./bin/exec "North Bay" -4 -19
+North Bay: highest reading -4
+[coder@localhost] ~/mp-6 $ ./bin/exec
+Usage: ./bin/exec <bench> <reading> [reading ...]
+The quoted bench name gives four user arguments: the name and three readings. Without quotes, the command gives 
+five user arguments; Sixth becomes the bench name and Floor is the first invalid reading.
+
+Running Your Program
+arguments.txt contains commands for the Run button and is not graded. Run compiles a fresh copy of the project 
+and processes the commands in order, starting in /home/coder. The supplied cd mp-6 changes the working directory 
+for later commands. Edit the executable commands to try different inputs.
+
+The activity supports cd, paths to executables in the project's bin directory, and cp with paths inside the 
+project. Spaces and quotation marks work as in the examples. This is a restricted command runner, not a complete 
+shell: it rejects patterns, substitutions, redirection, and multiple commands on one line. Some special characters 
+are rejected even within quotes. Tests can supply such characters directly to your functions; preserve them as 
+ordinary argument text.
+
+Constraints and Grading
+Keep the required function declarations unchanged. Any additional functions must be declared in 
+includes/solution.hpp and defined in src/solution.cc. Do not define functions in the header. The grader checks the 
+provided driver against its own copy.
+Convert argument entries to strings in ArgumentsAsStrings. Work with the converted strings in the remaining 
+functions. Use an int index when comparing with argc; retain the course's unsigned int convention for vector 
+indexes.
+Use your own loops for character validation and finding the greatest reading. std::stoi is allowed. Library 
+sorting, searching, counting, range-processing, character-classification, and C-style string or conversion 
+functions are not permitted.
+Ten points are allocated to five clear-code checks, two points each: compilation without warnings, compiler 
+checks for unused variables and uninitialized reads, function size and complexity, naming, and readability. 
+These checks help identify mistakes; they do not prove that every execution is valid. Give meaningful quantities 
+named constants, follow the kLikeThis constant naming convention, use empty() to test whether a container is 
+empty, and use Boolean expressions directly.
+The functional tests carry ninety points. Ten helper-function groups carry four points each; five ReportReadings 
+groups carry ten points each. Tests supply argument lists directly and check the specified results; they do not 
+score your arguments.txt transcript.
+The course build uses -std=c++20 -Wall -Wextra -Werror -pedantic -fsanitize=address,undefined 
+-fno-sanitize-recover=all -g. Run permits unused parameters in unfinished function bodies; the clear-code 
+compilation check does not.
+Allowed headers: "solution.hpp", <iostream>, <ostream>, <string>, <vector>.

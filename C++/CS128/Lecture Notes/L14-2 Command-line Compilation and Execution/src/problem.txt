@@ -1,0 +1,50 @@
+Overview
+The project mp-1 contains a program that adds the cartons in stock to the cartons delivered. 
+Its source files are ready to compile, but its bin directory is empty. Your task is to compile both source 
+files and run the resulting executable.
+
+mp-1/
+|-- bin/
+|-- includes/
+|   `-- solution.hpp
+`-- src/
+    |-- driver.cc
+    `-- solution.cc
+    
+The workspace file tabs show the source and header files. driver.cc contains main, solution.hpp declares the 
+helper function, and solution.cc defines that function. The commands place the executable in bin.
+
+Write the commands in commands.txt, in the order you want them executed. Run and Grade each create a fresh 
+project from the supplied files, then begin reading commands from /home/coder. Run displays the commands, 
+their output, and any warnings or error messages; a failed command does not prevent the next line from being 
+attempted.
+
+This activity supports cd, pwd, ls, cat, mkdir, clang++, and executables inside the project's bin directory. 
+You can use quoted arguments, comments, a backslash immediately followed by a newline, ~ for the home directory, 
+and filename patterns. Paths must stay within the activity home directory. Write one command per line; pipelines, 
+redirection, variable substitutions, and command substitutions are not supported.
+
+What to Do
+Change the working directory to mp-1.
+Compile src/driver.cc and src/solution.cc, using includes as the project header search directory and bin/exec 
+as the output path.
+Use the course options below. Keep their checks enabled; a later option must not disable a required warning or 
+sanitizer check.
+Run bin/exec after compilation succeeds.
+The required options are:
+
+-std=c++20 -Wall -Wextra -Werror -pedantic -fsanitize=address,undefined -fno-sanitize-recover=all -g
+Supply the paths for -I, -o, and the two source inputs. Option order, supported equivalent path forms, and 
+quoting do not determine the grade; the commands must compile and execute the required program.
+
+Constraints and Grading
+Write your solution in commands.txt. Grading compiles its own copies of both source files and the header, so 
+edits to them have no effect. Equivalent supported command spellings are accepted; the required computations, 
+input files, options, and output paths must remain correct.
+
+Requirement	Points
+An executable compiled to bin/exec	25
+That executable runs and produces the supplied program's output	25
+The successful build uses the required course options	20
+The executable contains debugging information and sanitizer support	10
+Your commands run the compiled program	20

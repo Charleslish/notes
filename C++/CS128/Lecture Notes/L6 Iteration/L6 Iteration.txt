@@ -1,0 +1,16 @@
+L6 Iteration
+    Repetition and the while statement
+        One execution of the body is an iteration
+    Increment and decrement
+        ++i produces the value after the increment, and the postfix expression i++ produces the old value
+        int i = 5;
+        int a = i++;//5
+        int b = ++i;//7
+    The for statement
+    The do-while statement
+        executes its body first and evaluates its condition after, so the body is always entered at least once
+        do {
+            std::cout << count << " ";
+            ++count;
+        } while (count < kLimit);
+    break and continue

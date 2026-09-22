@@ -1,0 +1,25 @@
+L10-2 Vector of Vectors
+    std::vector<std::vector<int>> is a vector of vectors
+    Declaring a vector of vectors
+        const unsigned int kStudentCount = 2;
+        const unsigned int kAssignmentCount = 3;
+        const int kStartingScore = 0;
+
+        std::vector<std::vector<int>> gradebook(kStudentCount,
+                                        std::vector<int>(kAssignmentCount, kStartingScore));
+        std::vector<std::vector<int>> roster(kStudentCount);
+    Growing a vector of vectors
+        gradebook.push_back(new_row)  gradebook[row].push_back(value)
+    Double subscripting
+    Visiting every element
+        nested for-statement
+    Erasing a row
+        gradebook.erase(gradebook.begin() + row)
+        gradebook[row].erase(gradebook[row].begin() + col)
+    Vectors of vectors and functions
+        const std::vector<std::vector<int>>& gradebook
+        // Returns the sum of every score in gradebook.
+        int ScoreTotal(const std::vector<std::vector<int>>& gradebook);
+        // Returns a vector of vectors whose rows are the rows of gradebook in reverse order.
+        std::vector<std::vector<int>> RowsReversed(const std::vector<std::vector<int>>& gradebook);
+    A computation over every element

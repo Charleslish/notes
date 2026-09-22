@@ -1,0 +1,16 @@
+L10-1 Strings 
+    std::string is a container of char
+        #include <string>
+        size() empty() push_back() 
+    The characters in memory
+        0 ~ size()-1
+        A string declared without an initializer is not left indeterminate
+    String concatenation
+        "A" + "B" = "AB"
+    Comparing strings
+        stored == typed produces true exactly when the sizes match and every pair of corresponding characters matches
+    Passing a string to a function
+        const std::string& line
+    Erasing while traversing
+        container.erase(container.begin() + index)
+            every later character moves one position toward the front, and the size shrinks by one

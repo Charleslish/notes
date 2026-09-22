@@ -1,0 +1,61 @@
+Overview
+A greenhouse controller runs the irrigation pump, forecasts vine growth, and cross-checks its paired moisture 
+sensors. Each job is one function: a computation with a guard, a loop that rotates two days of state, and a 
+compound condition.
+
+Write MinutesToFill, GrowthOn, and ReadingsAgree, the three functions the controller runs.
+
+Functions to Implement
+int MinutesToFill(int level, int capacity, int rate);
+Returns the whole minutes of pumping needed for the tank to hold at least capacity liters, filling at rate liters 
+per minute; a partly used minute counts as a full minute. A tank already at or above capacity needs 0 minutes. 
+rate is always at least 1.
+int GrowthOn(int day, int first, int second);
+Returns the vine's new-leaf count on the given day. Day 0 grows first leaves, day 1 grows second, and every later 
+day grows the sum of the previous two days. day is 0 through 30; first and second are 0 through 10.
+bool ReadingsAgree(int first_reading, int second_reading, int tolerance);
+Returns whether the two readings differ by at most tolerance, in either direction. A difference equal to the 
+tolerance agrees, and either reading may be the larger. tolerance is never negative.
+Where each piece goes: includes/solution.hpp declares all three and is submitted unchanged. Declarations live in 
+the header, definitions in the source file, and src/driver.cc reaches both through one #include.
+
+The boundaries: An exact multiple of rate needs no extra minute, day 0 and day 1 are the seeds themselves, and a 
+difference equal to the tolerance agrees.
+
+Two days of state, rotated: GrowthOn keeps the previous two days' counts and moves them forward one day at a time, 
+so nothing before those two days needs to be kept.
+
+Examples
+Example 1: A partly used minute counts as a full one
+MinutesToFill(0, 22, 6)   // returns 4: three full minutes deliver
+                          // 18 liters, and the last 4 need a fourth
+MinutesToFill(18, 18, 6)  // returns 0
+Example 2: Seed days and a later day
+GrowthOn(2, 3, 8)  // returns 11
+GrowthOn(0, 3, 8)  // returns 3
+Example 3: A difference at and past the tolerance
+ReadingsAgree(20, 24, 4)  // returns true
+ReadingsAgree(20, 25, 4)  // returns false
+Constraints
+Write all three function bodies in src/solution.cc. includes/solution.hpp provides the declarations this activity 
+requires, and those declarations must not be changed. You may add functions of your own, provided you declare each 
+one in includes/solution.hpp as well as define it in src/solution.cc. A rule below that requires a definition to 
+contain a loop or a function call means that function's own definition, not a function it calls.
+GrowthOn must contain a loop. This is enforced: a definition without a for-statement, while-statement, or 
+do-statement is rejected before any test runs.
+No function may call itself. This is enforced: the rotation is written with a loop, not recursion.
+None of the three reads input or prints anything. src/driver.cc calls all three with values you may change to 
+experiment, and is not graded.
+Ten of the hundred points are for clear code, two for each of five checks: the program compiles without warnings, 
+every variable you declare is initialized and used, each function stays within the course's size and complexity 
+limits, identifiers follow the course's naming conventions, and the code reads clearly. Readability and naming are 
+the two to watch. Give a number that carries a meaning a name rather than writing it as a literal. Spell a constant 
+you name kLikeThis. Ask a container empty() rather than comparing its size() with 0. Use a bool on its own rather 
+than comparing it with true or false, and do not use an int where a bool is meant.
+Compiled with clang++ under -std=c++20 -Wall -Wextra -Werror -pedantic. Function definitions belong in 
+src/solution.cc, not in the header. The tests are compiled with AddressSanitizer and UndefinedBehaviorSanitizer, 
+which diagnose memory errors and some forms of undefined behavior; neither detects every invalid operation.
+Allowed headers:
+
+"solution.hpp"
+<iostream>

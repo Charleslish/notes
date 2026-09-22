@@ -1,0 +1,73 @@
+A sensor log stores each sensor identifier, temperature, and validity flag in one Reading object. Implement 
+BestReading to return the valid reading with the highest temperature and CountValid to report how many readings 
+are valid. Both functions read the log without modifying it.
+
+Provided type
+The definition of Reading is provided in includes/reading.hpp. Its members appear in the order shown below.
+
+Data member	Type	Description
+sensor_id	unsigned int	Provided. The identifier of the sensor that reported the reading. Its default member 
+initializer is 0.
+celsius	int	Provided. The recorded temperature, which may be negative, zero, or positive. Its default member 
+initializer is 0.
+is_valid	bool	Provided. Whether the reading is valid. Its default member initializer is false.
+Functions to implement
+Return type	Declaration	Description
+______	
+BestReading(______ log);
+Return the complete valid Reading with the highest celsius. Ignore readings whose is_valid is false, regardless 
+of their temperatures. If the highest valid temperature occurs more than once, return the first such reading. 
+If the log is empty or has no valid reading, return a Reading with member values 0, 0, and false. Do not modify 
+the log.
+unsigned int	
+CountValid(______ log);
+Return the number of elements whose is_valid is true. An empty log returns 0. Do not modify the log.
+The argument named log has type std::vector<Reading>. For each parameter, choose the form that permits reading 
+the vector without copying its elements. For the return type of BestReading, choose a form that can return either 
+a selected reading or a newly created default result.
+
+A declaration such as Reading result{}; uses the default member initializers. This object represents the result 
+when the log has no valid reading. A valid temperature of 0 or a negative temperature must still be considered; 
+validity is determined by is_valid, not by the temperature.
+
+Examples
+Example 1: The highest valid reading
+std::vector<Reading> log{{2, 15, true}, {6, 27, true}, {10, 9, true}};
+Reading best = BestReading(log);
+// best.sensor_id is 6, best.celsius is 27, best.is_valid is true
+// CountValid(log) is 3
+Example 2: A higher reading that is not valid
+std::vector<Reading> log{{4, 19, true}, {12, 58, false}};
+Reading best = BestReading(log);
+// best.sensor_id is 4, best.celsius is 19
+// sensor 12 recorded 58, but that reading is not valid
+// CountValid(log) is 1
+Example 3: Nothing in the log is valid
+std::vector<Reading> log{{60, 35, false}, {62, -8, false}};
+Reading best = BestReading(log);
+// best.sensor_id is 0, best.celsius is 0, best.is_valid is false
+// CountValid(log) is 0
+Constraints
+Declare the functions in includes/solution.hpp and define them in src/solution.cc. Choose the parameter forms 
+and the return type of BestReading from the requirements above. Incorrect forms are rejected; the diagnostic 
+identifies the function without supplying the required form. You may add helper functions; declare each helper 
+in the header and define it in the source file.
+Submit includes/reading.hpp unchanged. An edited copy is rejected before the functional tests run.
+Traverse the input with your own loop. Each required function must contain a for-statement, while-statement, or 
+do-statement in its own definition; a loop only in a helper does not satisfy this requirement. Library algorithms 
+that search, count, sort, select, copy, or transform a range are not permitted.
+For local testing, use src/driver.cc to call your functions and print their returned results. This driver is not 
+graded. Its function calls do not compile until you supply the declarations and definitions.
+Write clear code: initialize and use your variables, choose descriptive identifiers, and keep functions within the 
+course size and complexity limits. Name constants in the form kLikeThis. Prefer empty() to comparing a container's 
+size with zero, and use Boolean expressions directly.
+The course compiler is clang++ with -std=c++20 -Wall -Wextra -Werror -pedantic. Compiler warnings affect the 
+clear-code checks. When using an index variable, declare it as unsigned int and compare it with size(). The 
+functional tests use AddressSanitizer and UndefinedBehaviorSanitizer; these tools diagnose some invalid operations, 
+but do not detect every error.
+Allowed headers:
+
+"solution.hpp"
+"reading.hpp"
+<vector>
+<iostream>

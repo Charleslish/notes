@@ -1,0 +1,65 @@
+Overview
+A course reports each quiz score in bands, notes whether the score includes partial credit, 
+and decides whether the student must file a study plan. Each of those decisions selects one outcome from several, 
+and each is written with a different construct: an if / else if / else chain over named constants, 
+the remainder operator, and a compound condition.
+
+Write QuizBand, AwardsPartialCredit, and RequiresStudyPlan, the three functions that make those decisions.
+
+Functions to Implement
+char QuizBand(int quiz_score);
+Returns the band the score falls in: 'h' when the score has reached 90, 'p' at 70 through 89, 
+'c' at 50 through 69, and 'a' below 50. A score may be negative.
+
+bool AwardsPartialCredit(int quiz_score);
+Returns whether the score includes partial credit. Every question is worth 5 points, so a score that is not a 
+whole number of questions includes partial credit.
+
+bool RequiresStudyPlan(int quiz_score, bool attended_review);
+Returns whether a study plan is required. A plan is required unless the score has reached 70 and the review 
+session was attended.
+
+Order of the conditions: QuizBand is a single if / else if / else chain. 
+The order of the conditions is part of the meaning: a score of 95 satisfies three of the four bands and reports 
+only 'h'.
+
+Reaching a cutoff: A score equal to a cutoff has reached it, so 90 is band 'h' and 70 is band 'p'.
+
+Named cutoffs: Name every cutoff as a constant. A bare 90 written into a condition costs the readability points.
+
+Examples
+Example 1: Bands at and below a cutoff
+QuizBand(94)  // returns 'h'
+QuizBand(61)  // returns 'c'
+
+Example 2: Whole questions and partial credit
+AwardsPartialCredit(63)  // returns true
+AwardsPartialCredit(75)  // returns false
+
+Example 3: A passing score with and without the review
+RequiresStudyPlan(88, true)   // returns false
+RequiresStudyPlan(88, false)  // returns true
+
+Constraints
+Write all three function bodies in src/solution.cc. includes/solution.hpp provides the declarations this activity 
+requires, and those declarations must not be changed. You may add functions of your own, provided you declare 
+each one in includes/solution.hpp as well as define it in src/solution.cc. A rule below that requires a definition 
+to contain a loop or a function call means that function's own definition, not a function it calls.
+
+None of the three reads input or prints anything. src/driver.cc calls all three with values you may change to 
+experiment, and is not graded.
+Ten of the hundred points are for clear code, two for each of five checks: the program compiles without warnings, 
+every variable you declare is initialized and used, each function stays within the course's size and complexity 
+limits, identifiers follow the course's naming conventions, and the code reads clearly. Readability and naming are 
+the two to watch here. Every cutoff in this activity is a number that carries a meaning, so give each one a name 
+rather than writing it as a literal. Spell a constant you name kLikeThis. Ask a container empty() rather than 
+comparing its size() with 0. Use a bool on its own rather than comparing it with true or false, and do not use an 
+int where a bool is meant.
+
+Compiled with clang++ under -std=c++20 -Wall -Wextra -Werror -pedantic. Function definitions belong in 
+src/solution.cc, not in the header. The tests are compiled with AddressSanitizer and UndefinedBehaviorSanitizer,
+which diagnose memory errors and some forms of undefined behavior; neither detects every invalid operation.
+Allowed headers:
+
+"solution.hpp"
+<iostream>

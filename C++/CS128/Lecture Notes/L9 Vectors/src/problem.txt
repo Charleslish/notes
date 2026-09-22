@@ -1,0 +1,60 @@
+Overview
+In this activity, you will implement RotateLeft, which returns the elements of a std::vector<int> rotated a 
+given number of positions to the left. A schedule board cycles through its entries the same way: the entry at the 
+front moves to the back, and everything else steps forward.
+
+Functions to Implement
+std::vector<int> RotateLeft(const std::vector<int>& values, unsigned int no_rotations);
+Returns the elements of values rotated no_rotations positions to the left.
+A whole turn returns the elements unchanged: Rotating by 0, by exactly the size, or by any multiple of the size 
+produces the elements in their original order. Rotating an empty vector produces an empty vector.
+
+Counts past the size wrap: A rotation count larger than the size wraps around, so only the remainder after 
+dividing by the size affects the result.
+
+Examples
+Example 1: One rotation wraps the first element to the back
+Before	4	9	2
+Index	0	1	2
+After	9	2	4
+Index	0	1	2
+Example 2: A count past the size lands on the remainder
+Five rotations of a four-element vector land where one rotation would, because 5 divided by 4 leaves a remainder 
+of 1.
+
+Before	3	6	9	12
+Index	0	1	2	3
+After	6	9	12	3
+Index	0	1	2	3
+Example 3: Nothing to rotate
+RotateLeft({}, 5)  // returns an empty vector
+Constraints
+Write the function body in src/solution.cc. The provided header includes/solution.hpp declares the function, 
+and that declaration must not be changed. You may add functions of your own, provided you declare each one in 
+includes/solution.hpp as well as define it in src/solution.cc. A rule below that requires a definition to contain 
+a loop or a function call means that function's own definition, not a function it calls.
+RotateLeft must contain a loop. This is enforced: a definition without a for, while, or do-while statement is 
+rejected before any test runs.
+No function may call itself.
+The rotation is your own loop over the elements. Library functions that rotate, copy, or rearrange a range are 
+rejected before any test runs, and so are the std::vector members this course does not cover. A std::vector 
+constructed from a pair of iterators is rejected as well. Build the result one element at a time with push_back, 
+or size it first and write each element by index.
+no_rotations may be as large as the largest value an unsigned int can hold. Reduce the rotation count against the 
+size before any element moves. Repeating a one-position rotation no_rotations times is far too slow to finish.
+Handle the boundaries: the empty vector, a rotation of 0, a rotation equal to the size, and counts far past the size.
+RotateLeft reads no input and prints nothing. src/driver.cc is not graded.
+Ten of the hundred points are for clear code, two for each of five checks: the program compiles without warnings, 
+every variable you declare is initialized and used, each function stays within the course's size and complexity 
+limits, identifiers follow the course's naming conventions, and the code reads clearly. Readability and naming are 
+the two to watch. Give a number that carries a meaning a name rather than writing it as a literal, and spell a 
+constant you name kLikeThis. Ask a container empty() rather than comparing its size() with 0. Use a bool on its 
+own rather than comparing it with true or false, and do not use an int where a bool is meant.
+Compiled with clang++ under -std=c++20 -Wall -Wextra -Werror -pedantic. Function definitions belong in 
+src/solution.cc, not in the header. The tests are compiled with AddressSanitizer and UndefinedBehaviorSanitizer, 
+which diagnose memory errors and some forms of undefined behavior; neither detects every invalid operation.
+Allowed headers:
+
+"solution.hpp"
+<vector>
+<iostream>

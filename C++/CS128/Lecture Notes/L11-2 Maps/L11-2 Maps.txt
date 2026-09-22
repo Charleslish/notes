@@ -1,0 +1,71 @@
+L11-2 Maps
+    std::map
+    From membership to association
+        std::map stores key-value pairs.
+        Each key appears at most once, and looking up a key produces the value stored with it
+    Declaring a std::map
+        #include <map>
+        A declaration names two types between angle brackets, the key type and then the value type,
+        std::map<std::string, int> inventory;
+        std::map<std::string, int> ages {{"grace", 51}, {"ada", 36}};
+        size() empty()
+        a map keeps its pairs in sorted order, and the order is decided by the keys alone
+    Growing a map with insert()
+        container.insert({key, value})
+        if the key is already present, the map is unchanged and the stored value remains
+    Reading with at()
+        ages.at("ada")//36
+        at() never inserts: 
+            it produces the stored value, and a missing key stops the program rather than changing the map
+        Whether a key is present at all is asked as it is asked of a set: 
+            contains(key) produces true exactly when the map holds the key
+    Writing with []
+        The statement inventory["apples"] = 6
+            stores 6 with the key "apples", creating the pair if the key is new and overwriting the value if it is not
+    The read that writes
+        std::map<std::string, int>
+        [] on a missing key writes
+        If a key is not found, it is entered into the map with a default value for its value, 
+            and [] produces that value: [] is little more than a convenient notation for insert()
+        [] for building a map, overwriting a value, or counting
+        Reading a map:
+            with at() or 
+            behind a contains() guard and reserves [] for statements that write, or
+            find()
+        const std::map<std::string, int> ages {{"ada", 36}};
+        std::cout << ages["ada"] << std::endl;
+        //error, [] may insert a pair, and a const map cannot change, so a const map provides no []. 
+    Traversing a map
+        for (const auto& [item, count] : stock)
+            item names one pair's key and count names its value for one iteration
+            std::map<std::string, int> stock {{"pens", 8}, {"apple", 3}, {"kiwi", 5}};
+            use structured binding to traverse
+            for (const auto& [item, count] : stock)
+                std::cout << item << " " << count << std::endl;
+            //apple 3\nkiwi 5\npens 8
+            or, use .first and .second to reach the key and value
+            for (const auto& roster : rosters)
+                std::cout << roster.first << " "<< roster.second << std::endl;
+        The two names together stand for one element, whose full type is std::pair<const std::string, int>
+            const on the key records that a stored key never changes
+            auto is a placeholder for that type
+    The counting idiom
+        Counting how often each value occurs is one of a map's most common uses
+            if (!counts.contains(reading)) counts[reading] = 1;
+            else counts[reading] += 1;
+    A complete counting program
+    Erasing pairs
+        container.erase(key)
+            removes the pair with that key and produces 1
+        a loop that is traversing a map must not erase from that map, because 
+        an erase during the traversal removes a pair the traversal depends on, 
+        the behavior is undefined, and the compiler reports no error.
+            for (const auto& [item, count] : stock) if (count == 0) sold_out.insert(item);
+            for (const auto& sold : sold_out) stock.erase(sold);
+    Composite values
+        A map's value type can itself be a container
+            std::map<std::string, std::vector<std::string>> followers {
+                {"ada", {"grace", "mary"}},
+                {"grace", {"ada"}}
+            };
+            

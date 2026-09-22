@@ -1,0 +1,47 @@
+Overview
+Two exam scores are stored in int objects, and the average of 91 and 78 is 84.5. Producing that half point takes 
+a deliberate conversion, because a division between two int values discards whatever follows the decimal point.
+
+Write AverageOfTwo, which converts in order to keep a fraction, and WholeNumberPart, which converts in order to 
+discard one.
+
+Functions to Implement
+double AverageOfTwo(int first, int second);
+Returns the average of the two values, keeping any half.
+int WholeNumberPart(double value);
+Returns the whole-number part of the value, discarding anything after the decimal point.
+Keeping the fraction: AverageOfTwo is correct for every pair of scores, not only for those whose sum happens to 
+be even. A division between two int values produces an int, so the half is discarded before the return type is 
+ever consulted, and the conversion has to happen before the division.
+
+Discarding the fraction: WholeNumberPart discards; it does not round. 72.6 produces 72, and a negative value 
+moves toward zero, so -6.4 produces -6.
+
+Examples
+Example 1: An average that keeps a half
+AverageOfTwo(91, 78)  // returns 84.5
+AverageOfTwo(64, 60)  // returns 62.0
+Example 2: Discarding what follows the decimal point
+WholeNumberPart(72.6)  // returns 72
+WholeNumberPart(-6.4)  // returns -6
+Constraints
+Write both function bodies in src/solution.cc. includes/solution.hpp provides the declarations this activity 
+requires, and those declarations must not be changed. You may add functions of your own, provided you declare 
+each one in includes/solution.hpp as well as define it in src/solution.cc. A rule below that requires a definition 
+to contain a loop or a function call means that function's own definition, not a function it calls.
+Each function is a single return statement.
+Neither function reads input or prints anything. src/driver.cc calls both with two scores you may change to 
+experiment, and is not graded.
+Ten of the hundred points are for clear code, two for each of five checks: the program compiles without warnings, 
+every variable you declare is initialized and used, each function stays within the course's size and complexity 
+limits, identifiers follow the course's naming conventions, and the code reads clearly. Readability and naming are 
+the two to watch. Give a number that carries a meaning a name rather than writing it as a literal, and spell a 
+constant you name kLikeThis. Ask a container empty() rather than comparing its size() with 0. Use a bool on its 
+own rather than comparing it with true or false, and do not use an int where a bool is meant.
+Compiled with clang++ under -std=c++20 -Wall -Wextra -Werror -pedantic. Function definitions belong in 
+src/solution.cc, not in the header. The tests are compiled with AddressSanitizer and UndefinedBehaviorSanitizer, 
+which diagnose memory errors and some forms of undefined behavior; neither detects every invalid operation.
+Allowed headers:
+
+"solution.hpp"
+<iostream>

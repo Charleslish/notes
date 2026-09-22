@@ -1,0 +1,29 @@
+L8 The Preprocessor, the Linker, and Overloading
+    From source files to a program
+        Turning those files into one running program takes four stages: 
+        1.preprocessor: it reads a source file and carries out every directive that begins with #, 
+            producing the expanded text the next stage actually sees. 
+            That expanded text is called a translation unit, and it is what the rest of the pipeline works on
+        2.compiler: translates that text into assembly, a low-level language that names the processor's own operations one at a time
+        3.assembler: translates the assembly into machine code, one object file for each source file
+        4.linker: it joins the object files into one runnable program, pairing each function call with its definition
+    The include guard
+        C++ requires that a class, an enumeration, or a function be defined no more than once in a translation unit
+        An include guard prevents the second copy: skipped on every inclusion after the first one
+            #ifndef FUNCTIONS_HPP //survive only if the macro FUNCTIONS_HPP is not yet defined
+            #define FUNCTIONS_HPP //From this point on, FUNCTIONS_HPP is defined
+            #endif  // closes the include guard
+    The header and its source file
+    Function overloading
+        overload set: Functions may share one name in the same scope when their parameter lists differ
+        A promotion widens a value to a larger type of the same kind with nothing lost, as char to int does
+            void Report(int value) {
+                std::cout << "int: " << value << std::endl;
+            }
+            void Report(double value) {
+                std::cout << "double: " << value << std::endl;
+            }
+            Report('a'); //int
+        When no overload wins
+        When to overload
+        When a definition drifts

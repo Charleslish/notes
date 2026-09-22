@@ -1,0 +1,69 @@
+Overview
+A proofreading tool lists the words a draft uses exactly once. A misspelling usually occurs once, while a real 
+word recurs, so the writer checks each listed word for a typo. The draft arrives already split into words, 
+stored in the order written, and every word is compared exactly as it was typed: "Howdy" and "howdy" are 
+different words, and so are "dog" and "dog.".
+
+Write UsedOnce, which returns the words used exactly once, in the order a std::set keeps them. Nothing is 
+counted: for each word, the function asks only whether it has been seen before.
+
+Functions to Implement
+std::vector<std::string> UsedOnce(const std::vector<std::string>& draft);
+Returns the words of draft that occur exactly once, in sorted order. A word that occurs two or more times is 
+left out.
+Seen before, and seen again: Two sets carry the answer. seen holds every word visited so far, and once holds 
+the words visited exactly once so far. For each word of draft, seen.contains(word) decides the case: a word not 
+yet seen is inserted into both sets, and a word seen before is erased from once. When a word is seen a third time 
+it is already absent from once, and erasing a value the set does not hold leaves the set unchanged, so a word 
+seen two, three, or more times stays out.
+
+The result is in sorted order: A set keeps its elements in sorted order, so a range-based for-statement over once 
+visits the words smallest first, and push_back of each visited word builds the vector in that order. Strings 
+compare by character code, character by character, and every uppercase letter's code precedes every lowercase 
+letter's, so "Howdy" precedes "cat". Case matters: "Ada" and "ada" are different words.
+
+Nothing left: An empty draft, and a draft whose every word repeats, both produce a vector with no elements. 
+No word of draft is empty.
+
+Examples
+Example 1: A repeated word is left out, and the rest come back in sorted order
+UsedOnce({"the", "cat", "saw", "the", "dog"})  // returns {"cat", "dog", "saw"}
+Example 2: An uppercase word precedes every lowercase word
+UsedOnce({"zebra", "Howdy", "apple", "zebra"})  // returns {"Howdy", "apple"}
+Example 3: A word seen a third time stays out
+UsedOnce({"a", "b", "a", "a"})  // returns {"b"}: "a" is seen three times
+UsedOnce({"go", "go", "stop", "stop"})  // returns {}
+UsedOnce({})  // returns {}
+Constraints
+Write the function body in src/solution.cc. includes/solution.hpp provides the declaration this activity requires, 
+and that declaration must not be changed. You may add functions of your own, provided you declare each one in 
+includes/solution.hpp as well as define it in src/solution.cc. A rule below that requires a definition to contain 
+a loop or a function call means that function's own definition, not a function it calls.
+UsedOnce must contain a loop. This is enforced: a definition without a for-statement, while-statement, or 
+do-statement is rejected before any test runs.
+UsedOnce records the words it has visited in a std::set and decides each word with the set's own contains or 
+erase. This is enforced: a definition that makes no function call to insert, contains, or erase on a std::set 
+is rejected before any test runs.
+Declare the parameter const std::vector<std::string>&, as the header does, because the function only reads it.
+No function may call itself.
+Work with your own loops. Library functions that sort, search, count, remove from, combine, or compare a range 
+are rejected before any test runs. So are the set's other lookup members and the set members this course does not 
+cover; the set's contains, insert, erase, size and empty stay available. The vector members and string members 
+this course does not cover are rejected as well.
+The function reads no input and prints nothing. src/driver.cc is not graded.
+Ten of the hundred points are for clear code, two for each of five checks: the program compiles without warnings, 
+every variable you declare is initialized and used, each function stays within the course's size and complexity 
+limits, identifiers follow the course's naming conventions, and the code reads clearly. Readability and naming are 
+the two to watch. Give a number that carries a meaning a name rather than writing it as a literal, and spell a 
+constant you name kLikeThis. Ask a container empty() rather than comparing its size() with 0. Use a bool on its 
+own rather than comparing it with true or false, and do not use an int where a bool is meant.
+Compiled with clang++ under -std=c++20 -Wall -Wextra -Werror -pedantic. Function definitions belong in 
+src/solution.cc, not in the header. The tests are compiled with AddressSanitizer and UndefinedBehaviorSanitizer, 
+which diagnose memory errors and some forms of undefined behavior; neither detects every invalid operation.
+Allowed headers:
+
+"solution.hpp"
+<set>
+<string>
+<vector>
+<iostream>

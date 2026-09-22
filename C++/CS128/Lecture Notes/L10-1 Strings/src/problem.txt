@@ -1,0 +1,90 @@
+Overview
+A hand tally counter shows a fixed number of digits, and an usher at a stadium gate clicks it once for each 
+person admitted. Counters differ in size: one shows three digits and another five, so a recorded display is a 
+string of any size, and the functions accept every size. Each click advances the display by one: the last digit 
+moves to the next digit, a 9 rolls to 0 and carries one into the digit to its left, and a display of all 9s rolls 
+over to all 0s. A click never changes the size of a display. The gate software records a display as a string of 
+digits exactly as it reads, leading zeros included, so "0417" and "417" are different displays, and the leading 
+zeros of "0417" are kept through every click.
+
+Write the three functions the gate software runs: IsValidDisplay, Advance, and ClicksBetween. The table below 
+describes each one.
+
+Functions to Implement
+bool IsValidDisplay(const std::string& display);
+Returns true exactly when display is not empty and every character of it is one of '0' through '9'. A recorded 
+string of any size can be a valid display.
+std::string Advance(const std::string& display);
+Returns the display after one click, a string of the same size as display. display is always well formed.
+int ClicksBetween(const std::string& before, const std::string& after);
+Calls Advance repeatedly, first on before and then on each result, until the result equals after, and returns 
+the number of times it called Advance.
+Digits are consecutive characters: A comparison between a char and a character literal compares the numbers the 
+encoding assigns to the two characters, and in ASCII the digits '0' through '9' are assigned ten consecutive 
+numbers. display[i] >= '0' && display[i] <= '9' therefore produces true exactly when display[i] is a digit, and 
+static_cast<char>(display[i] + 1) is the next digit when display[i] is not '9': the sum is an int, and the cast 
+converts it back to char.
+
+One click: The digits are visited from the last toward the first. Every '9' visited becomes '0', and the traversal 
+continues to the digit before it; the first digit visited that is not '9' becomes the digit after it, and the 
+traversal stops. When every digit is '9', every digit becomes '0': Advance("9999") produces "0000", and 
+Advance("9") produces "0". Leading zeros are kept, so Advance("0009") produces "0010".
+
+Writing through a subscript: A subscript names one character, and assigning to it, advanced[i - 1] = '0';, 
+replaces that one character and nothing else; the size does not change.
+
+ClicksBetween calls Advance: The function keeps a copy of before. While the copy differs from after, it calls 
+Advance on the copy, assigns the result back to the copy, and adds one to the number of clicks. The number it 
+returns is the number of times it called Advance. A string is assigned as any object is: display = Advance(display); replaces the characters display holds with the characters the function call returns.
+
+Every display is reached: Every click moves a display to the next display of the same size, and a display of all 
+9s moves to all 0s, so repeated clicks from any display reach every display of that size. The loop in 
+ClicksBetween therefore runs while the display != after and ends for every pair of displays, whichever of the two 
+reads as the larger number: ClicksBetween("9998", "0001") is 3, through "9999", "0000", and "0001".
+
+Examples
+Example 1: Deciding whether a recorded string is a valid display
+IsValidDisplay("0603")  // returns true
+IsValidDisplay("")      // returns false: a display has at least one digit
+IsValidDisplay("7b2")   // returns false: 'b' is not a digit
+Example 2: One click
+Advance("0529")  // returns "0530": the '9' rolls to '0' and carries one
+Advance("1399")  // returns "1400"
+Advance("99")    // returns "00": the whole display rolls over
+Example 3: Clicks between two displays
+ClicksBetween("0512", "0517")  // returns 5
+ClicksBetween("9997", "0002")  // returns 5: 9998, 9999, 0000, 0001, 0002
+ClicksBetween("0512", "0512")  // returns 0
+Constraints
+Write the definitions in src/solution.cc. includes/solution.hpp provides the declaration this activity requires, 
+and that declaration must not be changed. You may add functions of your own, provided you declare each one in 
+includes/solution.hpp as well as define it in src/solution.cc. A rule below that requires a definition to contain 
+a loop or a function call means that function's own definition, not a function it calls.
+Each function must contain a loop. This is enforced: a definition without a for-statement, while-statement, or 
+do-statement is rejected before any test runs.
+ClicksBetween must call your own Advance, once per click. This is enforced: a definition of ClicksBetween with 
+no function call to Advance is rejected before any test runs.
+No function may call itself.
+Advance cannot change display, a reference to const. A function that changes digits in place first initializes 
+its own string from the parameter, std::string advanced = display;, and changes the copy; or it builds the result 
+from an empty string, character by character, with += or push_back.
+Work on the characters themselves. Library functions that convert a string to a number or a number to a string, 
+that classify characters, or that search, copy, or compare a range are rejected before any test runs, as are the 
+string member functions this course does not cover.
+The functions read no input and print nothing. src/driver.cc is not graded.
+Ten of the hundred points are for clear code, two for each of five checks: the program compiles without warnings, 
+every variable you declare is initialized and used, each function stays within the course's size and complexity 
+limits, identifiers follow the course's naming conventions, and the code reads clearly. Readability and naming 
+are the two to watch. Give a number that carries a meaning a name rather than writing it as a literal, and spell 
+a constant you name kLikeThis. Ask a container empty() rather than comparing its size() with 0. Use a bool on its 
+own rather than comparing it with true or false, and do not use an int where a bool is meant.
+Compiled with clang++ under -std=c++20 -Wall -Wextra -Werror -pedantic. Function definitions belong in 
+src/solution.cc, not in the header. The tests are compiled with AddressSanitizer and UndefinedBehaviorSanitizer: 
+a downward traversal whose index wraps below 0 names memory far outside the display, the sanitizer reports that 
+read as an error, and the test fails. A ClicksBetween test ends after four seconds when Advance never reaches the 
+second display.
+Allowed headers:
+
+"solution.hpp"
+<string>
+<iostream>
