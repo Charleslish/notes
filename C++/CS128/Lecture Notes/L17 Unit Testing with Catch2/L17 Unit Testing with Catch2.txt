@@ -1,0 +1,70 @@
+L17 Unit Testing with Catch2
+    A test suite is a program
+        Writing the checks as code lets us repeat them consistently instead of entering and inspecting each input by hand.
+        A unit test checks the required behavior of a small part of a program
+        Testing is not debugging
+            Testing searches for errors and tells you that one exists; 
+            debugging finds where it lives and why it happens
+        The checks live in their own source file, and that file defines no main function.
+            Your file holds test cases, and Catch2 provides the program that runs them
+        A suite is three files: 
+            the header that declares the function, 
+            the source that defines it, 
+            and the tests that make claims about it.
+        TEST_CASE("name", "[tag]") {declare what the case needs, 
+            you call the function under test, and you state what you expect with REQUIRE}
+            ./bin/tests "[boundary]" runs those and no others
+        test.cc
+            #include <catch2/catch_test_macros.hpp>
+            #include "solution.hpp"
+            TEST_CASE("a temperature at the threshold takes the state above it", "[boundary]") {
+                const double kBoiling = 100.0;
+                REQUIRE(StateOfWater(kBoiling) == "gas");
+            }
+            TEST_CASE("a temperature below freezing is solid", "[low]") {
+                const double kCold = -20.0;
+                REQUIRE(StateOfWater(kCold) == "solid");
+            }
+        Compiling the suite differs from compiling a program in one respect: 
+            the test cases and the implementation are separate files, and the framework is a library that must be linked.
+            clang++ -std=c++20 -stdlib=libc++ -Wall -Wextra -Werror -pedantic -I ./includes ./tests/tests.cc ./src/solution.cc -o ./bin/tests -lCatch2Main -lCatch2
+    What a failure tells you
+        e.g. 
+            TEST_CASE("a temperature below freezing is solid", "[low]") {
+            const double kCold = -20.0;
+            REQUIRE(StateOfWater(kCold) == "liquid");
+            }
+        failure report: gives the failing assertion in three lines
+            -------------------------------------------------------------------------------
+            a temperature below freezing is solid //name you give
+            -------------------------------------------------------------------------------
+            tests.cc:10 //line of the case; it can hold many assertions; case begins
+            ...............................................................................
+
+            tests.cc:12: FAILED: //the file and the line of the assertion itself, names the assertion that fails
+                REQUIRE( StateOfWater(kCold) == "liquid" )//Catch2 prints the expression you wrote
+            with expansion:
+                "solid" == "liquid"//The third fills in the values, so that the left side is what the function returned and the right side is what you required
+
+            ===============================================================================
+            test cases: 2 | 1 passed | 1 failed
+            assertions: 2 | 1 passed | 1 failed //counts the assertions that executed
+    Comparing floating-point results
+        For a floating-point result, the values can look equal even when the assertion fails
+        Catch2 supplies Catch::Approx, which compares values using a tolerance. 
+            Include <catch2/catch_approx.hpp> and compare the function’s result with Catch::Approx(kExpected)
+            e.g.REQUIRE(AverageRainfall(kReadings) == Catch::Approx(kReading));
+    Choosing between REQUIRE and CHECK
+        If a REQUIRE fails, Catch2 records the failure and stops the current test case. 
+            Assertions later in that case do not run
+        Stopping the case is useful when an assertion checks a condition that must hold before the next operation is valid.
+            e.g. index boundary error
+        Catch2 provides CHECK for these situations: 
+            it records a failure and continues the current test case, allowing later assertions to run.
+    Choosing expected results and test inputs
+    What a passing suite establishes
+        A report ending in All tests passed means that every assertion that ran passed.
+    Writing the test first
+    Summary
+
+

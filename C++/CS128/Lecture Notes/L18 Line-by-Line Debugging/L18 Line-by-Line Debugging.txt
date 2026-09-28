@@ -1,0 +1,42 @@
+L18 Line-by-Line Debugging
+    Testing finds that something is wrong, and debugging finds where
+    Compile first, and compile so the debugger can follow
+        we must compile the program before starting a debugging session
+            clang++ -std=c++20 -I ./includes -Wall -Wextra -Werror -pedantic -fsanitize=address,undefined \
+            -fno-sanitize-recover=all -g -O0 -o ./bin/exec ./src/driver.cc ./src/solution.cc
+        The -g option adds debugging information to the executable, including source locations and information about variables. 
+            This lets the debugger connect the executing machine instructions to the source code shown in your editor.
+        The -O0 option disables compiler optimization.
+            Optimization can rearrange instructions or remove variables while preserving the program’s required behavior, 
+            making execution harder to follow through the source
+        In VS Code, open the Run and Debug view, choose a configuration, and start debugging.
+            Choose debug exec gdb to run bin/exec, or debug tests gdb to run bin/tests
+            The program configuration pauses at the beginning of main; the test configuration runs without an initial pause. 
+            To pause the tests at a location you want to inspect, set a breakpoint
+        A breakpoint is a place to stop
+            A breakpoint lets us reach the part of the program we want to inspect without stepping through every preceding statement.
+            Set a breakpoint by clicking in the editor margin to the left of a source line’s number. 
+            Choose Continue to resume execution. 
+                The program runs until it reaches a breakpoint, encounters another event that stops execution, or finishes
+                A breakpoint pauses the program only if execution reaches it
+            When execution pauses at a breakpoint, the editor marks the current line
+    Three ways past a line
+        The toolbar includes Continue, three stepping controls( Step Over, Step Into, and Step Out ), Restart, and Stop.
+        Step Over executes the current source line, including any function calls, and pauses at the next source location.
+            e.g.int wide = Doubled(width);, it lets Doubled execute without pausing inside it.
+            inspect the result of a function call without following the statements inside the function.
+        Step Into lets you follow a function call into the called function.
+            investigate what happens inside the function
+        Step Out resumes execution of the function you are currently inspecting and pauses after it returns to its caller.
+            Use it when you have finished examining that function and want to return to the code that called it.
+        Returning from a function does not necessarily mean that the entire calling statement has finished.
+            use another Step Over
+    When the executable is older than the source
+        Saving a source edit does not change that executable.
+    What the sections tell you
+        Variables shows the parameters and local variables available in the selected function call.
+        Watch lets you keep selected expressions visible across steps. 
+        The Call Stack shows how execution reached the current function.
+            Each active function call has a stack frame
+    Working an error from report to cause
+    Summary

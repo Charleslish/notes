@@ -1,0 +1,188 @@
+2.1
+Q1.Navigate to the repository at /home/player/code/calculator. What is the name of the current branch?
+    [player@cs128-term] ~/code/calculator $ git branch
+        * primary
+Q2.Navigate to /home/player/dev/game. What is the commit message for commit 713263b?
+    [player@cs128-term] ~/dev/game $ cd /home/player/dev/game
+    [player@cs128-term] ~/dev/game $ git log --oneline
+        7da989d Security patch v2.1
+        037342d Major update to version 3.0
+        7f6fffc Version 2.0 with bug fixes
+        713263b Release 2.0: bug fixes and improvements
+        12d0c4b Update to v2.0 and add changelog
+        0e26d50 Bump version to v4.0
+        db8afcc Release version 1.0 with README
+        6c0e5b9 Add new features in v2.5
+Q3.Return to /home/player/code/calculator. There is one file that shows as modified (not untracked). What is the name of this file?
+    [player@cs128-term] ~/code/calculator $ cd /home/player/code/calculator
+    [player@cs128-term] ~/code/calculator $ git status
+        On branch primary
+        Changes not staged for commit:
+          (use "git add <file>..." to update what will be committed)
+          (use "git restore <file>..." to discard changes in working directory)
+            modified:   records.txt
+        Untracked files:
+          (use "git add <file>..." to include in what will be committed)
+            pending.txt
+        no changes added to commit (use "git add" and/or "git commit -a")
+Q4.Still in /home/player/code/calculator, how many commits are there in total?
+    [player@cs128-term] ~/code/calculator $ git log --oneline
+    4fe9d3c Update feature and add notes
+    bfa0e56 Fix bug in data handling
+    ed76891 Initial project setup with core files
+Q5.In the directory /home/player/code/calculator, stage the file pending.txt.
+    [player@cs128-term] ~/code/calculator $ git add pending.txt
+Q6.Still in /home/player/code/calculator, create a commit with the message Add pending feature.
+    [player@cs128-term] ~/code/calculator $ git commit -a -m "Add pending feature"
+        [primary 9c14f7e] Add pending feature
+         2 files changed, 2 insertions(+), 1 deletion(-)
+         create mode 100644 pending.txt
+Q7.Still in /home/player/code/calculator, a file has been modified. Identify which file is modified, then restore it to its state from commit 4fe9d3c.
+    [player@cs128-term] ~/code/calculator $ git restore --source=4fe9d3c records.txt
+Q8.Navigate to the existing directory /home/player/assignments/chat-app and initialize a new git repository there.
+    [player@cs128-term] ~/assignments/chat-app $ cd /home/player/assignments/chat-app
+    [player@cs128-term] ~/assignments/chat-app $ git init
+        Initialized empty Git repository in /home/player/assignments/chat-app/.git/    
+Q9.Still in /home/player/assignments/chat-app, create a file called README.md, then stage and commit it with the message Initial commit.
+    [player@cs128-term] ~/assignments/chat-app $ touch README.md
+    [player@cs128-term] ~/assignments/chat-app $ git add .
+    [player@cs128-term] ~/assignments/chat-app $ git commit -a -m "Initial commit"
+        [master (root-commit) 64c4b37] Initial commit
+         2 files changed, 1 insertion(+)
+         create mode 100644 .placeholder
+         create mode 100644 README.md
+Q10.Navigate to /home/player/dev/game. The file version.txt has been modified. Restore it to match commit 7da989d
+    [player@cs128-term] ~/dev/game $ cd /home/player/dev/game
+    [player@cs128-term] ~/dev/game $ git restore --source=7da989d version.txt
+2.2
+Overview
+The two repositories are at /home/player/projects/warehouse and /home/player/code/inventory. The first one is there to be read. Questions 1 to 4 ask what git reports about it, and you type those four answers into the boxes under the table. The second one is where you work: questions 5 to 10 are graded from the state you leave that repository in, not from what your terminal printed.
+
+The terminal runs one command at a time, and refuses a line holding >, <, |, ;, &, $, or `. A program named write-line.sh is waiting in your home directory, and you run it by its pathname and hand it two arguments: ~/write-line.sh notes.txt anchor-2031 makes notes.txt hold the single line anchor-2031 and nothing else, in the directory you are standing in, and creates the file if it is not there yet. It is short enough to read, and cat ~/write-line.sh prints it. Every line named below is a whole line, and it is the only line its file holds.
+
+Q1.Move to /home/player/projects/warehouse and run git status. Exactly one file is named under both Changes to be committed and Changes not staged for commit. What is its name?
+    [player@cs128-term] ~/projects/warehouse $ cd /home/player/projects/warehouse
+    [player@cs128-term] ~/projects/warehouse $ git status
+        On branch main
+        Changes to be committed:
+          (use "git restore --staged <file>..." to unstage)
+	        modified:   drivers.txt
+	        modified:   manifest.txt
+        Changes not staged for commit:
+          (use "git add <file>..." to update what will be committed)
+          (use "git restore <file>..." to discard changes in working directory)
+            modified:   drivers.txt
+            modified:   rates.txt
+        Untracked files:
+          (use "git add <file>..." to include in what will be committed)
+            scratch.txt
+Q2. In the same repository, run git diff --staged. It names two files, and one of them is your answer to question 1. What is the name of the other one?
+    [player@cs128-term] ~/projects/warehouse $ git diff --staged
+        diff --git a/drivers.txt b/drivers.txt
+        index bd256b1..1b68cad 100644
+        --- a/drivers.txt
+        +++ b/drivers.txt
+        @@ -1 +1 @@
+        -drivers revised at step 4
+        +drivers revision 3717
+        diff --git a/manifest.txt b/manifest.txt
+        index 36e0e79..d4165ca 100644
+        --- a/manifest.txt
+        +++ b/manifest.txt
+        @@ -1 +1 @@
+        -manifest as first recorded
+        +manifest revision 5264
+Q3.	In the same repository, run git diff. It also names two files, and one of them is again your answer to question 1. What is the name of the other one?
+    [player@cs128-term] ~/projects/warehouse $ git diff
+        diff --git a/drivers.txt b/drivers.txt
+        index 1b68cad..7f039ae 100644
+        --- a/drivers.txt
+        +++ b/drivers.txt
+        @@ -1 +1 @@
+        -drivers revision 3717
+        +drivers revision 3567
+        diff --git a/rates.txt b/rates.txt
+        index 93a7bfd..f999c9e 100644
+        --- a/rates.txt
+        +++ b/rates.txt
+        @@ -1 +1 @@
+        -rates revised at step 5
+        +rates revision 3803
+Q4.In the same repository, run git log --oneline. What is the message on the last line of what it prints, without the short name in front of it?
+    [player@cs128-term] ~/projects/warehouse $ git log --oneline
+        6ff7839 Bring the rates up to date
+        4125646 Correct two transposed entries
+        631c7f5 Tidy the column headings
+        ef9d31b Record the opening figures
+        2fb8852 List the relief drivers
+        c570052 Add the overnight schedule
+Q5.Move to /home/player/code/inventory. Make docks.txt hold the single line anchor-3759, and bays.txt hold the single line davit-8272. Neither file is there yet. Stage both of them with one run of git add . from the top of the repository, and leave them staged.
+    [player@cs128-term] ~/code/inventory $ cd /home/player/code/inventory    
+    [player@cs128-term] ~/code/inventory $ ~/write-line.sh docks.txt anchor-3759
+        docks.txt now holds the single line: anchor-3759
+    [player@cs128-term] ~/code/inventory $ ~/write-line.sh bays.txt davit-8272
+        bays.txt now holds the single line: davit-8272
+    [player@cs128-term] ~/code/inventory $ git add .
+Q6.Make totals.txt hold the single line pylon-1234. Without staging it first, run git commit -a -m "Post the revised figure". Run git status afterwards and see that totals.txt is named under neither heading: -a wrote the index from the directory you edit and committed what it wrote, so all three places hold that line. The same commit records the two files you staged in question 5, because a commit records what the index holds.
+    [player@cs128-term] ~/code/inventory $ ~/write-line.sh totals.txt pylon-1234
+        totals.txt now holds the single line: pylon-1234
+    [player@cs128-term] ~/code/inventory $ git commit -a -m "Post the revised figure"
+        [main fd11584] Post the revised figure
+         3 files changed, 3 insertions(+), 1 deletion(-)
+         create mode 100644 bays.txt
+         create mode 100644 docks.txt
+    [player@cs128-term] ~/code/inventory $ git status
+        On branch main
+        nothing to commit, working tree clean
+Q7.	Make shifts.txt hold the single line pallet-5523 and stage it. Then make the same file hold the single line cargo-7274, and do not stage that second change. Run git status and confirm that shifts.txt is now named under both Changes to be committed and Changes not staged for commit. Then run git commit -m "Save the reviewed line".
+    [player@cs128-term] ~/code/inventory $ ~/write-line.sh shifts.txt pallet-5523
+        shifts.txt now holds the single line: pallet-5523
+    [player@cs128-term] ~/code/inventory $ git add shifts.txt
+    [player@cs128-term] ~/code/inventory $ ~/write-line.sh shifts.txt cargo-7274
+        shifts.txt now holds the single line: cargo-7274
+    [player@cs128-term] ~/code/inventory $ git status
+        On branch main
+        Changes to be committed:
+         (use "git restore --staged <file>..." to unstage)
+            modified:   shifts.txt
+        Changes not staged for commit:
+         (use "git add <file>..." to update what will be committed)
+         (use "git restore <file>..." to discard changes in working directory)
+            modified:   shifts.txt
+    [player@cs128-term] ~/code/inventory $ git commit -m "Save the reviewed line"
+        [main 1d5d8f2] Save the reviewed line
+         1 file changed, 1 insertion(+), 1 deletion(-)
+Q8.That commit recorded pallet-5523, the line the index held, and not cargo-7274, the line in the directory you edit. Run git diff to see that the later line is still there and still outside the commit. Leave shifts.txt holding cargo-7274, unstaged, for the rest of your work.
+    [player@cs128-term] ~/code/inventory $ git diff
+        diff --git a/shifts.txt b/shifts.txt
+        index 418f5a7..1a8cfec 100644
+        --- a/shifts.txt
+        +++ b/shifts.txt
+        @@ -1 +1 @@
+        -pallet-5523
+        +cargo-7274
+Q9.Make invoices.txt hold the single line hopper-9407 and stage it. Do not commit. Run git diff --staged and see invoices.txt reported, because the index now holds a version of it that the last commit does not.
+    [player@cs128-term] ~/code/inventory $ ~/write-line.sh invoices.txt hopper-9407
+        invoices.txt now holds the single line: hopper-9407
+    [player@cs128-term] ~/code/inventory $ git add invoices.txt
+    [player@cs128-term] ~/code/inventory $ git diff --staged
+        diff --git a/invoices.txt b/invoices.txt
+        index 066dc8e..a7e7987 100644
+        --- a/invoices.txt
+        +++ b/invoices.txt
+        @@ -1 +1 @@
+        -invoices as first recorded
+        +hopper-9407
+Q10. Now make invoices.txt hold the single line spindle-2907, and do not stage it. Run git status one last time: invoices.txt is named under both headings, and shifts.txt under one of them. Leave the repository in exactly that state and submit.
+    [player@cs128-term] ~/code/inventory $ ~/write-line.sh invoices.txt spindle-2907
+        invoices.txt now holds the single line: spindle-2907
+    [player@cs128-term] ~/code/inventory $ git status
+        On branch main
+        Changes to be committed:
+         (use "git restore --staged <file>..." to unstage)
+            modified:   invoices.txt
+        Changes not staged for commit:
+         (use "git add <file>..." to update what will be committed)
+         (use "git restore <file>..." to discard changes in working directory)
+            modified:   invoices.txt
+            modified:   shifts.txt

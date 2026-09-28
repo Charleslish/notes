@@ -7,4 +7,5 @@ __pycache__/
 .DS_Store
 
 # C++ build output
-C++/build/
+C++/build/C++/CS128/MPs/MP1/
+bin/

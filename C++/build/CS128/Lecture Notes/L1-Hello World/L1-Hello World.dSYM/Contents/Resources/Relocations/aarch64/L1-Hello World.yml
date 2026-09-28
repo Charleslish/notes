@@ -1,0 +1,5 @@
+---
+triple:          'arm64-apple-darwin'
+binary-path:     '/Users/apple/notes/C++/build/CS128/Lecture Notes/L1-Hello World/L1-Hello World'
+relocations:     []
+...

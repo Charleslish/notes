@@ -1,0 +1,105 @@
+L19 Version Control with Git
+    Recording versions while testing and debugging
+        A version control system records versions of a project that we choose to preserve. 
+        stores the project’s recorded history in a directory named .git inside the project directory. 
+        We can record versions, compare changes, and restore earlier files on our own machine without connecting to a server.
+    An office-hours queue
+    Creating a repository and setting your identity
+        Before recording a version, we need to initialize Git in the project directory.
+        This creates a repository, where Git stores the recorded versions and the information needed to manage them. 
+        Run git init from the project’s root directory to create the repository.
+        Before making a commit, use git config to set your name and email address
+            git config --global user.name "Your Name"
+            git config --global user.email "you@illinois.edu"
+            git config --global init.defaultBranch main
+        git config is by default local
+        Run git add with a file’s path to prepare its current contents for that commit; 
+            this operation is called staging.
+        From the project’s root directory, git add . stages changes throughout the project, 
+            excluding untracked files covered by ignore rules.
+        Staging prepares the version; it does not create the commit.
+    The working tree, index, and last commit
+        The working tree contains the project files you edit, including src/solution.cc and includes/solution.hpp.
+        The index represents the file contents prepared for the next commit.
+            Git also calls the index the staging area.
+            git add to add files to the index
+            A tracked file is a file represented in the index or the current commit. 
+                Git can report how its working-tree contents differ from the staged or committed version.
+                A new file that has not been added is untracked
+                git status lists it under Untracked files unless an ignore rule excludes it.
+        A commit records a version of the project using the file contents represented in the index.
+            Run git commit after staging the contents you want to preserve.
+        git add stages selected contents from the working tree, and git commit records the contents represented in the index.
+        git commit -a -m "Describe the change" combines automatic staging with committing.
+            -a option stages modifications and deletions of tracked files before creating the commit; 
+            it does not add untracked files. Use git add to include a new file.
+    Recording a version with a commit
+        A commit records the project contents represented in the index, together with information about 
+            who recorded the version, 
+            when it was recorded, and 
+            its relationship to earlier commits.
+        You supply a message describing the change.
+            Write a short commit message that begins with a capitalized verb and names the behavior being changed
+        Use the -m option to supply the message when creating the commit
+            Without -m, Git opens its configured editor for you to enter the message. 
+        Git computes an identifier for each commit from the information it records.
+            Commands that inspect or restore a recorded version can use this identifier to select the commit. 
+        Creating a new commit adds a recorded version without replacing the earlier commit. 
+    Keeping generated files out of the history
+        To exclude untracked files, create a .gitignore file in the project root
+        With these rules in place, git status omits matching untracked files, and git add . does not stage them. 
+        Commit .gitignore itself so that the rules are recorded with the project.
+        Ignore rules do not stop Git from tracking files already represented in the index. 
+    Inspecting the commit history    
+        use git log --oneline to inspect the history
+            newer commits shown before their ancestors
+        Beside the current commit, the log shows (HEAD -> main)
+            Here, HEAD identifies the checked-out branch, main, whose current commit is the version we are working from. 
+            Commands can use HEAD to select that commit, HEAD~1 to select its first parent, or HEAD~2 to follow that relationship twice.
+        By default, the log follows the history reachable from the current commit. 
+            It does not list every commit on every branch. 
+    Restoring files and reverting commits
+        When a change introduces a failure, use the history to identify a version whose relevant behavior was correct.
+        We can restore a file from that version or undo a commit’s changes with a new commit.
+        Use git restore when you want to replace a file’s working-tree contents. 
+            Without a source option, it restores the contents represented in the index. 
+            With --source, it restores contents from a commit you specify.
+                To restore from an earlier commit, first inspect the log and compare that version with your current file.
+                git log --oneline
+                git diff 491d0c1 -- src/solution.cc //compare the difference between the current version and 491d0c1
+                git restore --source=491d0c1 src/solution.cc 
+        To restore from an earlier commit, first inspect the log and compare that version with your current file.
+        Use git revert when you want to undo the changes introduced by a commit across the project. 
+            It applies the inverse of those changes and records the result in a new commit.
+            git revert --no-edit 3bf0295 
+                The --no-edit option uses Git’s generated commit message rather than opening an editor. 
+        Before reverting, finish recording changes you intend to keep and check that the working tree and index are clean. 
+    Recording changes on a branch
+        We can record corrections on a branch, test it, and decide whether to bring it into main.
+        git switch -c guard  creates the branch at the current commit and switches to it.
+        Use git switch to change which branch you are working on.
+            before switching in the example below, commit your changes so that you can compare the recorded versions on guard and main.
+        git branch to show all branches
+              guard
+              * main //the * means the current branch
+    Merging changes into main
+        Once the correction on guard is ready to include in main, switch to main and run git merge guard
+            git switch main
+            git merge guard
+        If main is still at the commit where guard began, 
+            Git can move main forward to the newer commit without combining separate changes. 
+            This is a fast-forward merge. 
+        If both branches have added commits since they separated, 
+            Git combines their changes and normally records a merge commit with two parents. 
+    Resolving a merge conflict
+        When merging diverged branches, Git compares their changes with a common ancestor.
+        If the changes are incompatible, Git reports a merge conflict and pauses the merge
+            <<<<<<< HEAD
+                return "(nobody waiting)";    //this comes from the current branch
+            =======
+                return "";      //this comes from the branch being merged
+            >>>>>>> guard
+        These markers are part of the file’s contents until you remove them.
+        To resolve the conflict, edit the file to contain the intended implementation and remove the markers. 
+        make that edit, then run git add to mark the file as resolved and git commit to finish the merge
+    Summary

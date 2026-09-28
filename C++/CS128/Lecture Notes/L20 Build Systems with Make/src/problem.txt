@@ -1,0 +1,35 @@
+Overview
+This project arrives with its source files written and no Makefile. Write one. 
+It records how each of the two executables this project produces is made, so that the commands live in the project 
+rather than in your memory.
+
+The project holds includes/tiles.hpp, src/tiles.cc, src/driver.cc, tests/tests.cc and an empty bin directory. 
+All of them are provided and none of them needs changing. 
+src/driver.cc holds main; 
+tests/tests.cc holds the test cases and is compiled against the testing framework instead of against the driver.
+
+Targets to Write
+Target	What it does
+exec	Asks for bin/exec, the program, compiled from the driver and the implementation.
+tests	Asks for bin/tests, the test suite, compiled from the test file and the same implementation, linking -lCatch2Main and then -lCatch2 after the sources.
+clean	Removes what has been produced, leaving bin empty.
+bin/exec	The rule that produces the program. Its prerequisites are the files the program is made from.
+bin/tests	The rule that produces the suite. Its prerequisites are the files the suite is made from, which are not the same files.
+
+Examples
+Command	What should happen
+make	Produces bin/exec, because exec is the target asked for when none is named.
+make tests	Produces bin/tests.
+make a second time	Produces nothing, because nothing has been written since.
+touch includes/tiles.hpp, then make exec tests	Produces both again, because both are made from that header.
+touch tests/tests.cc, then make exec tests	Produces bin/tests again and leaves bin/exec alone, because the program is not made from the test file.
+./bin/exec	Prints Tiles across: 12 and Tiles for the floor: 96.
+
+Constraints
+Write only Makefile. The source files and the header are provided and are graded as provided.
+Every recipe line begins with a tab.
+A recipe may run clang++ or rm, and one command per recipe. Anything else is refused and the submission earns nothing.
+Compile the program with -std=c++20 -I ./includes -Wall -Wextra -Werror -pedantic -fsanitize=address,undefined -fno-sanitize-recover=all -g -O0.
+Compile the suite with -std=c++20 -stdlib=libc++ -Wall -Wextra -Werror -pedantic -I ./includes -g -O0, and link -lCatch2Main -lCatch2 in that order after the sources.
+The three targets that name no file are declared in .PHONY.
+A bare make asks for exec.

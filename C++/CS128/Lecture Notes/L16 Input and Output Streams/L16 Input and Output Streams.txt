@@ -85,19 +85,19 @@ L16 Input and Output Streams
             Otherwise, the failure state prevents ignore() from discarding the unwanted input. 
         perform extraction where the loop can examine its failure before deciding what to do next.
         while (in.good()) {
-        int value = 0;
-        in >> value;
-        if (in.bad())
-            break;
-        if (in.fail()) {
-            if (in.eof()) 
+            int value = 0;
+            in >> value;
+            if (in.bad())
                 break;
-            in.clear();
-            in.ignore(std::numeric_limits<std::streamsize>::max(), '\n');
-            continue;
+            if (in.fail()) {
+                if (in.eof()) 
+                    break;
+                in.clear();
+                in.ignore(std::numeric_limits<std::streamsize>::max(), '\n');
+                continue;
+            }
+            readings.push_back(value);
         }
-        readings.push_back(value);
-    }
     Writing to a file
         Use std::ofstream and << to write values to a file,
             std::ofstream again(kFileName);

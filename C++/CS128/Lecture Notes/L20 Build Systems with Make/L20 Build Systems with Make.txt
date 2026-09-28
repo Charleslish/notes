@@ -1,0 +1,71 @@
+L20 Build Systems with Make
+    Why use a Makefile
+        writing long commands into a simple Makefile
+        A build file records both commands with the files each depends on. 
+        After an edit, we can ask it to recompile the program, the tests, or both without reconstructing the command ourselves.
+    Writing a Makefile rule
+        The program make reads build rules from a makefile. 
+        GNU Make searches for GNUmakefile, makefile, and Makefile, in that order, and uses the first one it finds.
+    A rule connects the output we want with the inputs and command needed to produce it.
+        it has 3 parts: a target, prerequisites, and a recipe.
+            target: prerequisites
+                recipe
+        The target names what we ask make to update.
+        The prerequisites name the files the target depends on.
+            Listing the dependencies lets make determine whether a change requires recompiling the target.
+        The recipe contains the commands used to update the target. 
+            each recipe line must begin with a tab character
+    Deciding when a target needs recompiling
+        When we request a target, make decides whether its recipe needs to run.
+        For the file targets in this example, it compares the target’s modification time with those of its prerequisites.
+            Conversely, a header edit cannot trigger this rule unless the header is listed as a prerequisite.
+        Use make --debug=b to see basic information about these decisions.
+            the output explains why make chooses to recompile the executable.
+                 Prerequisite 'src/solution.cc' is newer than target 'bin/exec'.
+                Must remake target 'bin/exec'.
+    Phony targets and the default goal
+        The names exec and tests let us request a build without typing the executable’s full path. 
+            exec: bin/exec
+            tests: bin/tests
+        We can also define clean to remove the generated executables.
+            clean:
+                rm -f bin/*
+            The clean rule has a recipe but no prerequisites. 
+            The shell expands bin/* to matching entries in bin/. 
+            The -f option prevents missing files from causing an error, so cleaning also works before the first build.
+        A target that represents an action rather than a file is called a phony target.
+            so that make does not treat files with those names as the targets.
+            .PHONY: exec tests clean
+            Consider what happens if a file named clean exists in the project root. 
+                Without the phony declaration, make can treat that file as an existing target with no prerequisites requiring an update. 
+        Set .DEFAULT_GOAL to choose what a bare make requests when no goal is supplied.
+            .DEFAULT_GOAL := exec
+        Without an explicit setting, GNU Make selects its default goal from the first eligible target rule. 
+    Building the program and test suite
+        The program rule compiles driver.cc, which defines the program’s main. 
+        The test rule compiles tests/tests.cc instead and links Catch2’s runner.
+    Reusing text with variables
+        Assign a value with = and refer to it with $(...), such as $(CXX)
+        With =, references in the assigned text are expanded when the variable is used; 
+        with :=, they are expanded when it is assigned.
+            CXX = clang++
+            CXX_FLAGS = -std=c++20 -I ./includes -Wall -Wextra -Werror -pedantic \
+                        -fsanitize=address,undefined -fno-sanitize-recover=all -g -O0
+            TEST_FLAGS = -std=c++20 -stdlib=libc++ -Wall -Wextra -Werror -pedantic \
+             -I ./includes -g -O0
+        Inside a recipe, the automatic variable $@ holds the target’s name. 
+            In the program rule, -o $@ therefore means -o bin/exec
+    The complete Makefile
+    Diagnosing build problems
+        A recipe indented with spaces
+            Makefile:14: *** missing separator.  Stop.
+        A prerequisite nothing makes
+            make: *** No rule to make target 'src/nowhere.cc', needed by 'bin/exec'.  Stop.
+            Check that the path is spelled correctly and that the file exists at that location.
+        A prerequisite you did not list
+    Writing to a directory that is not there
+        Create the directory with mkdir bin, then request the build again.
+    Nothing to be done
+        make: Nothing to be done for 'exec'.
+        make: 'bin/exec' is up to date.
+        make: Nothing to be done for 'bin/exec'.

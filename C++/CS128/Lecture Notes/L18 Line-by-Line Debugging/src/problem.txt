@@ -1,0 +1,56 @@
+Overview
+src/summary.cc reads a log of daily readings and reports three things about it. 
+The program compiles, it runs, and all three answers are wrong. Repair it.
+
+Nothing here is a compiler error, so the compiler will not help you. 
+Each of the three wrong answers has a different cause, and each cause is somewhere the values a running program holds 
+are easier to look at than to work out on paper.
+
+You will use the VSCode line by line debugger to examine this program. 
+In the top right corner of the activity prompt, you should see a "download" button with an arrow pointing downwards. 
+Click on this button to receive a .zip file with the project directory for this assignment. 
+Once you unzip the file, you will be able to open the resulting folder "26c-grade-repair-the-log" in VSCode, and use 
+the line by line debugger. When finished making your changes to the program, you can click on the "upload" button with 
+the up arrow in the top corner of the activity prompt to submit your changed files.
+
+Functions to Repair
+Function	Description
+void AddAbove(double reading, double threshold, Summary& summary)	
+Adds reading to summary.total_above when it is at or above threshold. A reading below the threshold contributes nothing.
+
+void NoteSteady(double reading, double threshold, double limit, Summary& summary)	
+Clears summary.steady when reading lies below threshold or above limit. One reading outside that range is enough.
+
+Summary Summarize(const std::vector<double>& readings, double threshold, double limit)	
+Visits readings once and returns the summary of them. 
+longest_run is the greatest number of consecutive readings at or above threshold, and a reading below it ends a run. 
+total_above is the sum AddAbove accumulates, and steady is what NoteSteady leaves.
+
+The driver runs the readings {18.0, 22.0, 25.0, 30.0, 12.0, 40.0} with a threshold of 20 and a limit of 35. 
+Here is what it should print, beside what it prints today:
+
+should print          prints today
+longest run: 3        longest run: 1
+total above: 117      total above: 80
+steady: no            steady: yes
+Work out for yourself why 117 and 3 are the right answers before you change anything. 
+A repair made against a number you have not checked is a guess.
+
+Examples
+The threshold is 20 and the limit is 35 throughout.
+
+readings	longest run	total above	steady
+{22.0, 25.0, 30.0}	3	77	yes
+{25.0}	1	25	yes
+{22.0, 25.0, 12.0, 30.0}	2	77	no
+{12.0, 22.0, 25.0}	2	47	no
+{22.0, 40.0}	2	62	no
+Constraints
+Repair src/summary.cc. Do not change includes/summary.hpp, and do not change any function's signature. 
+Neither is necessary, and both will be reported.
+The three functions keep their present shape: AddAbove and NoteSteady each examine one reading, and Summarize visits 
+the readings once with a loop.
+Permitted headers are <vector>, <iostream> and "summary.hpp". No other header is permitted.
+Give every value a named constant rather than writing it into an expression.
+Your code is compiled with clang++ -std=c++20 -stdlib=libc++ -Wall -Wextra -Werror -pedantic.
+Do not use NOLINT.

@@ -1,0 +1,41 @@
+Overview
+A tank holds 500 litres. Somebody else has written TankLevel, which reports in one word how full it is, and you are 
+going to write the test suite for it. You will not write the function, and you will not see it.
+
+Your suite is run twice over. First against an implementation that meets the specification, where every assertion you 
+wrote must hold: an assertion that fails there is a claim the specification does not support, and it is your claim 
+that is wrong rather than the function. Then against five implementations that each carry one deliberate error, 
+where your suite earns credit for each error it catches. An error is caught when one of your assertions fails, 
+which happens only if some case of yours gives that implementation an input where it answers wrongly.
+
+Write your test cases in tests/tests.cc. That is the only file you submit.
+
+Functions to Test
+Function	Description
+std::string TankLevel(double litres)	
+    A volume above 500 returns "overflowing". 
+    A volume of exactly 500 returns "full". 
+    A volume at 50 and above, but below 500, returns "usable". 
+    A volume below 50 returns "low". 
+    A negative volume is not a volume at all, and returns "?".
+Five sentences, and each one is somewhere an implementation can go wrong. 
+Two of them describe a single value rather than a range, 
+and a case that gives the function a value from the middle of a range cannot speak for either.
+
+Examples
+Call	Returns
+TankLevel(0.0)	"low"
+TankLevel(50.0)	"usable"
+TankLevel(200.0)	"usable"
+TankLevel(500.0)	"full"
+TankLevel(600.0)	"overflowing"
+TankLevel(-5.0)	"?"
+Constraints
+Write only tests/tests.cc. Do not change includes/tank.hpp.
+Include <catch2/catch_test_macros.hpp> and "tank.hpp". If you compare a double you may also include 
+<catch2/catch_approx.hpp>. No other header is permitted.
+Give every volume you test a named constant, as in const double kJustBelowUsable = 49.5;. 
+The name is how a later reader knows which sentence of the specification the case is about.
+Your file is compiled with clang++ -std=c++20 -stdlib=libc++ -Wall -Wextra -Werror -pedantic and linked with 
+-lCatch2Main -lCatch2.
+Do not redefine the testing macros, and do not use NOLINT.
