@@ -11,7 +11,9 @@ TEST_FLAGS = -std=c++20 -stdlib=libc++ \
              -Wall -Wextra -Werror -pedantic \
              -g -O0
 
-SOURCES := $(wildcard src/*.cc)
+DRIVER := src/driver.cc
+TEST_DRIVER := tests/tests.cc
+SOURCES := $(filter-out $(DRIVER),$(wildcard src/*.cc))
 HEADERS := $(wildcard includes/*.hpp)
 
 TARGET := bin/exec
@@ -24,13 +26,13 @@ exec: $(TARGET)
 
 tests: $(TEST_TARGET)
 
-$(TARGET): $(SOURCES) $(HEADERS)
+$(TARGET): $(DRIVER) $(SOURCES) $(HEADERS)
 	@mkdir -p bin
-	$(CXX) $(CXXFLAGS) $(SOURCES) -o $@
+	$(CXX) $(CXXFLAGS) $(DRIVER) $(SOURCES) -o $@
 
-$(TEST_TARGET): tests/tests.cc src/solution.cc $(HEADERS)
+$(TEST_TARGET): $(TEST_DRIVER) $(SOURCES) $(HEADERS)
 	@mkdir -p bin
-	$(CXX) $(TEST_FLAGS) tests/tests.cc src/solution.cc -o $@ -lCatch2Main -lCatch2
+	$(CXX) $(TEST_FLAGS) $(TEST_DRIVER) $(SOURCES) -o $@ -lCatch2Main -lCatch2
 
 clean:
 	rm -f bin/*

@@ -1,0 +1,71 @@
+An Inventory records the number of units of each item that a shop holds, with the name of each item as a 
+key of a std::map<std::string, int>. 
+Its invariant is that every quantity in stock_ lies between 1 and kMaxQuantity. 
+The member functions maintain the invariant in two ways: an item whose quantity reaches 0 is erased from stock_, 
+and a call that would violate the invariant returns false and leaves the object unchanged. 
+Inventory declares no constructor, so every Inventory object begins with an empty stock_.
+
+Inventory
+The starter header inventory.hpp declares every member listed below, 
+and you write the body of each member function in inventory.cc.
+
+Public interface
+Signature	Description
+bool AddStock(const std::string& item, int quantity);	
+Adds quantity to the quantity of item, inserting item into stock_ when it is not a key of stock_, and returns true. 
+When quantity is 0 or negative, or when the resulting quantity would exceed kMaxQuantity, it returns false and leaves stock_ unchanged.
+
+bool Sell(const std::string& item, int quantity);	
+Calls HasAtLeast(item, quantity) to check that stock_ holds at least quantity units of item. 
+It then subtracts quantity from the quantity of item, calls RemoveIfEmpty(item) to erase item when its quantity reaches 0, 
+and returns true. When quantity is 0 or negative, or when HasAtLeast returns false, it returns false and leaves stock_ unchanged.
+
+bool InStock(const std::string& item) const;	
+Returns true when item is a key of stock_, and false otherwise.
+
+int GetQuantity(const std::string& item) const;	
+Returns the quantity of item, or 0 when item is not a key of stock_.
+
+int GetTotalItems() const;	
+Returns the sum of the quantities of every item in stock_, or 0 when stock_ is empty.
+
+Private member functions
+Signature	Description
+bool HasAtLeast(const std::string& item, int quantity) const;	
+Returns true when item is a key of stock_ and its quantity is at least quantity, and false otherwise.
+
+void RemoveIfEmpty(const std::string& item);	
+Erases item from stock_ when its quantity is 0. When the quantity of item is positive, or when item is not a key of stock_, it leaves stock_ unchanged and inserts no element.
+
+Private data members
+Member	Type	Description
+kMaxQuantity	static constexpr int	The largest quantity that one item can have, 999. 
+It is a static member, so the class holds one copy that every Inventory object shares.
+
+stock_	std::map<std::string, int>	Maps the name of each item to its quantity. 
+Every quantity lies between 1 and kMaxQuantity.
+
+Constraints
+Your code must compile with clang++ using the c++20 standard and -stdlib=libc++, without errors under 
+-Wall -Wextra -Werror -pedantic -Wuninitialized. Your code is also compiled with AddressSanitizer, 
+which reports invalid memory accesses, and UndefinedBehaviorSanitizer, which reports operations such as signed 
+integer overflow; the Run button shows their reports.
+
+Declare every member exactly as the tables give it, and define every member function in inventory.cc. 
+Function definitions in header files are rejected. The data members of Inventory are exactly the two in the table, 
+so you may not declare a data member of your own. Inventory declares no constructor and no base class, and its 
+public member functions are exactly those in the table, so you may not add a constructor, a base class or a public member 
+function. You may declare private member functions of your own to implement the interface. Non-member helper functions 
+of your own are declared in inventory.hpp after the class definition and defined in inventory.cc. Beyond those and what 
+this prompt gives, the header declares no other function, operator or variable, and no using-declaration or 
+using-directive. An object's state lives in its data members, so a static local variable or a variable at namespace 
+scope must be a constant, and a constant is const all the way through, such as static constexpr int or const char* const. 
+The autograder sets stock_ directly before each call, so every member function must read the state of the object from 
+stock_ alone.
+
+You may include only the following headers: "inventory.hpp", <map>, <string>.
+
+Compute the sum in GetTotalItems with your own loop over stock_. Functions from the standard algorithm and numeric 
+libraries, such as those declared in <algorithm> and <numeric>, and the iterator functions that measure or move between 
+positions, are not permitted. The member functions of std::map, such as contains, at, erase, and the subscript operator, 
+are permitted.

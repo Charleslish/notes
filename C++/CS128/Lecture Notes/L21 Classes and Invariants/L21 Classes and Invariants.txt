@@ -1,0 +1,122 @@
+L21 Classes and Invariants
+    Why objects need invariants
+        An invariant is a condition on the representation of an object, that is, on the values of its data members.
+            e.g. temperature > -273K
+        A class is a user-defined type that represents a concept
+            A class can restrict which code accesses its data members. 
+        A member function is a function declared in a class. 
+        A constructor establishes the invariant when it initializes an object.
+            temp = setTemp(temperature)
+    Controlling access with public and private
+        A class definition has the same form as a struct definition
+        Its members are divided into sections, each introduced by an access specifier
+        A public member, declared after public:, is accessible to all users of the class. 
+        A private member, declared after private:, can be accessed by the member functions of its class.
+            class Hero {
+                private:
+                    int health_ = 30;
+            };
+            it cannot be read or write other than that way
+        A struct is a class whose members are public by default.
+        The trailing underscore in health_ follows the naming convention for the private data members of a class. 
+            It distinguishes them from parameters and local variables. 
+        Access control moves the responsibility for the invariant from every statement in the program to the class itself. 
+    Declaring, defining, and calling member functions
+        #ifndef HERO_HPP
+        #define HERO_HPP
+        
+        class Hero {
+            public:
+            int GetHealth() const; //The keyword const declares a const member function.
+            //A const member function is declared not to modify the state of the object for which it is called.
+            void TakeDamage(int amount);
+
+            private:
+            static constexpr bool kTrace = true;
+            int health_ = 30;
+        };
+
+        #endif  // HERO_HPP
+        #include "hero.hpp"
+        #include <iostream>
+        int Hero::GetHealth() const {
+            if (kTrace) {
+                std::cout << "Hero::GetHealth() returns " << health_ << std::endl;
+            }
+            return health_;
+        }
+        void Hero::TakeDamage(int amount) {
+        if (kTrace) {
+            std::cout << "Hero::TakeDamage(" << amount << "): health_ " << health_
+                    << " -> " << health_ - amount << std::endl;
+            }
+            health_ -= amount;
+        }//HERO.CC
+        The public members of a class form its interface: 
+            the set of declarations through which code outside the class uses its objects. 
+        The name of the function is qualified with the class name and the scope resolution operator ::
+        A member function is called for an object of its class, using the dot operator .
+            e.g. .size() for std::vector
+    Static data members: one copy for the class
+        A static member is a member of a class for which there is only one copy for the whole program rather than one per object.
+        A member function can also be declared static
+            a static member function need not be called for an object of its class
+        If kTrace were a non-static data member, declared as const bool kTrace = true;,
+            every Hero object would store its own copy of the same bool.
+    Object lifetime: constructors and destructors
+        A constructor is a member function with the same name as its class, used to initialize objects of its class.
+        A constructor has no return type.
+            Hero::Hero(std::string name, int max_health)
+                : name_(name),
+                max_health_(max_health),
+                health_(max_health) {
+                }
+        The part that follows the colon and precedes the body is the member initializer list.
+            Each member initializer names a data member and supplies its initial value in parentheses.
+        This is initialization rather than assignment: each data member receives its first value, and no previous value is involved.
+        A value that does not depend on the parameters belongs in the in-class member initializer.
+            int mana_ = kStartingMana;
+        When a class has a constructor, every object of the class is initialized by a constructor call.
+        A constructor that checks max_health against the allowed range establishes the invariant for every argument.
+        A destructor is a member function used to clean up an object when the object is destroyed, and it is called implicitly.
+            Its name is the class name prefixed by ~, so the destructor of Hero is ~Hero().
+        A destructor takes no arguments and has no return type, and a class has exactly one.
+            ~Hero()
+        A local object is destroyed when it goes out of scope, at the end of the block in which it is declared.
+        Objects declared in the same scope are destroyed in the reverse order of their construction.
+        When a class declares no destructor, the compiler supplies one that destroys each non-static data member.
+            Hero::~Hero() {
+                // cleanup, e.g.print out sth before cleaning
+            }//if you don't need to, you don'y have to explicitly declare destructors
+    Establishing and maintaining the invariant
+        Only the member functions of Hero can change its private data members.
+        The invariant therefore holds for every hero if the constructor establishes it and every member function that modifies a hero maintains it.
+        The constructor must establish the invariant before any other member function is called.
+            A constructor that initializes max_health_ directly from its parameter accepts any value.
+        A revised constructor therefore checks max_health_ against the allowed range.
+        The check can also be written in the member initializer list.
+        Both forms establish the invariant, but they differ in how each data member gets its value.
+    Separating the interface from the implementation
+        The public members of Hero form its interface, the set of declarations through which other code uses a hero.
+        The non-static data members form the representation, the state on which the invariant is a condition.
+        The implementation consists of the private members, including the representation, and the definitions of all the member functions.
+            A private member function is part of the implementation.
+        A helper function is a function that performs part of the work of a class.
+        A non-member helper function is a helper function that is not a member of the class.
+        Specifying an interface that hides the implementation details is called abstraction.
+        The enforcement of abstraction is called encapsulation.
+        Access control prevents access to the implementation details of an object except through its interface.
+        As long as the interface stays the same, code outside the class needs no change.
+    Examining objects with const member functions
+        A public member function that returns information about an object is often called an accessor, and one that modifies the object is called a mutator.
+        A member function that examines an object is declared const.
+            int GetHealth() const;
+        A const member function can be called for both const and non-const objects.
+        A non-static member function that is not declared const can be called only for non-const objects.
+            void TakeDamage(int amount); //cannot be called by const Hero
+        Access and const are separate rules:
+            private: controls who can access a member
+            const: prevents a member function from modifying its object
+        The keyword const is part of the type of a member function, so it appears in both the declaration and the definition.
+        We declare every non-static member function that examines its object without modifying it const, 
+            and we leave a non-static member function that modifies the object without that qualifier.
