@@ -1,0 +1,93 @@
+L22 Initialization and Interface Design
+    Overloading constructors
+        Constructors are member functions, so they can be overloaded like other functions.
+        The two declarations share a name and differ in their parameter lists.
+            Hero(const std::string& name, int max_health);
+            Hero(const std::string& name, int max_health, int starting_mana);
+        A data member can have both an in-class member initializer and a member initializer.
+        When a constructor's member initializer list names such a data member, 
+            only the member initializer is used, and the in-class member initializer is ignored.
+        A constructor whose list does not name the data member still uses the in-class member initializer when one is present.
+        A member with neither initializer is default-initialized.
+        A member of primitive type does not receive a value from default initialization, 
+            so we give such members explicit initial values.
+        Each constructor names only the data members whose values depend on its own parameters, 
+            and every value that the constructors share is stated once, in the class definition.
+    Stating shared defaults once
+        A member initializer list can name a data member even when its value does not depend on a parameter, 
+            but the value is then stated in two places.
+        The member initializer overrides the in-class member initializer.
+        A default that appears in the class definition and again in a member initializer list must be changed in every place it appears.
+        Stating each default once, in its in-class member initializer, removes that possibility.
+    When a class has a default constructor
+        A default constructor is a constructor that requires no arguments.
+        The compiler supplies a default constructor only when a class declares no constructor at all.
+        A class should have a default constructor only when its objects have a natural default value.
+        A std::vector declared with only an initial size constructs each of its elements with the default constructor.
+            A declaration such as std::vector<Hero> therefore requires a default constructor of Hero if only the size is given.
+        A class that declares a constructor requiring arguments does not automatically have a default constructor.
+    Defaulting constructors and controlling implicit conversions
+        Some classes do have a natural default.
+            Potion() = default; //requests the default constructor that the compiler would otherwise have supplied.
+        A constructor that can be called with one argument also defines a conversion from the type of that argument.
+        An implicit conversion is one that the language applies without the program requesting it.
+        A constructor declared with the keyword explicit is an explicit constructor, and it is not used for implicit conversions.
+            explicit Potion(int strength);
+        An explicit constructor is used only when the program requests the construction.
+            Potion(kStrongStrength)
+        From here on, a constructor that can be called with one argument is declared explicit, 
+            unless the conversion it defines is one the reader of the program should expect.
+    Initializing members in declaration order
+        Data members are initialized in the order of their declaration in the class, 
+            whatever order the member initializer list is written in.
+        We write every member initializer list in declaration order, 
+            so the order in which the list is read is the order in which the data members are initialized.
+        A member initializer that uses another data member is correct only when that data member is declared first.
+        Without such flags, the running program reads an uninitialized data member, which is undefined behavior.
+    Preventing narrowing with braces
+        Converting a double to an int is a narrowing conversion.
+        The conversion discards the fractional part.
+        Initialization with braces does not allow narrowing conversions.
+            const Hero kAyla{"Ayla", kMaxHealth};
+        Initialization with parentheses can perform a narrowing conversion.
+            const Hero kAyla("Ayla", kMaxHealth);
+        A conversion that discards part of a value is written with static_cast.
+            static_cast<int>(kMaxHealth)
+    Using scoped enumerations for type-safe parameters
+        An enumeration is a user-defined type consisting of a set of named values, and each name is an enumerator.
+            enum class Role { kWarrior, kMage };
+        The enumerators of an enum class are in the scope of their enumeration.
+            Role::kWarrior
+            Role::kMage
+        An enum class is a scoped enumeration and a distinct type: 
+            its values do not convert implicitly to int, and an int does not convert implicitly to it.
+        The constructor takes one Role, and the role determines both the maximum health and the starting mana.
+        A distinct parameter type can prevent a function call from passing an argument of the wrong type 
+            or exchanging two arguments of different types.
+    Writing non-member helper functions
+        A helper function is a function that performs part of the work of a class.
+        A non-member helper function is a helper function that is not a member of the class.
+        The non-member helpers in this lesson use objects only through their public interfaces.
+            A non-member helper function is not part of the interface of its class.
+            The public member functions form that interface.
+        We make a function a member function only if it needs direct access to the representation.
+        The non-member helpers in these examples respect encapsulation.
+        When the author of the class changes the representation, only the member functions must be rewritten, 
+            and every non-member helper function continues to work unchanged.
+    Designing an interface
+        Design is creating a clean and reasonably simple structure for a program.
+            minimal: it offers no operation its users do not need.
+            complete: it provides every operation that users of the class need.
+            type safe: its parameter types rule out arguments of the wrong kind or in the wrong order.
+            const correct: every non-static member function that examines an object without modifying it is declared const.
+        An interface must also prevent any code from violating the invariant of its class.
+        A member function that only assigns its argument to a data member protects the invariant no better than a public data member.
+            Such a member function defeats encapsulation.
+    Designing a Class
+        The design of a class follows the four phases of software development: Analysis, Design, Implementation, and Repeat.
+            Analysis identifies the concept that the class represents and the rules its values obey.
+            Design then fixes the invariant, the interface, and the representation, in that order.
+            Implementation writes the member functions.
+            Repeat returns to Analysis when implementation reveals something the analysis missed.
+        A class represents one concept.
+        

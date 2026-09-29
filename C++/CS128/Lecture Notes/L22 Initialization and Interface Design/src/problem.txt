@@ -1,0 +1,161 @@
+A QuestLog records the quests that one hero has taken on in a game, in the order they were added, 
+and the points the hero has earned by completing them. 
+Its invariant is that max_quests_ lies between kMinMaxQuests and kMaxMaxQuests, both ends included, 
+and that quests_ holds at most max_quests_ quests, each with a name that is not empty and that no other quest in 
+quests_ shares. The constructor with two parameters maintains the invariant by limiting max_quests_ to its range. 
+AddQuest and Complete maintain it by returning false and leaving the object unchanged when a call would violate it 
+or has nothing to do. The points of a quest log are computed from the completed quests each time GetPoints is called; 
+they are not stored.
+
+The starter header quest_log.hpp defines the enumeration Difficulty and the struct Quest, 
+and it declares every member of QuestLog and the non-member helper function IsFinished in the tables below. 
+You write the definition of each member function of QuestLog, and of IsFinished, in quest_log.cc.
+
+Difficulty and Quest
+Difficulty is an enum class with the three enumerators Difficulty::kEasy, Difficulty::kMedium, and Difficulty::kHard, 
+declared in that order. 
+A Quest is a struct that holds one quest. 
+Every Difficulty argument must be one of the three named enumerators. You may assume that this precondition holds.
+
+Public data members of Quest
+Member	Type	Description
+name	std::string	The name of the quest.
+difficulty	Difficulty	The difficulty of the quest. Its in-class member initializer is = Difficulty::kEasy.
+completed	bool	true when the hero has completed the quest. Its in-class member initializer is = false.
+
+QuestLog
+
+Public interface
+Signature	Description
+QuestLog() = default;	
+The default constructor, declared = default. 
+The in-class member initializers give hero_ the value "Adventurer" and max_quests_ the value kMaxMaxQuests. 
+The vector quests_ has no in-class member initializer; its own default constructor makes it empty.
+
+explicit QuestLog(const std::string& hero);	
+An explicit constructor. It initializes hero_ with hero in its member initializer list, and max_quests_ takes 
+its in-class member initializer. The vector quests_ uses its own default constructor and begins empty. 
+Because the QuestLog constructor is explicit, a std::string does not convert implicitly to a QuestLog.
+
+QuestLog(const std::string& hero, int max_quests);	
+Initializes hero_ with hero and max_quests_ with max_quests in its member initializer list, 
+and quests_ begins empty through its own default constructor. 
+The body then compares max_quests_ with each bound. When max_quests_ is below kMinMaxQuests, 
+it assigns kMinMaxQuests to max_quests_, and when max_quests_ is above kMaxMaxQuests, it assigns kMaxMaxQuests. 
+The body leaves a limit within the range unchanged.
+
+bool AddQuest(const std::string& name, Difficulty difficulty);	
+Calls CanAdd(name) to check that a quest named name can be added. When CanAdd returns true, 
+it appends to quests_ a Quest whose name is name, whose difficulty is difficulty, and whose completed is false, 
+and it returns true. When CanAdd returns false, it returns false and leaves quests_ unchanged.
+
+bool Complete(const std::string& name);	Calls FindQuest(name) to find the quest named name. 
+When that quest exists and is not completed, it sets the quest's completed to true and returns true. 
+When no quest in quests_ has that name, or when the quest is already completed, it returns false and leaves quests_ unchanged.
+
+bool IsCompleted(const std::string& name) const;	
+Calls FindQuest(name) to find the quest named name, and returns true when that quest exists and is completed. 
+It returns false when the quest is not completed or when no quest in quests_ has that name.
+
+int GetPoints() const;	
+Returns the sum of the points of every completed quest in quests_, or 0 when no quest is completed. 
+It calls PointsFor with the difficulty of each completed quest to obtain that quest's points. 
+A quest that is not completed adds nothing.
+
+unsigned int GetNumQuests() const;	
+Returns the number of quests in quests_, completed or not.
+
+unsigned int GetNumCompleted() const;	
+Returns the number of completed quests in quests_.
+
+std::string GetHero() const;	
+Returns hero_, the name of the hero.
+
+int GetMaxQuests() const;	
+Returns max_quests_, the largest number of quests the log can hold.
+
+Private member functions
+Signature	Description
+bool CanAdd(const std::string& name) const;	
+Returns true when a quest named name can be added without violating the invariant: 
+name is not empty, no quest in quests_ has the name name, and quests_ holds fewer than max_quests_ quests. 
+It returns false otherwise. It calls FindQuest(name) to check whether a quest has the name name.
+
+unsigned int FindQuest(const std::string& name) const;	
+Returns the index in quests_ of the quest whose name equals name, 
+or the number of quests in quests_ when no quest has that name. 
+Names are compared whole, and an uppercase letter differs from its lowercase letter, 
+so "Slay" matches neither "Slay the dragon" nor "slay".
+
+int PointsFor(Difficulty difficulty) const;	
+Returns the points that a completed quest of difficulty difficulty earns: 
+kEasyPoints for Difficulty::kEasy, kMediumPoints for Difficulty::kMedium, and kHardPoints for Difficulty::kHard.
+
+Private data members
+Member	Type	Description
+kMinMaxQuests	static constexpr int	
+The smallest limit on the number of quests, 1. It is a static member, so the class holds one copy that every QuestLog object shares.
+
+kMaxMaxQuests	static constexpr int	The largest limit on the number of quests, 10. It is also a static member.
+
+kEasyPoints	static constexpr int	The points of a completed easy quest, 10.
+
+kMediumPoints	static constexpr int	The points of a completed medium quest, 25.
+
+kHardPoints	static constexpr int	The points of a completed hard quest, 50.
+
+hero_	std::string	The name of the hero who keeps the log. Its in-class member initializer is = "Adventurer".
+
+max_quests_	int	The largest number of quests the log can hold. It lies between kMinMaxQuests and kMaxMaxQuests, 
+both ends included. Its in-class member initializer is = kMaxMaxQuests.
+
+quests_	std::vector<Quest>	The quests, in the order they were added. It holds at most max_quests_ quests, 
+every quest has a name that is not empty, and no two quests share a name.
+
+Non-member helper function
+Signature	Description
+bool IsFinished(const QuestLog& log);	
+Returns true when log holds at least one quest and every quest in it is completed, and false otherwise, 
+so a log with no quests is not finished. It is declared in quest_log.hpp after the class definition, 
+it is not a member of QuestLog, and it uses only the public interface of QuestLog.
+
+Constraints
+Your code must compile with clang++ using the c++20 standard and -stdlib=libc++, without errors under -Wall -Wextra 
+-Werror -pedantic -Wuninitialized. Your code is also compiled with AddressSanitizer, which reports invalid memory 
+accesses, and UndefinedBehaviorSanitizer, which reports operations such as signed integer overflow. 
+
+Declare every member exactly as the tables give it, including = default on the default constructor and explicit on 
+QuestLog(const std::string& hero) and on no other constructor. Define every member function of QuestLog, and IsFinished, 
+in quest_log.cc. Function definitions in header files are rejected. The data members of QuestLog are exactly the 
+eight in its table, and the data members of Quest are exactly the three in its table, so you may not declare a data 
+member of your own. QuestLog declares no constructor, public member function, or base class beyond those in its tables, 
+and Quest declares none at all. You may declare private member functions of your own in QuestLog to implement the 
+interface. Non-member helper functions of your own are declared in quest_log.hpp after the class definitions and 
+defined in quest_log.cc. The header declares no other functions, operators, variables, using-declarations, or 
+using-directives beyond the prompt's. Difficulty keeps exactly its three enumerators, in the order given. 
+A local variable whose value does not change may be declared const, including when its initializer depends on a 
+parameter or data member. A local constant whose initializer is a constant expression may be declared constexpr. 
+Your code declares no static local variable that is not const, no variable at namespace scope that is not const, 
+and no helper or nested class with a static data member that is not const. The autograder sets hero_, max_quests_, 
+and quests_ directly before each call, so every member function must read the state of the object from those data 
+members alone.
+
+Initialization follows one rule: a value that comes from a parameter goes in the constructor's member initializer list, 
+a default goes in an in-class member initializer, and any validation happens in the member initializer list or in the 
+constructor's body. QuestLog(const std::string& hero) must therefore initialize hero_ from its parameter hero in its 
+member initializer list and leave max_quests_ and quests_ out of that list. QuestLog(const std::string& hero, 
+int max_quests) must initialize hero_ and max_quests_ from its parameters in its member initializer list and leave 
+quests_ out of that list. QuestLog must declare hero_ with the in-class member initializer = "Adventurer" and 
+max_quests_ with the in-class member initializer = kMaxMaxQuests.
+
+You may include only the following headers: "quest_log.hpp", <string>, <vector>.
+
+Search quests_ in FindQuest, sum the points in GetPoints, and count the completed quests in GetNumCompleted with 
+your own loops over quests_. Each of these three member functions must contain its loop in its own definition, 
+not in a function it calls. No function in quest_log.cc may call itself. A submission that breaks either rule is 
+rejected before any test runs. Functions from the standard algorithm and numeric libraries, such as those declared 
+in <algorithm> and <numeric>, and the iterator functions that measure or move between positions, are not permitted. 
+Neither are the non-member functions std::erase and std::erase_if, or the functions that search a string for a character 
+or a substring: the member functions of std::string and std::string_view that do so, std::char_traits, and the 
+C library functions such as strchr, strstr, and memchr. The member functions of std::vector, such as push_back, 
+at, size, and empty, are permitted.
