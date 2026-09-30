@@ -1,0 +1,102 @@
+The core of a semantic version consists of three non-negative integers written as major.minor.patch, 
+such as 1.10.0. The class Version represents this three-component core; this activity does not model 
+pre-release identifiers or build metadata. Its invariant is that each of major_, minor_, and patch_ is at 
+least kMinComponent, which is 0. The constructor maintains the invariant by storing kMinComponent in place 
+of a negative argument. Two versions are compared with == and <, and a version is printed with <<. 
+Each of these operators is defined by a non-member operator function that reads the components through the 
+public interface of Version, so none of them needs to be a friend of the class.
+
+The starter header version.hpp declares every member of Version and every operator function in the tables below. 
+You write the definition of each member function and each operator function in version.cc.
+
+Version
+Public interface
+Signature	Description
+Version(int major, int minor, int patch);	
+Initializes major_, minor_, and patch_ with major, minor, and patch in its member initializer list. 
+The body then compares each of the three data members with kMinComponent and assigns kMinComponent to a 
+data member that is below it. The body leaves a component of 0 or more unchanged, so Version(-2, 4, -7) holds 0.4.0.
+int GetMajor() const;	Returns major_, the major component.
+int GetMinor() const;	Returns minor_, the minor component.
+int GetPatch() const;	Returns patch_, the patch component.
+Private data members
+Member	Type	Description
+kMinComponent	static constexpr int	The smallest value of a component, 0. It is a static member, 
+so the class holds one copy that every Version object shares.
+major_	int	The major component, at least kMinComponent. Its in-class member initializer is = kMinComponent.
+minor_	int	The minor component, at least kMinComponent. Its in-class member initializer is = kMinComponent.
+patch_	int	The patch component, at least kMinComponent. Its in-class member initializer is = kMinComponent.
+Non-member operator functions
+Each operator function below is declared in version.hpp after the class and defined in version.cc. 
+It is not a member of Version and not a friend of it.
+
+Signature	Description
+bool operator==(const Version& lhs, const Version& rhs);	
+Returns true when the major components, the minor components, and the patch components of lhs and rhs are 
+each equal, and false otherwise. 
+It reads the components of both versions through GetMajor, GetMinor, and GetPatch. 
+Under C++20 the compiler evaluates a != b as !(a == b), so the prompt's header declares no operator!=.
+
+bool operator<(const Version& lhs, const Version& rhs);	
+Returns true when lhs comes before rhs. The major components decide first. 
+When they are equal, the minor components decide, and when those are also equal, the patch components decide. 
+Two versions with the same three components give false. The components compare as numbers, not as text, 
+so 1.9.3 < 1.10.0 is true: 9 is less than 10, although the text "10" comes before "9". 
+It reads the components of both versions through GetMajor, GetMinor, and GetPatch.
+
+std::ostream& operator<<(std::ostream& os, const Version& version);	
+Inserts the three components of version into os, using the stream's numeric formatting. 
+Assume that os has its default numeric formatting and locale, an initial field width of 0, and no error state. 
+Under these preconditions, the components are separated by a period, with no other characters: 
+Version(1, 10, 0) inserts 1.10.0. It reads the components through GetMajor, GetMinor, and GetPatch, 
+and it returns os, so that insertions can be chained. 
+It leaves the fill character of os unchanged and its field width at 0.
+
+Constraints
+Your code must compile with clang++ using the c++20 standard and -stdlib=libc++, without errors under 
+-Wall -Wextra -Werror -pedantic -Wuninitialized. Your code is also compiled with AddressSanitizer, 
+which reports invalid memory accesses, and UndefinedBehaviorSanitizer, which reports operations such as 
+signed integer overflow. The Run button shows their reports.
+
+Declare every member and every operator function exactly as the tables give it, and define each of them in 
+version.cc. Function definitions in header files are rejected. The data members of Version are exactly the 
+four in the table, so you may not declare a data member of your own. Version declares no constructor, 
+public member function, or base class beyond those the tables give, and outside the class version.hpp 
+declares only the three operator functions, the optional operator!= below, and your own non-member helper 
+functions: no using-declaration, and no variable of your own. You may declare private member functions of 
+your own. Declare any non-member helper function in version.hpp after the class, and define it in version.cc. 
+Your header may also declare bool operator!=(const Version& lhs, const Version& rhs); after the class, 
+in exactly that form, and define it in version.cc; if it does, a != b calls it, so it must agree with 
+operator==. The autograder sets major_, minor_, and patch_ directly before each function call, so every 
+function must read the state of a Version from those data members alone. A static local variable that is not 
+const, or one that is const but initialized from a parameter, a data member, or a call to a function that 
+is not constexpr, is rejected, and so are a thread_local variable, a variable declared at namespace scope 
+that is not const, a static data member of a helper class or a nested class that is not const, a mutable 
+data member, and errno, because each would let a function remember an earlier call. A constexpr variable, 
+and a const variable whose initializer reads only constants, such as static const int kTen = 10;, are allowed. 
+These restrictions on persistent state do not prohibit ordinary local variables. 
+A local const variable that is neither static nor thread_local may be initialized from a parameter or a 
+data member.
+
+Initialization follows one rule: a value that comes from a parameter goes in the constructor's member 
+initializer list, a default goes in an in-class member initializer, and any validation happens in the member 
+initializer list or in the constructor's body. Version(int major, int minor, int patch) must therefore 
+initialize each of major_, minor_, and patch_ from its parameter of the same name in its member initializer 
+list, and Version must declare each of them with the in-class member initializer = kMinComponent.
+
+The operator functions follow three rules, and a submission that breaks one is rejected with a message that 
+names it. First, operator==, operator<, and operator<< are non-member functions: an operator function 
+declared as a member of Version is rejected. Second, Version declares no friend: each operator function 
+reads the components through GetMajor, GetMinor, and GetPatch, in its own body. Third, you write the body 
+of each comparison yourself: a comparison operator function declared = default is rejected, and so is any 
+declaration of operator<=>.
+
+You may include only the following headers: "version.hpp" and <ostream>.
+
+Compare the components yourself, one pair at a time. Functions from the standard algorithm and numeric 
+libraries, such as those declared in <algorithm> and <numeric>, and the iterator functions that measure 
+or move between positions, are not permitted. Neither are library types and functions that store several 
+values together and compare them as a sequence, such as the standard containers and strings. 
+Library functions that convert a number to text are also not permitted, and neither are the compiler's 
+builtin functions that select the smaller or the larger of two values, or the library and builtin functions 
+that compare two blocks of memory. Declaring any function or variable with an assembler label is not permitted.

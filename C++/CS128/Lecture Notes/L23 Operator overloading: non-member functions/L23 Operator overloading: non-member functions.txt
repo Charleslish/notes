@@ -1,0 +1,116 @@
+L23 Operator overloading: non-member functions
+    Representing a purse of coins
+        A class keeps its data members private, and its member functions maintain its invariant.
+            The invariant of Coins is that gold_ is at least 0 and silver_ lies between 0 and 99.
+            100 silver coins are worth 1 gold coin.
+            The data members gold_ and silver_ are the representation of a purse.
+            The public member function TotalSilver gives the value of a purse in silver.
+        Different constructor arguments can represent the same value.
+            Coins(2, 145) → Coins(3, 45)
+        No definition of == exists for Coins, a user-defined type, 
+            so the compiler cannot evaluate the expression kPurse == kPrice.
+    Comparing purses with a non-member function
+        A non-member helper function that is not a friend of a class works through its public interface.
+        Operator overloading gives an operator a meaning for a user-defined type.
+        We define an operator function, a function whose name is the keyword operator followed by the symbol of the operator, 
+            such as operator==.
+        When the compiler encounters kPurse == kPrice, 
+            it looks for a function named operator== whose parameters accept two Coins objects.
+        An operator should keep the meaning that it has for the primitive types.
+        A non-member operator function expresses symmetry, because it receives both operands as parameters and treats them alike.
+    Defining an operator function
+        An operator function has the parts of every function: a return type, a name, a parameter list, and a body.
+            bool operator==(const Coins& lhs, const Coins& rhs); //declaration in .hpp
+            bool operator==(const Coins& lhs, const Coins& rhs) {
+                return lhs.TotalSilver() == rhs.TotalSilver();
+            } //Definition in .cc
+        The parameters are references to const, so the function reads both purses without copying or modifying either.
+        For int objects, == tests whether two values are equal and modifies neither operand.
+            The operator== above does the same for two purses.
+    Mapping operands to parameters
+        The compiler interprets kPurse == kPrice as a function call to operator== with the two operands as its arguments.
+            kPurse == kPrice // operator notation
+            operator==(kPurse, kPrice) // function call notation
+        When a non-member operator function is called, the left-hand operand initializes the first parameter and the right-hand operand initializes the second.
+            The parameter names lhs and rhs abbreviate left-hand side and right-hand side.
+            They are a naming convention, not a requirement.
+        The compiler selects the operator function for an expression by overload resolution.
+    Deriving inequality from equality in C++20
+        Under C++20, the bool-returning operator== also supplies the comparison for a != b when both operands are Coins objects.
+        With no matching operator!= declared, the compiler evaluates this expression as !(a == b). 
+            kPurse != kPrice
+            !operator==(kPurse,kPrice)
+        The selected equality function must return bool for this rewrite.
+        Before C++20, the program required a separate operator!= and did not compile without it.
+        The compiler derives != from == and derives no other operator for Coins.
+    Ordering purses by total value
+        For two purses, operator< has the same parameters and return type as operator==.
+        For two purses, operator< compares their total values in silver.
+            compare kPurse.gold * 100 + kPurse.silver with that of kPrice
+        A purse that holds exactly the price is not less than it, so the player can afford that item.
+        The body of an operator function must compare the whole value that the object represents.
+    Returning new values from arithmetic operators
+        Adding a reward to a purse produces a new purse, so operator+ returns a Coins object.
+            The return type is Coins, not a reference, because the result is a new object.
+            Neither operand is modified.
+            Coins operator+(const Coins& lhs, const Coins& rhs) {
+                return Coins(0, lhs.TotalSilver() + rhs.TotalSilver());
+            }
+        Paying for an item subtracts its price from the purse, so operator- also returns a new Coins object.
+            The order of the operands matters for subtraction.
+            kPurse - kPotion calls operator-(kPurse, kPotion).
+            For a price larger than the purse, operator- returns an empty purse.
+        Computing with the total value in silver avoids errors from subtracting gold and silver separately.
+    Unary and binary operators
+        The operators ==, <, +, and - defined for Coins are each a binary operator, 
+            an operator that takes two operands.
+            The non-member operator function for each has two parameters.
+        A unary operator takes one operand.
+        For int objects, the minus sign in 5 - 3 is binary, and the minus sign in -5 is unary.
+        A non-member operator- for unary minus has one parameter, and one for binary minus has two.
+        Postfix ++ and -- are exceptions to the one-parameter pattern for unary operators: 
+            their non-member functions take an additional int parameter that distinguishes postfix from prefix forms.
+            operator++(x)       → prefix
+            operator++(x, int)  → postfix
+        The number of parameters therefore tells the compiler whether a declaration of operator- defines unary or binary minus.
+            Coins defines no unary minus, because no purse holds a negative amount.
+    Why stream insertion is a non-member function
+        To write std::cout << kPurse, a program needs an operator<< 
+            whose first parameter is an output stream, of type std::ostream, and whose second parameter is a purse.
+        The left-hand operand std::cout initializes the first parameter, and kPurse initializes the second.
+        A member function of Coins is called for a purse, so a member operator<< takes the purse as its left-hand operand.
+        std::ostream is a class of the standard library, and a program cannot add a member function to it.
+        Therefore, operator<< must be a non-member function.
+            std::ostream& operator<<(std::ostream& os, const Coins& coins) {
+                os << coins.gold_ << "g " << coins.silver_ << "s";
+                return os;
+            }
+        Membership determines how operands correspond to parameters; 
+            friendship determines access to private members.
+            friend std::ostream& operator<<(std::ostream& os, const Coins& coins); //inside the class public
+            std::ostream& operator<<(std::ostream& os, const Coins& coins); //non-member, or outside the interface
+    Friend access and chained stream insertion
+        A friend function is a function that a class explicitly grants access to its private members.
+        A friend function is not a member function.
+        The definition in coins.cc repeats neither friend nor Coins::.
+        A non-member operator<< needs to be a friend only to read private members.
+        It can instead use the public interface.
+        std::cout << kPurse << "\n" means (std::cout << kPurse) << "\n".
+            operator<< returns its first parameter, os, as a std::ostream& so that stream insertion can be chained.
+            With a return type of void, the result of std::cout << kPurse cannot be the left-hand operand of the next <<.
+        Stream extraction, >>, has the same form: its left-hand operand is an input stream, 
+            such as std::cin, 
+            so an operator>> for a class is also a non-member function.
+    Rules that limit operator overloading
+        Operator overloading gives existing operators meanings for user-defined types.
+        A non-member operator function must have at least one parameter of class or enumeration type.
+            You cannot change what + means for two int objects.
+        Only the operators of the language can be overloaded.
+            You cannot create a new operator such as **.
+        The operators ::, ., .*, ?:, and sizeof cannot be overloaded at all.
+        The number of operands is fixed by the grammar.
+            You cannot define a unary % or a three-operand +.
+        An overloaded operator keeps the precedence and associativity of the original operator.
+            + still has higher precedence than ==.
+            - still evaluates from left to right.
+        The operators =, [], (), and -> can be overloaded only as member functions.
