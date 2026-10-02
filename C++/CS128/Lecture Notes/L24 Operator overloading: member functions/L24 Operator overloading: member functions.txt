@@ -1,0 +1,82 @@
+L24 Operator overloading: member functions
+    Modifying a purse with compound assignment
+        The class Coins represents a purse of gold coins and silver coins, and 100 silver coins are worth 1 gold coin.
+        Its invariant is that gold_ is at least 0 and silver_ lies between 0 and 99.
+        The class also declares operator<< as a friend function, 
+            which grants this non-member function access to its private members.
+        An operator such as + produces a new purse and modifies neither operand.
+        The expression purse += kReward should modify the left-hand operand and leave the right-hand operand unchanged.
+        Its two operands therefore play different roles.
+    Referring to the object with *this
+        Operator overloading gives an operator a meaning for a user-defined type.
+        The meaning is defined by an operator function, 
+            a function whose name is the keyword operator followed by the symbol of the operator.
+        A member operator function for a binary operator has one explicit parameter, not two.
+        The object for which the member function is called is the left-hand operand, 
+            and the right-hand operand initializes its one parameter.
+            aa += bb
+            aa.operator+=(bb)
+        Inside a non-static member function, the keyword “this” gives a pointer to the object for which the function is called.
+        Applying the dereference operator * to that pointer gives the object, 
+            so *this denotes the whole object.
+        A static member function has no this pointer because it is not called for a particular object.
+    Implementing compound assignment
+        The declaration of operator+= appears in the public part of the class, as 
+            Coins& operator+=(const Coins& rhs).
+        The body adds the parts of rhs and ends with return *this;, 
+            which returns the object for which the function is called.
+        The return type Coins& is a reference, so the function call yields that object itself, not a copy of it.
+        For the member function, the compiler interprets purse += kReward as purse.operator+=(kReward).
+        For the non-member function, the same expression is the function call operator+=(purse, kReward).
+        A public member function that modifies an object must leave the object in a state that satisfies the invariant.
+        Only the member functions and friends of Coins can call private members such as CarrySilver.
+        Access to private members is granted to the member functions of a class, not to one object.
+            A member operator function can therefore access the private members of another object of the same class.
+        Operators that modify an operand, such as =, *=, and ++, are most naturally defined as members for user-defined types.
+    Returning the modified object by reference
+        Compound assignment is itself an expression, and it can be the operand of another one.
+        Compound assignment groups from right to left.
+        The return type of operator+= for Coins is Coins&, and its body ends with return *this;.
+            The expression pouch += kLoot therefore yields the object pouch itself.
+        With a return type of void, the expression pouch += kLoot has type void.
+        With a return type of Coins, the function returns a copy of the object for which it is called.
+        Returning *this by reference makes a compound assignment for a class behave as it does for int.
+        Every compound assignment operator, such as -= and *=, follows the same convention.
+    Implementing prefix and postfix increment
+        The prefix expression ++count increments count and yields the new value.
+        The postfix expression count++ also increments it, but yields the old value.
+        Increment is a unary operator, so a member operator function for it has no explicit parameter for its operand.
+        The postfix form takes an unnamed parameter of type int, which the language uses only to tell the two forms apart.
+            Coins& operator++();      // prefix
+            Coins& Coins::operator++() {
+                ++silver_;
+                CarrySilver();
+                return *this;   //The prefix form returns *this by reference.
+            }
+            Coins operator++(int);    // postfix
+            Coins Coins::operator++(int) {
+                const Coins kOld = *this;
+                ++*this;
+                return kOld;    //The postfix form returns the value from before the increment by value.
+            }
+        Because the postfix form must produce the value from before the increment, 
+            this implementation saves a copy that the prefix form does not need.
+        When a program does not use the old value, ++purse is the form to write.
+        For a class that also defines --, the declarations follow the same pattern.
+    Choosing between a member and a non-member function
+        Must be members: 
+            The assignment =, 
+            subscripting [], 
+            the function call (), 
+            and member access through -> must be member functions in C++20.
+        Usually members: 
+            Operators that modify an operand, such as += and ++, are most naturally member functions 
+            because they change the object for which the function is called.
+        Usually non-members: 
+            Operators that compute a new value from their operands and modify neither of them, 
+            such as ==, <, +, and -, are most naturally non-member functions.
+        Cannot be members: 
+            An operator whose left-hand operand is not an object of the class cannot be a member of that class.
+            In std::cout << purse, the left-hand operand is a std::ostream, so operator<< for Coins is a non-member function.
+        Friendship is a separate choice from membership.
+            A non-member operator function that needs the representation can be declared a friend of the class.

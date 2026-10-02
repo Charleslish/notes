@@ -1,0 +1,140 @@
+A Date holds one day of the Gregorian calendar as a year, a month, and a day. 
+Its invariant is that year_ lies between kMinYear and kMaxYear, month_ lies between 1 and kMonthsPerYear, 
+and day_ lies between 1 and the number of days in that month. 
+Every range includes both of its ends. The member operators ++, --, +=, and -= move a date by days across 
+the ends of months and years, February 29 of a leap year included. Each of them changes day_, 
+and the private member function Normalize then restores the invariant. 
+A date never moves past either end of the range: a move that would pass December 31 of kMaxYear, 
+the last date, stops there, and a move that would pass January 1 of kMinYear, the first date, stops there. 
+The constructor keeps the invariant by limiting each argument to its range.
+
+The starter header date.hpp declares every member of Date in the tables below. 
+You write the definition of each member function of Date in date.cc.
+
+Date
+Public interface
+Signature	Description
+Date() = default;	
+    The default constructor. The in-class member initializers give January 1 of kDefaultYear.
+Date(int year, int month, int day);	
+    Initializes year_, month_, and day_ with year, month, and day in its member initializer list. 
+    The body then limits each data member to its range, in this order: year_ to the range from kMinYear to 
+    kMaxYear, month_ to the range from 1 to kMonthsPerYear, and day_ to the range from 1 to DaysInMonth(). 
+    The body compares each data member with each bound and assigns the bound only when the member lies 
+    outside it: a value below the range becomes the lower bound, and a value above it becomes the upper bound. 
+    The constructor calls the private member function DaysInMonth for the upper bound of day_, after year_ 
+    and month_ hold their limited values.
+int GetYear() const;	
+    Returns year_.
+int GetMonth() const;	
+    Returns month_.
+int GetDay() const;	
+    Returns day_.
+Date& operator++();	
+    Prefix increment. Adds 1 to day_, calls the private member function Normalize to restore the invariant, 
+    and returns *this by reference. On the last date, the date is unchanged.
+Date operator++(int);	
+    Postfix increment. Saves a copy of the object for which it is called, increments that object as the prefix 
+    form does, and returns the saved copy by value. The returned Date holds the date from before the increment.
+Date& operator--();	
+    Prefix decrement. Subtracts 1 from day_, calls the private member function Normalize to restore the 
+    invariant, and returns *this by reference. On the first date, the date is unchanged.
+Date operator--(int);	
+    Postfix decrement. Saves a copy of the object for which it is called, decrements that object as the prefix 
+    form does, and returns the saved copy by value. The returned Date holds the date from before the decrement.
+Date& operator+=(int days);	
+    Moves the date forward by days days, or backward when days is negative. It adds LimitStep(days) to day_, 
+    calls the private member function Normalize to restore the invariant, and returns *this by reference, 
+    so (date += 1) += 2 moves date itself by 3 days. It calls the private member function LimitStep so that 
+    day_ stays within the values Normalize accepts.
+Date& operator-=(int days);	
+    Moves the date backward by days days, or forward when days is negative. It subtracts LimitStep(days) from 
+    day_, calls the private member function Normalize to restore the invariant, and returns *this by reference. 
+    It calls the private member function LimitStep so that day_ stays within the values Normalize accepts.
+
+Private member functions
+Signature	Description
+bool IsLeapYear() const;	
+    Returns true when year_ is a leap year of the Gregorian calendar, and false otherwise. 
+    A leap year is a multiple of 400, or a multiple of 4 that is not a multiple of 100, 
+    so 2024 and 2000 are leap years, and 2023 and 1900 are not.
+int DaysInMonth() const;	
+    Returns the number of days in month month_ of year year_. January, March, May, July, August, October, 
+    and December have 31 days, and April, June, September, and November have 30. 
+    February has 29 days when IsLeapYear() returns true and 28 otherwise. 
+    It calls the private member function IsLeapYear to decide the length of February.
+int LimitStep(int days) const;	
+    Returns days limited to the range from -kMaxStep to kMaxStep: a value below -kMaxStep becomes -kMaxStep, 
+    a value above kMaxStep becomes kMaxStep, and every other value is returned unchanged. 
+    No date lies more than kMaxStep days from either end of the range, 
+    so the limited step ends at the same date as the original one, 
+    and adding it to day_ cannot exceed the range of int.
+void Normalize();	
+    Restores the invariant after day_ has moved outside the days of month_. 
+    It is called with year_ and month_ in their ranges and with day_ between 1 - kMaxStep and 31 + kMaxStep. 
+    While day_ is greater than DaysInMonth(), it subtracts DaysInMonth() from day_ and moves to the next month, 
+    where the month after December is January of the next year. 
+    While day_ is less than 1, it moves to the previous month and adds that month's DaysInMonth() to day_, 
+    where the month before January is December of the previous year. Then, when year_ is above kMaxYear, 
+    the date becomes the last date, and when year_ is below kMinYear, the date becomes the first date. 
+    It calls the private member function DaysInMonth for the length of each month.
+
+Private data members
+Member	Type	Description
+kMinYear	static constexpr int	The first year of the range, 1600. It is a multiple of 400, so it is a leap year.
+kMaxYear	static constexpr int	The last year of the range, 2400. It is a multiple of 400, so it is a leap year.
+kMonthsPerYear	static constexpr int	The number of months in a year, 12.
+kMaxStep	static constexpr int	The number of days from the first date to the last date, 292559.
+kDefaultYear	static constexpr int	The year of the date that the default constructor gives, 2000.
+year_	int	The year, between kMinYear and kMaxYear. Its in-class member initializer is = kDefaultYear.
+month_	int	The month, between 1 for January and kMonthsPerYear for December. Its in-class member initializer is = 1.
+day_	int	The day of the month, between 1 and DaysInMonth(). Its in-class member initializer is = 1.
+
+Constraints
+Your code must compile with clang++ using the c++20 standard and -stdlib=libc++, 
+without errors under -Wall -Wextra -Werror -pedantic -Wuninitialized. Your code is also compiled with 
+AddressSanitizer, which reports invalid memory accesses, and UndefinedBehaviorSanitizer, which reports 
+operations such as signed integer overflow. The Run button shows their reports.
+
+Declare every member exactly as the tables give it, and define every member function of Date in date.cc. 
+Function definitions in header files are rejected. The data members of Date are exactly the eight in the 
+table, so you may not declare a data member of your own. Date declares no constructor, public member function, 
+or base class beyond those the tables give, and outside the class date.hpp declares only your own non-member 
+helper functions: no using-declaration, and no variable of your own. You may declare private member 
+functions of your own. Declare any non-member helper function in date.hpp after the class, and define it in 
+date.cc. The autograder sets year_, month_, and day_ directly before each call, so every member function must 
+read the state of the object from those data members alone. A static local variable that is not const, or 
+one that is const but initialized from a parameter, a data member, or a call to a function that is not 
+constexpr, is rejected, and so are a thread_local variable, a variable declared at namespace scope that 
+is not const, a static data member of a helper class or a nested class that is not const, a mutable data 
+member, and errno, because each would let a function remember an earlier call. A constexpr variable, and a 
+const variable whose initializer reads only constants, such as static const int kTen = 10;, are allowed. 
+An ordinary local const variable without static can be initialized from a parameter, a data member, or a 
+function call at runtime; it does not retain a value between function calls.
+
+Initialization follows one rule: a value that comes from a parameter goes in the constructor's member 
+initializer list, a default goes in an in-class member initializer, and any validation happens in the member 
+initializer list or in the constructor's body. Date(int year, int month, int day) must therefore initialize 
+year_, month_, and day_ from its parameters year, month, and day in its member initializer list, and Date 
+must declare year_ with the in-class member initializer = kDefaultYear and month_ and day_ each with = 1. 
+Date() must be declared = default.
+
+You may include only the following header: "date.hpp".
+
+Compute every date yourself. The date and time facilities of the standard library are not permitted, and 
+neither are the C library functions that convert, normalize, format, or subtract calendar times. 
+Compare each value with its bounds yourself, in the constructor and in LimitStep. Library algorithms and 
+numeric operations are not permitted: the functions that limit a value to a range, the functions that select 
+the smallest or largest of several values or of a range, and every other function that sums, visits, sorts, 
+searches, counts, copies, fills, reorders, or removes the elements of a range.
+
+No comparison operator is required. A comparison operator that you add as a private member function, or as 
+a non-member helper function in date.cc, must have a body that you write yourself: a comparison operator 
+declared = default is rejected, and so is any declaration of operator<=>. Date declares no friend of any 
+kind, because every operator that a Date needs is a member function or can use the public interface.
+
+Declare and call every function and variable by its C++ name. Declaring any function or variable with an 
+assembler label is not permitted.
+
+An operator function may not be a function template. Declare each operator function exactly as the tables 
+give it.
