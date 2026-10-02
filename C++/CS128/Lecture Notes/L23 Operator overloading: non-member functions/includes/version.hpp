@@ -11,6 +11,8 @@ class Version {
   int GetMinor() const;
   int GetPatch() const;
 
+  friend std::ostream& operator<<(std::ostream& os, const Version& version);
+
  private:
   static constexpr int kMinComponent = 0;
 
