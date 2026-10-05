@@ -1,0 +1,128 @@
+A container port keeps its containers in a yard, a std::vector<Container>. 
+A Crane lifts one container at a time without copying it. Its hook is the pointer hook_, 
+which points to the element of the yard that the crane is lifting, or holds nullptr when the hook is empty. 
+A pointer suits the hook for three reasons. An empty hook holds no container, which nullptr represents and a 
+reference cannot. The hook is reseated each time the crane lifts, releases, stows, or hands off a container, 
+and a reference cannot be reseated. Finally, the hook must identify an element of the yard rather than hold a 
+copy of it: Stow changes the element itself, and IsHolding compares addresses, not values.
+
+Every address that a crane holds or returns is the address of an element of a yard. 
+When push_back adds an element to a vector whose memory is full, the vector moves its elements to new memory 
+and the old elements no longer exist, so a pointer obtained earlier becomes a dangling pointer. 
+No member function of Crane adds elements to a yard, and every caller in this activity builds its yard 
+completely before it takes the address of any element.
+
+The starter header crane.hpp defines the struct Container and declares every member of Crane in the tables 
+below. You write the definition of each member function of Crane in crane.cc.
+
+Container
+A Container is a struct whose members describe one container in the yard.
+
+Public data members of Container
+Member	Type	Description
+code	std::string	The code painted on the container, such as "MSCU-104".
+tonnes	unsigned int	The mass of the container in tonnes. Its in-class member initializer is = 0.
+is_stowed	bool	true once the container has been loaded onto the ship. Its in-class member 
+initializer is = false.
+
+Crane
+Public interface
+Signature	Description
+Crane() = default;	
+The default constructor, declared = default. The in-class member initializers give hook_ the value nullptr 
+and max_tonnes_ the value kDefaultMaxTonnes.
+
+explicit Crane(unsigned int max_tonnes);	
+An explicit constructor. It initializes max_tonnes_ with max_tonnes in its member initializer list, 
+and hook_ takes its in-class member initializer, nullptr. Because the constructor is explicit, 
+an unsigned int does not convert implicitly to a Crane.
+
+bool Lift(Container* container);	
+Returns false and changes nothing when the hook already holds a container or when CanLift(container) 
+returns false. Otherwise it assigns container to hook_, so that the hook points to that container, and returns 
+true. It calls CanLift, and it changes no member of the container.
+
+Container* Release();	
+Returns the address that the hook held, or nullptr when the hook was empty, and leaves the hook empty. 
+The container stays where it is in the yard.
+
+bool Stow();	
+Returns false and changes nothing when the hook is empty. 
+Otherwise it assigns true to the is_stowed member of the container that hook_ points to, empties the hook, 
+and returns true. The container it changes is the element of the yard that hook_ points to, not a copy of it.
+
+bool HandOff(Crane* other);	
+Gives the container on this crane's hook to the crane that other points to. It returns false, 
+changing neither crane, when other is nullptr, when the other crane's hook is not empty, or when 
+other->CanLift(hook_) returns false. Otherwise the other crane's hook points to the container, 
+this crane's hook is empty, and it returns true. The limit that applies is therefore the other crane's, 
+not this crane's. These rules also settle two further cases. When this crane's hook is empty, hook_ is nullptr, 
+so other->CanLift(hook_) returns false. When other points to this crane and its hook holds a container, 
+the other crane's hook is this crane's own hook, which is not empty, so it returns false and the container 
+stays on the hook. It calls CanLift. A member function of Crane may name the private members of any Crane 
+object, so it may use other->hook_ and call other->CanLift.
+
+bool IsHolding(const Container* container) const;	
+Returns true exactly when hook_ and container are equal, that is, when both hold the same address or both 
+are nullptr. It compares addresses, never values, so a distinct container equal in every member to the one on 
+the hook is not held. IsHolding(nullptr) is therefore true exactly when the hook is empty, and while the hook 
+is empty it returns false for the address of any container.
+
+const Container* Holding() const;	
+Returns hook_ as a pointer to const, which is nullptr when the hook is empty. A caller can read the container 
+on the hook through the result but cannot change it through the result.
+
+Container* HeaviestLiftable(std::vector<Container>& yard) const;	
+Returns the address of the heaviest element of yard that CanLift accepts and that is not the container on this 
+crane's hook. When two such elements are equally heavy, it returns the address of the earlier one. It returns 
+nullptr when no element qualifies, including when yard is empty. It calls CanLift, and the result is the 
+address of an element of yard, never the address of a copy.
+
+unsigned int GetMaxTonnes() const;	
+Returns max_tonnes_, the mass of the heaviest container the crane can lift.
+
+Private member functions
+Signature	Description
+bool CanLift(const Container* container) const;	
+Returns true when container is not nullptr, the container is not stowed, and its tonnes is at most max_tonnes_. 
+It returns false otherwise. Dereferencing a null pointer has undefined behavior, so it tests container 
+against nullptr before it reads any member through it.
+
+Private data members
+Member	Type	Description
+kDefaultMaxTonnes	static constexpr unsigned int	The limit of a crane built by the default constructor, 30. 
+It is a static member, so the class holds one copy that every Crane object shares.
+
+hook_	Container*	The address of the container on the hook, or nullptr when the hook is empty. 
+It points to an element of a yard, never to a copy of one. Its in-class member initializer is = nullptr.
+
+max_tonnes_	unsigned int	The mass, in tonnes, of the heaviest container the crane can lift. 
+Its in-class member initializer is = kDefaultMaxTonnes.
+
+Constraints
+Your code must compile with clang++ using the c++20 standard and -stdlib=libc++, without errors under -Wall 
+-Wextra -Werror -pedantic -Wuninitialized. Your code is also compiled with AddressSanitizer, which reports 
+memory errors such as using an object that no longer exists, and UndefinedBehaviorSanitizer, which reports 
+operations such as dereferencing a null pointer. The Run button shows their reports.
+
+Declare every member exactly as the tables give it, including = default on the default constructor and 
+explicit on Crane(unsigned int max_tonnes) and on no other constructor. Every pointer in the tables stays 
+a pointer, and every member function of Crane is defined in crane.cc. The autograder rejects a submission 
+that declares a reference or a value in place of one of those pointers, or that defines a function in a 
+header file. The data members of Crane are exactly the three in its table, and the data members of Container are exactly the three in its table, so you may not declare a data member of your own. Crane declares no constructor or public member function beyond those in its tables, and Container declares no constructor or member function at all. You may declare private member functions of your own in Crane to implement the interface. Non-member helper functions of your own are declared in crane.hpp after the class definition and defined in crane.cc. Beyond those declarations and the prompt's, the header declares no function, operator, or variable, and contains no line that begins with the keyword using. A local variable whose value does not change may be declared const, including when its initializer depends on a parameter or data member. No variable declared inside a function is declared static, every variable declared outside every function and class is const, and no class or struct of your own has a static data member that is not const. The autograder sets hook_ and max_tonnes_ directly before each call, so every member function must read the state of a crane from those data members alone.
+
+Initialization follows one rule: a value that comes from a parameter goes in the constructor's member 
+initializer list, and a default goes in an in-class member initializer. Crane(unsigned int max_tonnes) 
+must therefore initialize max_tonnes_ from its parameter max_tonnes in its member initializer list and 
+leave hook_ out of that list. Crane must declare hook_ with the in-class member initializer = nullptr and 
+max_tonnes_ with the in-class member initializer = kDefaultMaxTonnes.
+
+crane.hpp and crane.cc may include only the following headers: "crane.hpp", <string>, <vector>.
+
+Lift, HandOff, and HeaviestLiftable must each call CanLift. HeaviestLiftable must visit yard with your own 
+loop, written in its own definition and not in a function it calls, and no function in crane.cc may call 
+itself. The keyword try may not appear in your code. No library function may do the work of a loop for you: 
+a library function that searches, counts, compares, sorts, copies, fills, combines, or removes the elements 
+of a vector is not permitted, and neither is a library function that searches a string for a character or a 
+substring. The member functions of std::vector, such as at, size, and empty, are permitted. The autograder 
+rejects a submission that breaks any rule in this paragraph before any test runs.

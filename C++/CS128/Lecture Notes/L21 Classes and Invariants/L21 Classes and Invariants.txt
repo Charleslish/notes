@@ -87,7 +87,7 @@ L21 Classes and Invariants
         When a class declares no destructor, the compiler supplies one that destroys each non-static data member.
             Hero::~Hero() {
                 // cleanup, e.g.print out sth before cleaning
-            }//if you don't need to, you don'y have to explicitly declare destructors
+            }//if you don't need to, you don't have to explicitly declare destructors
     Establishing and maintaining the invariant
         Only the member functions of Hero can change its private data members.
         The invariant therefore holds for every hero if the constructor establishes it and every member function that modifies a hero maintains it.

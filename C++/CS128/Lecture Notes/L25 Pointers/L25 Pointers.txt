@@ -1,0 +1,156 @@
+Pointers
+    Objects and their addresses
+        An object is a region of memory that holds a value.
+        An object occupies one or more consecutive bytes.
+        The address of the object is the address of the first byte it occupies.
+        The unary & operator, called the address-of operator, produces the address of its operand.
+            int score = 4;
+            &score → address of score
+        The address an object receives is determined when the program runs, not when it compiles.
+        An object can hold the same value each time the program runs while having a different address.
+    A pointer holds an address
+        An object whose value is an address is called a pointer.
+            int score = 4;
+            int* score_ptr = &score;
+        The declarator *score_ptr means “pointer to”.
+        A declaration of this kind is read from right to left: score_ptr is a pointer to int.
+        The type int* is a compound type, a type constructed from another type.
+            int* → pointer to int
+            double* → pointer to double
+            std::string* → pointer to std::string
+        A pointer is itself an object.
+        The expression score_ptr produces the address stored in score_ptr, 
+            whereas &score_ptr produces the address of score_ptr.
+        The declarator operator applies to a single declarator, not to the base type.
+            int* first, second;
+            first is a pointer to int, while second is an int.
+        Do not declare more than one name in a declaration that involves a pointer or reference declarator.
+    The base type of a pointer
+        An address identifies only the first byte of an object.
+        The base type of a pointer determines the number of bytes that make up the object at the stored address and how those bytes are interpreted.
+        The sizeof operator produces the number of bytes that an object of a given type occupies.
+            sizeof(char)   = 1
+            sizeof(int)    = 4
+            sizeof(double) = 8
+        The base type therefore changes what a pointer means, not how large the pointer is.
+        The unary * operator, called the dereference operator, applies to a pointer and produces the object that the pointer points to.
+            *score_ptr
+            The result is the object itself, not a copy of its value.
+            Assigning to *score_ptr changes the object that score_ptr points to.
+        The address-of operator produces a pointer whose base type is the type of its operand.
+            int count = 3;
+            &count → int*
+        A pointer must point to an object of its base type.
+    One symbol, two roles
+        In a declarator, * and & are declarator operators.
+        * means “pointer to” and & means “reference to”.
+        In an expression, unary * is the dereference operator, and unary & is the address-of operator.
+        With two operands, * is multiplication.
+            int* ptr;    → * = pointer to
+            *ptr         → * = dereference
+            int& ref;    → & = reference to
+            &count       → & = address-of
+        A parameter declaration is also a declaration.
+        The role of * or & depends on whether it appears in a declarator or in an expression. 
+            void AddBonus(int* score, int& bonus_count) {...}
+            AddBonus(&team_score, bonus_count);
+    The null pointer
+        The literal nullptr represents the null pointer, the pointer value that points to no object.
+            It can initialize, or be assigned to, a pointer of any base type.
+        A pointer declared without an initializer inside a function has an indeterminate value.
+            Using that value in any way has undefined behavior.
+        Initialize an unused pointer with nullptr.
+        Comparing a pointer with nullptr determines whether it is null.
+            if (score_ptr != nullptr) {
+                // safe to dereference
+            }
+        Dereferencing a null pointer has undefined behavior, because a null pointer points to no object.
+    Reseating and assigning through a pointer
+        A pointer that is not const can be assigned a new value.
+        Assigning a new address to the pointer itself changes which object it points to, 
+            which is called reseating the pointer.
+        Assigning through the pointer, with the dereference operator, changes the object it points to and leaves the pointer unchanged.
+        A reference cannot be reseated.
+            Initialization binds a reference to an object, 
+            and the reference denotes that object for its entire lifetime.
+        An assignment to a reference therefore assigns to the object it denotes.
+            posted = &away;  → changes the pointer
+            *posted = away;  → changes the object pointed to
+        Two pointers can point to the same object.
+        Comparing two pointers with == compares the addresses they hold, not the values of the objects they point to.
+    Pointers to structs and class objects
+        The base type of a pointer can be a struct or class type.
+        Dereferencing such a pointer produces the object at its address.
+        The -> operator performs member access through a pointer.
+            current->value
+        means
+            (*current).value
+        The parentheses in (*current).value are required because the member access operator . has higher precedence than unary *.
+        Member functions are called through a pointer in the same way.
+            unit->Target()
+        Inside a member function, the keyword this is a pointer to the object on which the function was called.
+    Pointers and const 
+        A pointer declaration involves two things that can be const: the pointer, and the object it points to.
+        A const written before the * is part of the base type.
+        A const written after the * applies to the pointer itself.
+            const int* reader
+                → pointer to const
+                → cannot assign through the pointer, but can reseat the pointer
+            int* const fixed
+                → const pointer
+                → can assign through the pointer, but cannot reseat the pointer
+            const int* const both
+                → cannot assign through the pointer and cannot reseat the pointer
+        A pointer to const provides read-only access through that pointer and does not make the object const.
+    Passing an object by pointer
+        A function can reach an object in its caller through a pointer parameter.
+        The parameter is a pointer, the argument is an address, and the parameter is initialized with that address.
+            void SubtractPenalty(int* score_ptr, int penalty)
+            SubtractPenalty(&team_score, kPenalty);
+        The pointer is therefore passed by value: the function receives its own copy of the address.
+        Dereferencing that copy reaches the caller's object, so the function can read or modify it.
+            Assigning through a pointer parameter changes the object in the caller.
+            Assigning a new address to the parameter changes only the parameter.
+        With a pointer parameter, the argument &object shows at the call that the function receives the address of the object.
+        A pointer parameter can hold nullptr, and a reference parameter cannot.
+        Use a reference when an object must be passed, 
+            and a pointer when passing no object is an acceptable argument.
+        A pointer parameter that may be nullptr must be checked before dereferencing it.
+    Pointers to elements
+        An element of a vector is an object, so a pointer can point to it.
+        A function that searches a vector can return a pointer to the element it finds.
+            The pointer identifies that element rather than copying its value.
+            The function can return nullptr when no element matches.
+            int* FirstBelow(std::vector<int>& readings, int limit) {
+                for (int& reading : readings) //reference
+                    if (reading < limit) 
+                        return &reading; //address
+                return nullptr;
+            }
+        A pointer is valid only while the object it points to exists.
+            A pointer whose object's lifetime has ended is called a dangling pointer.
+            Dereferencing a dangling pointer has undefined behavior.
+        A comparison with nullptr cannot detect a dangling pointer.
+        A range-based for variable declared int reading is a copy of the element, 
+            while int& reading refers to the element.
+        A pointer to a vector element can become dangling when the vector moves its elements, 
+            such as after push_back when its storage is full.
+        erase can also invalidate pointers to elements that follow the erased element.
+    Choosing a parameter form
+        For an input parameter of a primitive type such as int, double, char, or bool, use passing by value.
+            int something
+        For an input string or container that the function only reads, use a reference to const.
+            const std::string& only_read
+        When the function must modify an existing argument, use a non-const reference parameter.
+            std::vector<int>& readings
+        When passing no object is acceptable and the function may modify the object it receives, 
+            use a pointer parameter and compare it with nullptr before dereferencing it.
+                GetScore(nullptr);
+                    int* result
+                    if (result != nullptr) {
+                        *result = ...
+                    }
+        When passing no object is acceptable and the function only reads the object, use a pointer to const.
+            const std::vector<int>* readings
+        A pointer parameter that the function only reads through should be a pointer to const.
+        A reference parameter cannot be nullptr, while a pointer parameter can.
