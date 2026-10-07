@@ -1,0 +1,136 @@
+Built-in Arrays
+    Built-in arrays
+        A built-in array is C++'s fundamental way of representing a sequence of objects in memory.
+        For a type T and a constant expression N, T[N] is the type "array of N elements of type T".
+            The elements are indexed from 0 through N - 1.
+        A built-in array is not self-describing.
+            Its memory holds no count of the elements.
+        The size is part of the array's type.
+            kReadingCount = 5
+            int readings[kReadingCount] = {}; //int[3] and int[5] are different types.
+            //the declaration gives readings the type int[5]
+        In a declarator, [] means "array of".
+        In an expression, [] is the subscript operator.
+        The size in the declaration must be a constant expression.
+            A constexpr constant is a constant expression.
+                constexpr unsigned int kReadingCount = 5;
+            A function parameter is not a constant expression.
+            A const object is not always a constant expression either.
+                const unsigned int kCount = ReadCount();
+        A variable length array is an extension, not part of C++. Do not use one.
+    Initializing the elements
+        An initializer "= {}" initializes every element to "0".
+        If an initializer list has fewer values than the array,
+            the remaining elements are initialized to the element type's default value.
+        An initializer list with more values than elements is a compile-time error.
+        When an initializer list is present, the array size may be omitted and deduced from the number of values.
+            Prefer writing the size so the compiler can check the list against it.
+        Without an initializer, local built-in arrays of primitive types have indeterminate values.
+            Reading an indeterminate value is undefined behavior.
+            Initialize every built-in array.
+        An index identifies an element; the element's value can itself be used as an index.
+    Array-to-pointer conversion and pointer arithmetic
+        In most expressions, a built-in array converts to a pointer to its first element.
+        This is called array-to-pointer conversion, or "decay".
+        For an index i:
+            array[i] means *(array + i).
+        Pointer arithmetic counts elements, not bytes.
+            p + n moves n elements forward; p - n moves n elements backward.
+        A pointer can be subscripted like an array.
+        A pointer may point one past the end of an array.
+            It may be formed and compared, but it must not be dereferenced.
+        Pointer arithmetic before the first element or beyond one past the end is undefined behavior.
+        The range from the first element to one past the last element is a half-open range [begin, end).
+            The end pointer marks where traversal stops.
+            current = first
+            while current != end
+                use *current
+                ++current
+    Copying and comparing built-in arrays
+        A built-in array cannot be assigned or initialized from another built-in array.
+        Copying the elements of a built-in array requires assigning them one at a time.
+        Comparing built-in arrays with == does not compare their elements.
+            The arrays convert to pointers, and == compares the addresses of their first elements.
+            Comparing the contents of two built-in arrays requires comparing their elements one at a time.
+    Passing a built-in array to a function
+        A built-in array is not passed by value.
+            Instead, a pointer to its first element is passed by value.
+            The pointer parameter holds a copy of the address, not a copy of the array.
+        A pointer carries no size, so the function usually receives the size separately.
+            void ClearFirst(int* values, unsigned int size)
+        A pointer to non-const elements can modify the caller's array.
+            A const pointer parameter means the function only reads the elements.
+            A const built-in array cannot be passed to an `int*` parameter.
+        A built-in array passed to a pointer parameter is not copied.
+            A std::vector passed by value is copied.
+    A parameter declared with an array type is a pointer
+        A function parameter declared with an array type is adjusted to a pointer type.
+            const int readings[] is actually const int* readings.
+        The two declarations therefore declare the same function.
+            sizeof on a built-in array gives the size of the whole array.
+            sizeof on an array parameter gives the size of the pointer.
+        An array parameter does not retain the array's size.
+            A range-based for works on a built-in array when its size is known from the array type.
+            It cannot use an array parameter because the parameter is actually a pointer.
+        To visit elements through an array parameter, use the size parameter or pointer traversal.
+            void PrintReadings(const int readings[], unsigned int size) {
+                for (const int& reading : readings) 
+                    std::cout << reading << std::endl;
+                std::cout << size << std::endl;
+            }//compile error
+    Returning a built-in array
+        A function cannot return a built-in array.
+        A function can return a pointer to an element of a caller's built-in array.
+            The caller's array still exists after the function returns.
+        A pointer to a local built-in array becomes a dangling pointer when the function returns.
+            Dereferencing a dangling pointer is undefined behavior.
+            A dangling pointer is not necessarily `nullptr`.
+            Comparing a pointer with `nullptr` does not detect whether it is dangling.
+    Two-dimensional built-in arrays
+        The element type of a built-in array can itself be a built-in array.
+        In a two-dimensional array, each element is a row of the array.
+        All elements form one contiguous block of memory, row after row.
+            seats[row][seat] accesses one int.
+        When passed to a function, a two-dimensional array converts to a pointer to its first row.
+            The number of rows is passed separately.
+            The size of each row must be part of the parameter type.
+        Only the first dimension may be left empty.
+            const int seats[][kSeatsPerRow] //const int (*)[kSeatsPerRow]
+            const int seats[][] is invalid because the compiler needs the row size to perform pointer arithmetic.
+        void PrintSeats(const int seats[][kSeatsPerRow], unsigned int rows) {
+            if (seats == nullptr)
+                return;
+            for (unsigned int row = 0; row < rows; ++row) {
+                for (unsigned int seat = 0; seat < kSeatsPerRow; ++seat)
+                    std::cout << seats[row][seat] << " ";
+                std::cout << std::endl;
+            }
+        }
+    Range errors
+        A subscript outside a built-in array is a range error and has undefined behavior.
+            If the index is a constant expression, the compiler may detect the range error at compile time.
+            If the index is computed at runtime, the compiler usually cannot check it.
+        UndefinedBehaviorSanitizer can detect an out-of-range subscript when the array type records its size.
+        A pointer parameter carries no array size, so UBSan cannot check its index against the original array size.
+        AddressSanitizer can detect a read or write that reaches memory outside the array.
+        A sanitizer report is not guaranteed for every range error.
+            No sanitizer report does not prove that every index was valid.
+    C-style strings
+        A C-style string is a built-in array of char terminated by the null character '\0'.
+            The null character marks the end of the text.
+            The null pointer nullptr is unrelated here.
+        Every string literal is a built-in array of const char that includes a terminating '\0'.
+        A char array used as a C-style string must have room for the null character.
+            A char array without a null character is not a C-style string.
+        std::cout prints a C-style string up to its null character.
+        For text that a program builds or modifies, use std::string.
+    Built-in arrays and the standard library
+        std::array is a built-in array with its size attached.
+            std::array<int, kReadingCount>
+            std::array provides size(), can be assigned, copied, and returned from a function.
+            Its == compares elements.
+            std::array does not convert to a pointer, so its size is not lost when passed to a function.
+        std::span refers to an existing sequence through a pointer and a size.
+            std::span<const int>
+            It does not own the elements.
+        std::span combines the pointer and size that a function otherwise receives separately for a built-in array.
