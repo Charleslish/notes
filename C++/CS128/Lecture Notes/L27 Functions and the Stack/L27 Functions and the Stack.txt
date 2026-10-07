@@ -1,0 +1,75 @@
+Functions and the Stack
+    The stack
+        The parameters and local variables of a function call need storage while the function call runs.
+        In a typical implementation, that storage is a region of memory called the stack, 
+            also called the call stack.
+        Each function call has a stack frame, 
+            which holds its parameters, its local variables 
+            and the point in the calling function where execution resumes when the function call returns.
+        The frame is pushed on top of the stack when the function call begins and popped when it returns.
+        Another name for a stack frame is an activation record.
+        The stack pointer is a register that keeps the address of the top of the stack.
+        A parameter passed by value exists until its function call returns.
+        A local variable exists from its declaration until the end of its block.
+        The stack is how implementations provide those lifetimes.
+    A value no statement assigned
+        A local variable declared without an initializer has an indeterminate value.
+            int last;
+            Reading a local variable before assigning a value to it is undefined behavior.
+        A loop may fail to execute, leaving a variable unassigned before it is read.
+            for (int i = 0; i < 0; ++i)
+                last = i;
+        A program may appear to print a previous value, but that does not make the program correct.
+        The course's sanitizers do not check for reads of uninitialized variables.
+    Pushing and popping stack frames
+        Each function call pushes a new stack frame onto the stack.
+        Returning pops the function's stack frame and ends the lifetimes of its local variables and parameters.
+        Popping a frame does not necessarily erase the bytes in its storage.
+        A later function call may reuse storage that belonged to a previous stack frame.
+        A new object can therefore use old storage whose bytes still contain a previous value.
+        The initializer gives the new object its value; the old bytes do not give the new object its value.
+        The stack pointer moves when frames are pushed and popped.
+    A local variable without an initializer
+        A local variable without an initializer has an indeterminate value.    
+            Reading an indeterminate value is undefined behavior.
+        Stack storage may be reused by a later function call, but a program cannot rely on that reuse.
+        The fact that two local variables occupy the same storage in one build is not something the program can rely on.
+        Changing a function's parameters can change where its local variables are stored.
+    Why every local variable is initialized
+        Every local variable is initialized in its declaration.
+            A local variable with no initializer has an indeterminate value.
+            Reading an uninitialized local variable is undefined behavior.
+        Clang can warn when it finds a branch on which a local variable is never assigned.
+            The course's -Werror flags make that warning an error.
+        A meaningful initial value can be a named constant chosen outside the values the variable can otherwise hold.
+        Initialization and assignment are different: 
+            int last = ... initializes; last = i assigns.
+        Zeros that happen to appear in uninitialized storage are not an initialization; 
+            reading them is still undefined behavior.
+    Recursive function calls
+        A function that calls itself is recursive, and the call it makes to itself is a recursive call.
+            int MinutesAllowed(int daily_limit) {
+                if (daily_limit <= kNoMinutes)
+                    return kNoMinutes;
+                const int kLaterDays = MinutesAllowed(daily_limit - kDailyCut);
+                return daily_limit + kLaterDays;
+            }
+        The arguments of a recursive call should change so that some call does not call the function again.
+        The base case is the case the function handles without calling itself.
+        The recursive case makes a recursive call with an argument closer to the base case.
+        A recursive function call is an ordinary function call: it pushes its own stack frame.
+            Each stack frame has its own values for the function's parameters and local variables.
+            Recursive calls push frames, and the frames are popped in reverse order.
+        Returned values build the result as the recursive calls return.
+        To check a recursive function, check the base case, the recursive case, and that every chain of calls reaches the base case.
+    Work after a recursive function call
+        Statements after a recursive function call wait until that call returns.
+        Each recursive frame waits at the recursive call until the frame above it returns.
+        The base case returns first, then the statements after the recursive calls run as the frames are popped.
+        Therefore, work after a recursive call happens in reverse order of the recursive calls.
+    A base case the function calls reach
+        A recursive function must have a base case that its recursive calls can reach.
+        A base case that the arguments never reach does not stop the recursion.
+        Every recursive call pushes another stack frame.
+        A chain of function calls that exceeds the stack's maximum size causes a stack overflow.
+        The recursive case must move the arguments toward a base case that the calls can actually reach.

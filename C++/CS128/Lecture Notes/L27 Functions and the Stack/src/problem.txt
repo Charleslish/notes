@@ -1,0 +1,164 @@
+A phone's screen-time app logs each session with LogSession and reports the number of the last session with 
+ReportLastSession. In a typical implementation, each function call pushes a stack frame that holds the 
+call's parameters and local variables, and the return pops it.
+
+void LogSession(int minutes) {
+  const int kLogged = minutes;
+  std::cout << "logged a " << kLogged << "-minute session\n";
+}
+
+void ReportLastSession(int session_count) {
+  int last;
+  for (int i = 0; i < session_count; ++i) {
+    last = i;
+  }
+  std::cout << "last session: " << last << '\n';
+}
+
+The class FrameStack models the stack these function calls use. It is a model: a typical implementation does 
+not store frames in a class, and a real frame holds more than its parameters and local variables. 
+In the model, the stack is the built-in array values_ of kValueCount (16) int values, and a value may be any 
+int, negative or not. A frame occupies consecutive values of values_: its parameters first, in order, 
+then its local variables. The built-in array frames_ holds one Frame for each frame on the stack, 
+the bottom frame at index 0, and depth_ counts those frames, at most kMaxFrames (8). The stack pointer is the 
+index of values_ where the next frame begins: the top frame's start plus its number of values, or 0 when the 
+stack is empty.
+
+A value's position is the number of values before it in its frame, parameters first. In a frame of 
+ReportLastSession, session_count is at position 0, last at position 1 and i at position 2. A push reserves a 
+frame's values at the stack pointer and writes the arguments into the parameter positions. It then moves the 
+stack pointer past the frame. A push does not write the local positions, so each local position keeps whatever 
+value its storage already holds. A pop moves the stack pointer back to the popped frame's start and changes no 
+value. Read and Write reach only the top frame, by position.
+
+The following calls model LogSession(38) followed by ReportLastSession(0), starting from an empty stack.
+
+Call	What it models	Result
+Push({38}, 1)	
+The function call LogSession(38): one parameter, one local variable. Returns true. The frame starts at 0, 
+values_[0] is 38, and the stack pointer is 2.
+
+Write(1, 38)	
+The initialization of kLogged.	Returns true. values_[1] is 38.
+
+Pop()	
+The return from LogSession.	Returns true. The stack pointer is 0; values_[0] and values_[1] still hold 38.
+
+Push({0}, 2)	
+The function call ReportLastSession(0): one parameter, two local variables.	Returns true. The frame starts at 0, 
+values_[0] is 0, values_[1] still holds 38, and the stack pointer is 3.
+
+Read(1, &value)	
+Reading last, which no statement has assigned.	Returns true and stores 38 in value: the value kLogged left 
+in that storage. values_ holds zeros once, when a FrameStack is constructed; that is a choice of the model. 
+Reading a local position that no call has written is therefore well defined in the model, and it gives whatever 
+value that storage holds. In C++, a local variable declared without an initializer has an indeterminate value, 
+and reading it is undefined behavior, so course code initializes every local variable in its declaration.
+
+The starter header frame_stack.hpp defines the constants kValueCount and kMaxFrames and the struct Frame, 
+and declares every member of FrameStack in the tables below. You write the definition of each member function 
+of FrameStack in frame_stack.cc. No caller passes Push more than kValueCount arguments or a local_count 
+greater than kValueCount.
+
+Frame
+A Frame is a struct whose members describe where one frame lies in values_.
+
+Public data members of Frame
+Member	Type	Description
+start	unsigned int	
+The index of values_ that holds the frame's position 0. Its in-class member initializer is = 0.
+
+parameter_count	unsigned int	
+The number of parameters, which occupy positions 0 to parameter_count - 1. Its in-class member initializer is = 0.
+
+local_count	unsigned int	
+The number of local variables, which occupy the positions after the parameters. Its in-class member initializer is = 0.
+
+FrameStack
+Public interface
+Signature	Description
+FrameStack() = default;	
+The default constructor, declared = default. The in-class member initializers give every element of values_ 
+and every member of every element of frames_ the value 0, and depth_ the value 0.
+
+bool Push(const std::vector<int>& arguments, unsigned int local_count);	
+Pushes a frame of arguments.size() parameters and local_count local variables. 
+It returns false and changes nothing when Fits rejects a frame of that many values. 
+Otherwise it writes every argument, negative or not, in order, into the new frame's parameter positions, 
+starting at the stack pointer, and leaves the values at the local positions as they are. 
+It stores in frames_[depth_] a Frame whose start is the stack pointer before the push and 
+whose counts are the new frame's, adds one to depth_, and returns true. It calls Fits in its own body, 
+and it changes no value outside the new frame's parameter positions.
+
+bool Pop();	
+Returns false and changes nothing when the stack is empty. Otherwise it subtracts one from depth_ and returns true. 
+It changes nothing else: no element of values_, not even in the popped frame, and no element of frames_.
+const Frame* Top() const;	
+
+Returns the address of the element of frames_ that describes the top frame, not the address of a copy, 
+or nullptr when the stack is empty.
+
+bool Read(unsigned int position, int* value) const;	Stores the value at position in the top frame in the 
+object that value points to, and returns true. It returns false, and stores nothing, when the stack is empty, 
+when value is nullptr, or when position is not less than the top frame's number of values.
+
+bool Write(unsigned int position, int value);	
+Stores value at position in the top frame and returns true. It returns false and changes nothing when the 
+stack is empty or when position is not less than the top frame's number of values. It changes no other value.
+
+unsigned int StackPointer() const;	
+Returns the stack pointer: the top frame's start plus its parameter_count and its local_count, or 0 when the 
+stack is empty. It is computed from the top frame each time, whatever the elements of frames_ above the top 
+frame still hold.
+
+unsigned int Depth() const;	
+Returns depth_, the number of frames on the stack.
+
+Private member functions
+Signature	Description
+bool Fits(unsigned int value_count) const;	
+Returns true when a new frame of value_count values can be pushed: depth_ is less than kMaxFrames, 
+and the stack pointer plus value_count is at most kValueCount. It returns false otherwise. 
+A frame that ends exactly at kValueCount fits.
+
+Private data members
+Member	Type	Description
+values_	int[kValueCount]	
+The stack's values, frame after frame from index 0. Its in-class member initializer is {}.
+
+frames_	Frame[kMaxFrames]	
+One Frame for each frame on the stack, the bottom frame at index 0 and the top frame at index depth_ - 1. 
+The elements from index depth_ on describe no frame on the stack. Its in-class member initializer is {}.
+
+depth_	unsigned int	
+The number of frames on the stack. Its in-class member initializer is = 0.
+
+Constraints
+Your code must compile with clang++ using the c++20 standard and -stdlib=libc++, without errors under -Wall 
+-Wextra -Werror -pedantic -Wuninitialized. Your code is also compiled with AddressSanitizer, which reports 
+memory errors such as reading past the end of a built-in array, and UndefinedBehaviorSanitizer, which reports 
+operations such as dereferencing a null pointer. The Run button shows their reports.
+
+Declare every member exactly as the tables give it, including = default on the default constructor, and keep 
+kValueCount at 16 and kMaxFrames at 8. Every member function of FrameStack is defined in frame_stack.cc; the 
+autograder rejects a submission that defines a function in a header file. The data members of FrameStack are 
+exactly the three in its table, and the data members of Frame are exactly the three in its table, so you may 
+not declare a data member of your own. FrameStack declares no constructor or public member function beyond 
+those in its table, and Frame declares no constructor or member function at all. You may declare private 
+member functions of your own in FrameStack to implement the interface. Non-member helper functions of your 
+own are declared in frame_stack.hpp after the class definition and defined in frame_stack.cc. Beyond those 
+declarations and the starter header's, the header declares no function, operator, or variable, and contains 
+no line that begins with the keyword using. A local variable whose value does not change may be declared 
+const. No variable declared inside a function is declared static, every variable declared outside every 
+function and class is const, and no class or struct of your own has a static data member that is not const. 
+The autograder sets values_, frames_ and depth_ directly before each call, so every member function must read 
+the state of a stack from those data members alone.
+
+frame_stack.hpp and frame_stack.cc may include only the following headers: "frame_stack.hpp", <vector>.
+
+Push must call Fits in its own body. The class models the stack with its own data members, so no function 
+in frame_stack.cc may call itself. The keyword try may not appear in your code. Every loop is written out 
+in full. A library function that copies, fills, searches, counts, compares, sorts, combines, or removes the 
+elements of a vector or a built-in array is not permitted. Neither is a library function that searches a 
+tring for a character or a substring. The member functions of std::vector, such as at and size, are permitted. 
+The autograder rejects a submission that breaks any rule in this paragraph before any test runs.
