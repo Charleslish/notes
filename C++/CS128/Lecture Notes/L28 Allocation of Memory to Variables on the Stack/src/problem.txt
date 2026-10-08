@@ -1,0 +1,63 @@
+A screen-time app converts a day's phone pickups to minutes with DailyScreenTime. In a typical implementation, each function call of DailyScreenTime pushes a stack frame that holds its parameters and its local variables, and compiled code reaches each of them at a fixed offset from where the frame is. In the course's build, that position is kept in a register called the frame pointer.
+
+int DailyScreenTime(int morning_pickups, int evening_pickups) {
+  const int kMorningMinutes = MinutesOnScreen(morning_pickups);
+  const int kEveningMinutes = MinutesOnScreen(evening_pickups);
+  return kMorningMinutes + kEveningMinutes;
+}
+The class FrameOffsets lays out one stack frame in a simple model. In the model, a frame holds its objects in declaration order, parameters first, with no space between them. An object's offset N is the sum of the sizes, in bytes, of the objects up to and including it, and the object is at fp-N: its lowest byte is N bytes below the frame pointer. A first object of 4 bytes is therefore at fp-4. The frame's size is the sum of the sizes of all its objects.
+
+Object of DailyScreenTime	Size in bytes	Offset
+morning_pickups	4	fp-4
+evening_pickups	4	fp-8
+kMorningMinutes	4	fp-12
+kEveningMinutes	4	fp-16
+The frame of DailyScreenTime is therefore 16 bytes in the model. The class models a frame and is not how the machine stores one. A compiler may order the objects differently and may leave space between them, and a real frame also holds more than its parameters and local variables.
+
+An object is run-time-sized when its size is known only while the program runs, as for a built-in array whose number of elements is a parameter. A run-time-sized local array is not standard C++. Clang accepts one as an extension, which the course's compilation flags reject. In a typical implementation, a frame's size is a number the compiler writes into the instructions when it compiles the function, so a run-time-sized object would make it a value computed while the program runs. In the model, the offset of a run-time-sized object depends on its own size, and so does the offset of every object after it. The objects before it keep their offsets.
+
+The following calls lay out the frame of DailyScreenTime, starting from a FrameOffsets with no objects, and then add a run-time-sized array session_minutes.
+
+Call	Result
+AddObject("morning_pickups", 4), and the same for evening_pickups, kMorningMinutes and kEveningMinutes	Each returns true. objects_ holds the four objects in that order.
+OffsetOf("kMorningMinutes", &offset)	Returns true and stores 12 in offset.
+ObjectAt(8)	Returns the address of the element of objects_ named evening_pickups.
+ObjectAt(6)	Returns nullptr: 6 falls inside evening_pickups, whose offset is 8.
+FrameSize(&size)	Returns true and stores 16 in size.
+AddRunTimeSized("session_minutes")	Returns true. The fifth object of objects_ is run-time-sized.
+FrameSize(&size)	Returns false and leaves size unchanged.
+OffsetOf("kEveningMinutes", &offset)	Returns true and stores 16 in offset. An object before the run-time-sized one keeps its offset.
+The starter header frame_offsets.hpp defines the struct FrameObject and declares every member of FrameOffsets in the tables below. The starter source frame_offsets.cc defines each member function with a placeholder body that returns false or nullptr, so the program compiles and runs before any member function is written. Replace each placeholder body with the definition of its member function. No frame holds more than 16 objects, and no caller passes AddObject a size greater than 64.
+
+FrameObject
+A FrameObject is a struct whose members describe one object of a frame.
+
+Public data members of FrameObject
+Member	Type	Description
+name	std::string	The object's name. No two objects of a frame have the same name.
+size	unsigned int	The object's size in bytes, or 0 when the object is run-time-sized. Its in-class member initializer is = 0.
+size_known	bool	true when the object's size is known when the program is compiled, and false when the object is run-time-sized. Its in-class member initializer is = true.
+FrameOffsets
+Public interface
+Signature	Description
+FrameOffsets() = default;	The default constructor, declared = default. A frame constructed with it has no objects.
+bool AddObject(const std::string& name, unsigned int size);	Appends an object named name of size bytes, whose size_known is true, after every object already in the frame, run-time-sized or not, and returns true. It returns false and changes nothing when size is 0 or when the frame already has an object named name. It calls IndexOf.
+bool AddRunTimeSized(const std::string& name);	Appends a run-time-sized object named name, whose size is 0 and whose size_known is false, after every object already in the frame, and returns true. A frame may hold more than one run-time-sized object. It returns false and changes nothing when the frame already has an object named name. It calls IndexOf.
+bool OffsetOf(const std::string& name, unsigned int* offset) const;	Stores the offset N of the object named name in the object that offset points to, and returns true. It returns false, and stores nothing, when offset is nullptr, when the frame has no object named name, or when that object's offset is not known. It calls IndexOf and OffsetKnown.
+const FrameObject* ObjectAt(unsigned int offset) const;	Returns the address of the element of objects_ whose offset is known and equal to offset, not the address of a copy. It returns nullptr when no known offset equals offset: for 0, for a value that falls inside an object, and for a value past every known offset. It calls OffsetKnown.
+bool FrameSize(unsigned int* size) const;	Stores the frame's size, the sum of the sizes of all its objects, in the object that size points to, and returns true. A frame with no objects has size 0. It returns false, and stores nothing, when size is nullptr or when the frame holds a run-time-sized object. It calls OffsetKnown.
+Private member functions
+Signature	Description
+bool IndexOf(const std::string& name, unsigned int* index) const;	Stores the index in objects_ of the object named name, run-time-sized or not, in the object that index points to, and returns true. It returns false, and stores nothing, when the frame has no object named name. Every caller passes an index that is not nullptr.
+bool OffsetKnown(unsigned int index) const;	Returns true when the offset of the object at index in objects_ is known: when index is less than the number of objects and no object at or before index is run-time-sized. It returns false otherwise.
+Private data members
+Member	Type	Description
+objects_	std::vector<FrameObject>	The frame's objects in declaration order, the first object at index 0. It has no in-class member initializer, since a std::vector starts empty. The class stores no offset and no size of its own: every offset, and the frame's size, is computed from objects_ each time it is asked for.
+Constraints
+Your code must compile with clang++ using the c++20 standard and -stdlib=libc++, without errors under -Wall -Wextra -Werror -pedantic -Wuninitialized. Your code is also compiled with AddressSanitizer, which reports memory errors such as reading past the end of a built-in array, and UndefinedBehaviorSanitizer, which reports operations such as dereferencing a null pointer. The Run button shows their reports.
+
+Declare every member exactly as the tables give it, including = default on the default constructor. Every member function of FrameOffsets is defined in frame_offsets.cc, and the autograder rejects a submission that defines a function in a header file. The only data member of FrameOffsets is objects_, and the data members of FrameObject are exactly the three in its table, so you may not declare a data member of your own. FrameOffsets declares no constructor or public member function beyond those in its table, and FrameObject declares no constructor or member function at all. You may declare private member functions of your own in FrameOffsets to implement the interface. Non-member helper functions of your own are declared in frame_offsets.hpp after the class definition and defined in frame_offsets.cc. Beyond those declarations and the starter header's, the header declares no function, operator, or variable, and contains no line that begins with the keyword using. A local variable whose value does not change may be declared const. No variable declared inside a function is declared static, every variable declared outside every function and class is const, and no class or struct of your own has a static data member that is not const. The autograder sets objects_ directly before each call, so every member function must read the state of a frame from objects_ alone.
+
+frame_offsets.hpp and frame_offsets.cc may include only the following headers: "frame_offsets.hpp", <string>, <vector>.
+
+AddObject, AddRunTimeSized and OffsetOf must each call IndexOf, and OffsetOf, ObjectAt and FrameSize must each call OffsetKnown. The keyword try may not appear in your code. Every loop is written out in full: a library function that searches, counts, adds up, copies, compares, sorts, or visits the elements of a vector is not permitted, and neither is a library function that searches a string for a character or a substring. The member functions of std::vector, such as at, size and push_back, and the comparison operators of std::string are permitted. The autograder rejects a submission that breaks any rule in this paragraph before any test runs.

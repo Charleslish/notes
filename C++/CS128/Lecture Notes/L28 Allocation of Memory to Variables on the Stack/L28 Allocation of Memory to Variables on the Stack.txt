@@ -1,0 +1,38 @@
+Allocation of Memory to Variables on the Stack
+    Offsets into a stack frame
+        Each function call has a stack frame that holds its parameters and local variables.
+            A function call pushes its frame, and its return pops the frame.
+        The compiler gives each parameter and local variable a fixed position in its function's frame.
+        An object is labeled fp−N when its storage begins N bytes below the address the frame pointer holds.
+        The order and numbers are the compiler's choice.
+        The frame pointer holds the address where the running function call's parameters and local variables begin.
+        The stack pointer holds the address where the stack ends.
+        The frame pointer is set when a function call begins,
+            while the stack pointer moves whenever stack space is reserved or released.
+        The same offset in a frame that begins at the same place names the same bytes, 
+            although the object no longer exists when the function call returns.
+        The frames of a recursive function share offsets but not addresses.
+            frame 1 → fp−4, fp−8
+            frame 2 → fp−4, fp−8 //fp is different, therefore address is different
+    Why a frame's size is fixed when the program is compiled
+        Compiler knows the type and size of every parameter and local variable when compiling standard C++.
+        Therefore, it can determine the fixed size of a function's stack frame and fixed offsets for its local variables.
+        A built-in array's number of elements is part of its type, so its size must be known at compile time.
+        A std::vector is used when the number of elements is known only at runtime.
+        The std::vector object can be in the stack frame, but its elements are stored outside the frame.
+    A pointer into a popped frame
+        A local variable's lifetime ends when its function returns.
+            A parameter also belongs to the called function's frame.
+        A pointer or reference to a local variable or parameter that survives the function's return is dangling.
+            Reading or writing through a dangling pointer or reference is undefined behavior.
+        Passing a caller's local variable by pointer or reference is safe during the call 
+            because the caller's variable outlives the called function.
+        Never return a pointer or reference to the called function's own local variable or parameter.
+        Returning by value gives the caller its own object and is safe.
+    What a stack frame cannot provide
+        Every object in a stack frame dies when its function returns.
+        A frame's size is fixed when the program is compiled.
+            Therefore, a local built-in array cannot have a size chosen at runtime.
+        The stack also has a limited maximum size, so a very large local array can cause stack overflow.
+        std::vector stores its elements outside the stack frame, on the free store (often called the heap).
+            This allows its size to be chosen at runtime and allows its elements to outlive the function that created them.
