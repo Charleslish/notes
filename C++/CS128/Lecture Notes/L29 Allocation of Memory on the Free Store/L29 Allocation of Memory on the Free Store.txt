@@ -1,0 +1,70 @@
+Allocation of Memory on the Free Store
+    Creating an object with new
+        A function call's parameters and ordinary local variables occupy its stack frame.
+        We can create an object on the free store, where its lifetime is independent of the function call.
+        A std::vector already uses this storage for its elements, managing their allocation and deallocation for us.
+        The new operator creates the object and produces its address.
+            int* ptr = new int{40};
+            The expression new int{40}, called a new-expression, creates an int initialized with 40.
+        The pointer ptr is a local pointer variable in the stack frame, while the unnamed int is on the free store.
+        We access the object indirectly through that pointer, using *ptr.
+            new int creates an int holding 0.
+            new int leaves its value indeterminate;    
+                reading that value before assigning to the object is undefined behavior.
+        We will initialize each object when we create it.
+    An object that outlives its function call
+        Returning the address of a local variable creates a dangling pointer 
+            because the variable is destroyed when the function returns.
+        An object created with new remains alive after the function returns, as long as its address is retained.
+        delete destroys the object and releases its memory, but does not change the pointer's value.
+            int* morning = MakeSession(kMorningMinutes);
+            delete morning;
+            morning = nullptr;
+        After delete, the pointer becomes dangling. Assigning nullptr replaces its stored address with a null pointer value.
+            Applying delete to nullptr has no effect.
+        We usually return values directly when explicit control over an object's lifetime is unnecessary. 
+        Returning std::string or std::vector by value allows the returned object to manage its own storage.
+        For class objects, the destructor runs when the object is destroyed. 
+        ith delete, the destructor runs before the object's memory is released.
+    Arrays on the free store
+        We can create an array on the free store with new, using a size determined at runtime.
+            new int[size]{} 
+            initializes each element to 0. 
+            The new-expression produces the address of the first element, which can be accessed using ptr[index].
+        Use delete[] for an array and delete for an individual object. 
+            The form of deletion must match the allocation.
+        A pointer stores the address of the first element, but not the array's size. 
+            A struct can return both the pointer and the size.
+        Accessing an element outside the array's bounds has undefined behavior.
+        An array's size cannot be changed after creation. 
+            A std::vector allows us to append elements as needed.
+    Growing an array
+        Size is the number of elements in use; capacity is the number of elements the allocated array can hold.
+        An array has a fixed capacity throughout its lifetime. 
+        To grow it, we 
+            allocate a larger array, 
+            copy the elements in use, 
+            delete the original array, 
+            and update the pointer and capacity.
+        void Grow(SessionLog& log) {
+            unsigned int new_capacity = kFirstCapacity;
+            if (log.capacity > 0)
+                new_capacity = log.capacity * kGrowthFactor;
+            int* bigger = new int[new_capacity]{};
+            for (unsigned int i = 0; i < log.size; ++i)
+                bigger[i] = log.minutes[i];
+            delete[] log.minutes;
+            log.minutes = bigger;
+            log.capacity = new_capacity;
+        }
+        void Append(SessionLog& log, int minutes) {
+            if (log.size == log.capacity)
+                Grow(log);
+            log.minutes[log.size] = minutes;
+            ++log.size;
+        }
+        Append calls Grow when size equals capacity. It then stores the new element and increments size.
+        Passing SessionLog by reference allows Grow and Append to modify the caller's struct directly.
+        When std::vector reallocates its storage, pointers and references to its old elements become dangling. 
+            Transferring elements to new storage does not redirect existing pointers or references.
+        The growth factor determines the capacity of each replacement array.
