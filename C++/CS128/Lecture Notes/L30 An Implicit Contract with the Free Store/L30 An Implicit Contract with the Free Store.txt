@@ -1,0 +1,54 @@
+An Implicit Contract with the Free Store
+    Three obligations
+        After the final use, delete each object created with new and each array created with new[].
+        Never access an object through a pointer or reference after the object's lifetime has ended.
+        Use the matching form, delete for an individual object and delete[] for an array, 
+            and delete each allocation exactly once.
+        Together, these obligations form an implicit contract with the free store.
+    Memory leaks
+        Every object created with new must eventually be deleted.    
+        Losing the last accessible pointer to an object causes a memory leak.
+        Replacing a pointer's address does not delete the object it previously pointed to.
+        When growing an array, delete the old array after copying its values and before losing its address.
+        Correct output does not guarantee correct memory management.
+    Two pointers to one object
+        Copying a pointer copies the address, not the object.
+        The owner is responsible for deleting the object; observers access it without deleting it.
+        All pointers to an object must respect its lifetime.
+        Assigning nullptr to one pointer does not change other pointers holding the same address.
+        Accessing an object after deletion causes undefined behavior; 
+            deleting it twice violates the deletion obligation.
+    Deleting only what new created
+        Delete every object created with new, and every array created with new[], after its last use.
+        Apply delete only to an address produced by new, and delete[] to an address produced by new[].
+        Never delete an object that has already been deleted.
+        Local variables are managed by their scope, not by delete.
+        Use delete for a single object and delete[] for an array.
+    Deleting in the right order
+        Delete the array before deleting the struct that stores its address.
+            first delete[] week->minutes;
+            then delete week;
+        Delete[] releases the array; delete releases the struct.
+        After deletion, any pointer holding the object's former address is dangling.
+        Ensure both allocations are released, in an order that avoids accessing an object after its lifetime ends.
+    Two structs, one array
+        Copying a pointer member copies its address, not the object it points to.
+        A shallow copy duplicates pointer values, so both structs refer to the same array.
+            struct WeekLog {
+                int* minutes = nullptr;
+                unsigned int size = 0;
+            };
+            WeekLog week{new int[kDays]{}, kDays};
+            WeekLog copy = week; //copy.minutes and week.minutes is the same array
+        Deleting the same array through two pointers causes a double-free.
+        Pass an owner by reference until copy operations manage ownership correctly.
+        An owner's destructor can release its array when the owner's lifetime ends.
+    An owner that deletes in its destructor
+        The constructor acquires the resource; the destructor releases it.
+        A local object's destructor runs when its lifetime ends.
+        RAII(resource acquisition is initialization) ties resource management to an object's lifetime.
+            SessionHistory(unsigned int size);
+            ~SessionHistory();
+        Copying an owning pointer without managing ownership creates a shallow copy and may cause double-free.
+        Pass the owner by reference until correct copy operations are defined.
+    

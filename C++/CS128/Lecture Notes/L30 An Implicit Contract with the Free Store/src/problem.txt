@@ -1,0 +1,57 @@
+Bike Rack
+A bike rack at a train station has a fixed number of slots, and each slot holds at most one bike. 
+The class BikeRack models one rack. Its slots are the elements of an array of int on the free store: 
+the private data member bikes_, of type int*, holds the address of that array, and the private data member size_, 
+of type unsigned int, holds its number of slots. A slot that holds 0 is empty; any other value is the number of the 
+bike parked there, and every bike number is positive.
+
+A BikeRack is the owner of its array: the constructor creates the array with new[], the destructor deletes it with 
+delete[], and no other object deletes it. A rack can also hand its array to another rack. The receiving rack deletes 
+its own array, takes the other rack's address and size, and leaves the other rack holding nullptr and 0, so the 
+array still has exactly one owner. A rack that holds nullptr and 0 has no slots; destroying it deletes nothing, 
+because delete[] applied to nullptr does nothing.
+
+The starter header bike_rack.hpp declares every member of BikeRack in the tables below. You write the definition of 
+each member function in bike_rack.cc, the constructor and the destructor included. 
+
+BikeRack
+Public interface
+Signature	Description
+BikeRack(unsigned int size);	Initializes size_ to size in its member initializer list. In its body, it creates an array of size elements with new int[size]{}, so every slot is empty, and stores its address in bikes_.
+BikeRack(const BikeRack& other) = delete;	Provided. The copy constructor, declared = delete.
+BikeRack& operator=(const BikeRack& other) = delete;	Provided. The copy assignment, declared = delete.
+~BikeRack();	Deletes the array bikes_ holds with delete[].
+unsigned int Size() const;	Returns size_, the number of slots.
+bool Park(unsigned int slot, int bike);	Stores bike in slot slot of the rack's own array and returns true. It returns false and changes nothing when slot is not less than size_ or when the slot already holds a bike.
+bool BikeAt(unsigned int slot, int& bike) const;	Stores the number of the bike in slot slot in bike and returns true. It returns false and leaves bike unchanged when slot is not less than size_ or when the slot is empty.
+bool Resize(unsigned int size);	Returns false and changes nothing when size is 0. Otherwise it creates a new array of size empty slots with new[], even when size equals size_. It copies the slots of the old array into the new one, slot for slot, up to the smaller of the two sizes, so a bike in a slot past the new size is no longer in the rack. It then deletes the old array with delete[], stores the new array's address in bikes_, sets size_ to size, and returns true. A rack that holds nullptr and 0 receives a new array of empty slots.
+void TakeFrom(BikeRack& other);	Hands other's array to this rack. It deletes this rack's own array with delete[], stores other's address and size in bikes_ and size_, and leaves other holding nullptr and 0. It takes the array itself, not a copy of its elements. When other is this rack, it changes nothing.
+Private data members
+Member	Type	Description
+bikes_	int*	The address of the rack's array of slots on the free store, or nullptr when the rack has handed its array to another rack. Its in-class member initializer is = nullptr.
+size_	unsigned int	The number of slots in that array, or 0 when the rack holds nullptr. Its in-class member initializer is = 0.
+Examples
+The rows below run in order, each from the state the row above leaves.
+
+Function call	Result
+BikeRack north(4);	north has 4 empty slots.
+north.Park(1, 3070)	Returns true. Slot 1 holds bike 3070.
+north.Park(1, 2215)	Returns false: slot 1 already holds a bike.
+north.BikeAt(1, bike)	Returns true and stores 3070 in bike.
+north.BikeAt(2, bike)	Returns false: slot 2 is empty, and bike still holds 3070.
+north.Resize(6)	Returns true. north holds a new array of 6 slots; slot 1 holds bike 3070, and every other slot is empty. The old array is deleted.
+north.Resize(0)	Returns false, and north is unchanged.
+BikeRack south(2);
+south.TakeFrom(north);	south's array of 2 slots is deleted, and south now holds north's array: south.Size() is 6 and slot 1 holds bike 3070. north holds nullptr, and north.Size() is 0.
+north.Park(0, 2215)	Returns false: north has no slots.
+south.TakeFrom(south);	Changes nothing.
+Constraints
+Your code must compile with clang++ using the c++20 standard and -stdlib=libc++, without errors under -Wall -Wextra -Werror -pedantic -Wuninitialized. Your code is also compiled with AddressSanitizer, which reports memory errors such as reading an array after it is deleted, deleting an array twice, deleting an array with delete instead of delete[], and an array that is never deleted, and UndefinedBehaviorSanitizer, which reports operations such as dereferencing a null pointer. The Run button shows their reports.
+
+The provided header declares the copy constructor and copy assignment with = delete, so the compiler rejects any copy of a BikeRack; pass one by reference.
+
+Declare every member exactly as the starter header declares it, including both declarations written = delete. Every member function of BikeRack is defined in bike_rack.cc. BikeRack has two private data members, bikes_ and size_, and its constructor and public member functions are those in the table. You may declare private member functions of your own in BikeRack to implement the interface. A non-member helper function of your own is defined in bike_rack.cc; if you declare it in bike_rack.hpp, the declaration follows the class definition. The autograder sets bikes_ and size_ directly before each call, so every member function must read the state of a rack from those data members alone.
+
+bike_rack.hpp and bike_rack.cc may include only the header "bike_rack.hpp".
+
+The constructor initializes size_ in its member initializer list and creates its array with new[] in its body, so its member initializer list does not name bikes_. Resize creates its new array with new[] and deletes the old one with delete[], and the destructor deletes the array with delete[]. Every array is created and deleted only with new[] and delete[]: a library function or type that obtains or manages memory, a library container, and a library function that copies, fills, searches, counts, compares, sorts, combines, or removes the elements of an array are not permitted. The keyword try may not appear in your code. The autograder rejects a submission that breaks any rule in this paragraph before any test runs.
