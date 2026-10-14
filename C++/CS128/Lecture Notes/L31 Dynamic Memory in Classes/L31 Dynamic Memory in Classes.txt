@@ -1,0 +1,76 @@
+Dynamic Memory in Classes
+    An owner, recalled
+        The constructor allocates the array, and the destructor releases it when the owner's lifetime ends.
+        Default copying copies the array's address, leaving two objects responsible for deleting the same array.
+        Copying an owner requires defining copy operations that correctly manage the owned memory.
+        ScreenLog provides Set and Get to modify and read the stored values.
+            int ScreenLog::Get(unsigned int day) const { return minutes_[day]; }
+            void ScreenLog::Set(unsigned int day, int minutes) { minutes_[day] = minutes; }
+        Initialization and assignment copy from an object of the same type but call different member functions.
+    Two ways to copy an object
+        A copy constructor initializes a new object from an existing object of the same type.
+            ScreenLog copy = week; calls the copy constructor.
+        A copy assignment operator assigns to an object that already exists.
+            weekend = week; calls the copy assignment operator.
+        The compiler supplies both operations when they are not declared by the class.
+        The compiler-supplied operations perform a memberwise copy, copying the value of each data member.
+        For a pointer member, memberwise copying copies the address, not the pointed-to elements.
+        Copying the pointer can cause multiple objects to delete the same array and can leak the destination's original array.
+        Each destination object needs its own array containing the source object's values.
+    The copy constructor
+        The copy constructor initializes a new object from an existing object of the same type.
+            ScreenLog(const ScreenLog& other);
+        The source is passed by reference to const to avoid copying or modifying it.
+            Passing the source by value would recursively require the copy constructor to initialize its own parameter.
+        The copy constructor initializes size_, allocates a separate array, and copies each element from the source array.
+            minutes_ = new int[size_]{};
+            for (unsigned int day = 0; day < size_; ++day) 
+                minutes_[day] = other.minutes_[day];
+        A deep copy gives each object its own array containing the same values.
+        Modifying the copied object does not modify the original object.
+        Passing a read-only object by const reference avoids an unnecessary copy.
+        Initialization establishes a new object's state, while assignment changes the state of an existing object.
+            ScreenLog weekend = week;
+            ScreenLog weekend(week); //both calls the copy constructor
+            weekend = week; //calls the copy assignment operator, not the copy constructor.
+    Copy assignment
+        The copy assignment operator changes the state of an existing object.
+            ScreenLog& operator=(const ScreenLog& other);
+        this refers to the destination object, and other refers to the source object.
+            return *this; returns a reference to the modified object, allowing chained assignment.
+        Allocate separate storage and copy the values before deleting the destination's original array.
+        Update minutes_ and size_ after copying the elements.
+            int* copied = new int[other.size_]{};
+            // Copy elements before deleting the old array.
+            for (unsigned int day = 0; day < other.size_; ++day) copied[day] = other.minutes_[day];
+            delete[] minutes_;
+            minutes_ = copied;
+            size_ = other.size_;
+            return *this;
+        Copying before deletion preserves the source values, even during self-assignment.
+        Self-assignment occurs when the source and destination are the same object.
+        An implementation that deletes the original storage before preserving the source must check 
+            this == &other.
+    Copies that must not exist: = delete
+        Some classes should prohibit copying when a copy would not represent an independent resource.
+        = delete tells the compiler that an operation cannot be used.
+            ScreenLog(const ScreenLog& other) = delete;
+            ScreenLog& operator=(const ScreenLog& other) = delete;
+        The deleted copy constructor prohibits copy initialization and passing objects by value.
+        The deleted copy assignment operator prohibits assigning one existing object to another.
+        Passing by reference remains valid because it does not copy the object.
+            ScreenLog& ref = week;
+        = default requests a compiler-supplied implementation, while = delete prohibits the operation. 
+    The Rule of Three, and the Rule of Zero
+        The Rule of Three: when a class must define one of 
+            the destructor ~ScreenLog();, 
+            copy constructor ScreenLog(const ScreenLog& other);, 
+            or copy assignment operator ScreenLog& operator=(const ScreenLog& other);
+            to manage a resource, it should address all three.
+        Copy operations must preserve independent ownership or be declared = delete to prohibit copying.
+        The Rule of Zero: when members already manage their resources, let the compiler supply the special member functions.
+            class ScreenLog {
+             private:
+                std::vector<int> minutes_;
+            };//std::vector<int> manages its own storage, copying, and cleanup.
+        A pointer that only observes an object owned elsewhere does not make the observing class responsible for deleting that object.

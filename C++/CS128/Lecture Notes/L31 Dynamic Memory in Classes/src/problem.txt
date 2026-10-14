@@ -1,0 +1,72 @@
+Ferry Manifest
+    The car deck of a ferry has a fixed number of lane slots, and each slot holds at most one vehicle. The class Manifest records which vehicle is loaded in each slot. Its slots are the elements of an array of int on the free store: the private data member vehicles_, of type int*, holds the address of that array, and the private data member size_, of type unsigned int, holds its number of slots. A slot that holds 0 is empty; any other value is the number of the vehicle loaded there, and every vehicle number is positive.
+
+A Manifest is the owner of its array: the constructor creates the array with new[], the destructor deletes it with delete[], and no other object deletes it. The copy constructor and the copy assignment the compiler supplies by default is a shallow copy. It copies each data member, so a copy of a Manifest object would hold the address of the same array, and the two destructors would delete that array twice. Your Manifest will therefore follow the Rule of Three: it declares and defines the destructor, the copy constructor and the copy assignment. A copy would be a deep copy: it holds an array of its own with the same vehicles in the same slots, so loading a vehicle into one manifest never changes another.
+
+The starter header manifest.hpp declares every member of Manifest in the tables below. You write the definition of each member function in manifest.cc, the constructors, the copy assignment and the destructor included.
+
+Manifest
+Public interface
+Signature	Description
+Manifest(unsigned int size);	
+Initializes size_ to size in its member initializer list. In its body, it creates an array of size elements with 
+new int[size]{}, so every slot is empty, and stores its address in vehicles_. A size of 0 gives a manifest with 
+no slots; it needs no special case, because new int[0]{} creates an array of no elements, which delete[] deletes 
+like any other.
+
+Manifest(const Manifest& other);	
+The copy constructor. It gives the new Manifest an array of its own, created with new[], with the same number of 
+slots as other and the same vehicle in each slot, and sets size_ to other's size. other keeps its own array and its 
+vehicles, and afterward a vehicle loaded into either manifest is not in the other.
+
+Manifest& operator=(const Manifest& other);	
+The copy assignment. Afterward this manifest holds a new array, created with new[] and distinct from other's, 
+with the same number of slots as other and the same vehicle in each slot, and size_ is other's size. 
+The array this manifest held before is deleted with delete[], and other keeps its own array and its vehicles. 
+Assigning a manifest to itself leaves its vehicles and its size as they were. It returns a reference to this manifest, 
+so that assignments chain: third = second = first; makes both second and third copies of first.
+
+~Manifest();	
+Deletes the array vehicles_ holds with delete[].
+
+unsigned int Size() const;	
+Returns size_, the number of slots.
+
+bool Load(unsigned int slot, int vehicle);	
+Stores vehicle in slot slot of the manifest's own array and returns true. 
+It returns false and changes no slot when slot is not less than size_ or when the slot already holds a vehicle.
+
+bool VehicleAt(unsigned int slot, int& vehicle) const;	
+Stores the number of the vehicle in slot slot in vehicle and returns true. 
+It returns false and leaves vehicle unchanged when slot is not less than size_ or when the slot is empty.
+
+Private data members
+Member	Type	Description
+vehicles_	int*	The address of the manifest's array of slots on the free store. Its in-class member initializer is = nullptr.
+size_	unsigned int	The number of slots in that array. Its in-class member initializer is = 0.
+Examples
+The rows below run in order, each from the state the row above leaves.
+
+Function call	Result
+Manifest morning(4);	morning has 4 empty slots.
+morning.Load(1, 4417)	Returns true. Slot 1 holds vehicle 4417.
+morning.Load(1, 2093)	Returns false: slot 1 already holds a vehicle.
+Manifest copy(morning);	copy holds an array of its own with 4 slots, and its slot 1 holds vehicle 4417.
+copy.Load(0, 2093)	Returns true. Slot 0 of copy holds vehicle 2093, and slot 0 of morning is still empty.
+morning.VehicleAt(0, vehicle)	Returns false: slot 0 of morning is empty, and vehicle is unchanged.
+Manifest evening(2);
+evening = morning;	evening's array of 2 slots is deleted, and evening holds a new array of 4 slots whose slot 1 holds vehicle 4417. evening.Size() is 4.
+evening.VehicleAt(1, vehicle)	Returns true and stores 4417 in vehicle.
+Manifest& same = evening;
+evening = same;	evening is assigned to itself: it still has 4 slots, and slot 1 still holds vehicle 4417.
+Manifest night(3);
+night = evening = copy;	night and evening each hold an array of their own with 4 slots, slot 0 holding vehicle 2093 and slot 1 holding vehicle 4417.
+
+Constraints
+Your code must compile with clang++ using the c++20 standard and -stdlib=libc++, without errors under -Wall -Wextra -Werror -pedantic -Wuninitialized. Your code is also compiled with AddressSanitizer, which reports memory errors such as reading an array after it is deleted, deleting an array twice, deleting an array with delete instead of delete[], and an array that is never deleted, and UndefinedBehaviorSanitizer, which reports operations such as dereferencing a null pointer. The Run button shows their reports.
+
+Declare every member exactly as the starter header declares it. The copy constructor and the copy assignment are defined in manifest.cc; the autograder rejects a submission that declares either one = default or = delete, or leaves either one out so that the compiler supplies it. Every member function of Manifest is defined in manifest.cc. The data members of Manifest are vehicles_ and size_, and its constructors and public member functions are those in the table. You may declare private member functions of your own in Manifest to implement the interface. The autograder sets vehicles_ and size_ directly before each call, so every member function must read the state of a manifest from those data members alone.
+
+manifest.hpp and manifest.cc may include only the header "manifest.hpp".
+
+A member function may call another member function or construct a Manifest of its own. Four rules are graded checks worth points of their own: code that breaks one loses that check's points, and every test still runs. The constructor Manifest(unsigned int size) initializes size_ in its member initializer list and creates its array with new[] in its body, so its member initializer list does not name vehicles_. Every array is created only with new[] and deleted only with delete[]: a library function or type that obtains or manages memory, and a library container, are not permitted. The loops that copy the vehicles are your own: a library function that copies, fills, searches, counts, compares, sorts, combines, or removes the elements of an array is not permitted. The keyword try may not appear in your code.
