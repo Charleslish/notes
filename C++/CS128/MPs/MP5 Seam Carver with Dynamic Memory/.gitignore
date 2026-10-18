@@ -1,0 +1,8 @@
+bin/
+*.o
+.DS_Store
+carved.png
+unchanged.png
+your-ocean.png
+examples/my-energy.png
+examples/my-energy-carved.png

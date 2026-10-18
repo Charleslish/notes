@@ -1,0 +1,7 @@
+Checks: '-*,readability-function-size,readability-function-cognitive-complexity'
+WarningsAsErrors: 'readability-function-size,readability-function-cognitive-complexity'
+HeaderFilterRegex: 'includes/(pixel|image|seam_carver)\.hpp'
+CheckOptions:
+  readability-function-size.LineThreshold: '26'
+  readability-function-cognitive-complexity.Threshold: '20'
+  readability-function-cognitive-complexity.DescribeBasicIncrements: 'false'
