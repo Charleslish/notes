@@ -1,0 +1,86 @@
+Two-Dimensional Arrays on the Free Store
+    Choosing row dimensions at runtime
+        A built-in two-dimensional array requires both dimensions to be constant expressions.
+        When both dimensions depend on runtime input, allocate each row separately using new[] and organize the row addresses in an array.
+            int** seats = new int*[rows];
+            for (int i = 0; i < rows; ++i)
+                seats[i] = new int[cols]{};
+        seats[i][j] accesses element j of row i.
+        Each row is allocated separately and must be deleted separately, followed by deleting the array of row pointers
+    Storing addresses in an array
+        Each separately allocated row produces an address that we store in a pointer of type int*.
+        The pointer array and the rows are separate arrays. Declaring the pointer array does not allocate the rows.
+        A local built-in pointer array still requires a constant-expression size.
+            int* rows[3]{};
+            rows[0] = new int[2]{};
+        delete[] releases each dynamically allocated row. Applying delete[] to a null pointer has no effect.
+        Deleting a row leaves its pointer dangling but does not end the pointer array's lifetime.
+        A local pointer array is not dynamically allocated, so we do not apply delete[] to it.
+    Allocating the pointer array and rows
+        Allocating the pointer array on the free store allows the number of rows to depend on runtime input.
+            int** minutes = new int*[size]{};
+        The new-expression allocates an array of size elements of type int*, initialized to nullptr.
+            int** is a pointer to a pointer to int.
+        Allocate each row separately and store its address in the corresponding element of the array of row pointers.
+            for (unsigned int day = 0; day < kDays; ++day)
+                minutes[day] = new int[kSessions]{};
+        minutes[day][session] accesses an element in a particular row.
+        Delete each dynamically allocated row before deleting the array of row pointers.
+    Accessing elements through row pointers
+        The first subscript selects a pointer element, and the second selects an integer within that row.
+            p[i] is equivalent to *(p + i).
+            minutes[1][2] == *(*(minutes + 1) + 2)
+        The two additions operate within different arrays. 
+        Separately allocated rows are not necessarily contiguous in memory.
+        The day index must be less than kDays, and the session index must be less than kSessions.
+        Subscript operations do not check bounds. 
+            Accessing an element outside an array causes undefined behavior.
+    Releasing both levels of storage
+        Delete the integer arrays first, then delete the array of row pointers.
+        Each allocation with new[] must be matched with delete[].
+            for (unsigned int row = 0; row < kDays; ++row)
+                delete[] minutes[row];
+            delete[] minutes;
+        Deleting the pointer array first would prevent us from accessing its elements to retrieve the row addresses.
+        A mismatched delete may compile but cause an alloc-dealloc-mismatch error detected by AddressSanitizer.
+    Passing row pointers to functions
+        Functions receive the pointer array's address and the dimensions needed to access its elements.
+            Passing int** by value copies the address, not the arrays. 
+            void AddMinutes(int** minutes, ...);
+        The function can modify the integers because both pointers refer to the same storage.
+            minutes[day][session] += 5; //changes the origanal array
+        Assigning a new address to the local pointer parameter does not change the caller's pointer.
+            minutes = nullptr; //only change the local pointer parameter
+        const int* const* allows reading the integers but prevents modifying the integers or replacing the stored row addresses.
+            int TotalMinutes(const int* const* minutes, ...);
+        const int** cannot accept an int** argument 
+            because it would allow replacing a stored pointer with an address to a constant integer.
+        ReleaseMinutes needs the number of rows to delete each row and then the pointer array. 
+            It does not need the number of elements per row.
+            void ReleaseMinutes(int** minutes, unsigned int days);
+    Copying row addresses versus row elements
+        Copying row addresses creates separate pointer arrays but does not create separate integer arrays. 
+            This is a shallow copy.
+                copy[day] = minutes[day];
+        Both pointer arrays refer to the same integer arrays, 
+            so modifying an element through one is visible through the other.
+        Releasing one pointer array and its rows leaves the other pointer array with dangling pointers. 
+            Releasing the shared rows again causes a double-free.
+        A deep copy allocates a new pointer array and new integer arrays, then copies the integer values into the new arrays.
+        Each independently allocated array must be released exactly once.
+    Managing row ownership in a class
+        ScreenTimeTable stores the pointer array's address in minutes_ and the dimensions in days_ and sessions_.
+        The constructor allocates the pointer array and each integer row. 
+        The destructor deletes the rows before deleting the pointer array.
+        The Rule of Three consists of the destructor, copy constructor, and copy assignment operator.
+        The copy constructor allocates independent arrays and copies the source's integer values.
+        Copy assignment allocates and fills replacement arrays before deleting the destination's old arrays. 
+            It then updates the pointer and dimensions.
+        Copying before deletion preserves source values during self-assignment.
+            int** copied = /* allocate and copy */;
+            DeleteRows();
+            minutes_ = copied;
+            days_ = other.days_;
+            sessions_ = other.sessions_;
+        DeleteRows deletes each integer row, then deletes the pointer array.
+    

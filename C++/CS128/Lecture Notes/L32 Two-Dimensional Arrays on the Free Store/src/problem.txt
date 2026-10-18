@@ -1,0 +1,57 @@
+Vineyard Rows
+A vineyard is planted in rows, and every row holds the same number of vines. At harvest, the grower records the grams of grapes each vine yields. The class Vineyard keeps those yields on the free store as a two-dimensional array: the private data member yields_, of type int**, holds the address of an array of row pointers, and each element of that array holds the address of one row, an array of int whose elements are the yields of that row's vines. yields_[row][vine] is the yield of vine vine in row row. The private data members rows_ and vines_ hold the number of rows and the number of vines in each row.
+
+A Vineyard is the owner of its rows and of its array of row pointers: the constructor creates them with new[], and the destructor deletes them with delete[]. Each row is deleted before the array of row pointers, because the array of row pointers holds the only copies of the rows' addresses. A vineyard with no rows holds nullptr, 0 and 0. A vineyard is one piece of land, so a Vineyard is never copied.
+
+The starter header vineyard.hpp declares every member of Vineyard in the tables below. You write the definition of each member function in vineyard.cc, the constructor, the destructor and the private member function included.
+
+Vineyard
+Public interface
+Signature	Description
+Vineyard(unsigned int rows, unsigned int vines);	Initializes rows_ to rows and vines_ to vines in its member initializer list. When either is 0, its body sets both to 0 and creates nothing, so the vineyard holds nullptr, 0 and 0. Otherwise its body creates an array of rows row pointers with new[] and stores its address in yields_, then creates each row as its own array of vines elements with new int[vines]{}, so every yield is 0, and stores its address in that row's element of the array of row pointers.
+Vineyard(const Vineyard& other) = delete;	Provided. The copy constructor, declared = delete.
+Vineyard& operator=(const Vineyard& other) = delete;	Provided. The copy assignment, declared = delete.
+~Vineyard();	Deletes the rows and then the array of row pointers by calling DeleteRows.
+unsigned int Rows() const;	Returns rows_, the number of rows.
+unsigned int VinesPerRow() const;	Returns vines_, the number of vines in each row.
+bool Record(unsigned int row, unsigned int vine, int grams);	Stores grams as the yield of vine vine in row row, in the vineyard's own row, and returns true. It returns false and changes nothing when row is not less than rows_ or vine is not less than vines_.
+bool YieldAt(unsigned int row, unsigned int vine, int& grams) const;	Stores the yield of vine vine in row row in grams and returns true. It returns false and leaves grams unchanged when row is not less than rows_ or vine is not less than vines_.
+bool Resize(unsigned int rows, unsigned int vines);	Returns false and changes nothing when rows or vines is 0. Otherwise it creates a new array of rows row pointers and a new row of vines elements for each of them, every yield 0, even when rows and vines equal rows_ and vines_. It copies every yield whose row is less than both numbers of rows and whose vine is less than both numbers of vines into the same row and vine of the new rows. It then deletes the old rows and the old array of row pointers by calling DeleteRows, stores the new array's address in yields_, sets rows_ and vines_ to rows and vines, and returns true. A vineyard that holds nullptr, 0 and 0 receives new rows whose yields are all 0.
+
+Private member functions
+Signature	Description
+void DeleteRows();	Deletes each of the rows_ rows with delete[], then deletes the array of row pointers with delete[], and leaves the vineyard holding nullptr, 0 and 0. On a vineyard that already holds nullptr, 0 and 0, it deletes nothing, because delete[] applied to nullptr does nothing.
+Private data members
+Member	Type	Description
+yields_	int**	The address of the array of row pointers on the free store, or nullptr when the vineyard has no rows. Its in-class member initializer is = nullptr.
+rows_	unsigned int	The number of rows, which is also the number of elements of the array of row pointers. Its in-class member initializer is = 0.
+vines_	unsigned int	The number of vines in each row, which is the number of elements of every row. Its in-class member initializer is = 0.
+
+Examples
+The rows below run in order, each from the state the row above leaves, with an int named grams.
+
+Function call	Result
+Vineyard hillside(2, 3);	hillside has 2 rows of 3 vines, and every yield is 0.
+hillside.Record(1, 2, 2350)	Returns true. Vine 2 of row 1 yields 2350 grams.
+hillside.Record(2, 0, 1800)	Returns false: hillside has no row 2.
+hillside.Record(0, 1, 1975)	Returns true. Vine 1 of row 0 yields 1975 grams.
+hillside.YieldAt(1, 2, grams)	Returns true and stores 2350 in grams.
+hillside.YieldAt(0, 3, grams)	Returns false: a row has no vine 3, and grams still holds 2350.
+hillside.Resize(4, 2)	Returns true. hillside holds a new array of 4 row pointers and 4 new rows of 2 vines. Vine 1 of row 0 still yields 1975 grams, and every other yield is 0; the yield 2350 of vine 2 in row 1 is no longer in the vineyard, because a row now has no vine 2. The old rows and the old array of row pointers are deleted.
+hillside.Rows()
+hillside.VinesPerRow()	Return 4 and 2.
+hillside.Resize(0, 5)	Returns false, and hillside is unchanged.
+Vineyard terrace(3, 0);	terrace holds nullptr, 0 and 0.
+
+At the closing brace of the block that declares hillside, the destructor runs and deletes its 4 rows and then its array of row pointers.
+
+Constraints
+Your code must compile with clang++ using the c++20 standard and -stdlib=libc++, without errors under -Wall -Wextra -Werror -pedantic -Wuninitialized. Your code is also compiled with AddressSanitizer, which reports memory errors such as reading an array after it is deleted, deleting an array twice, deleting an array with delete instead of delete[], and, through LeakSanitizer, many arrays that are never deleted, and UndefinedBehaviorSanitizer, which reports operations such as dereferencing a null pointer. Neither detects every invalid operation. The Run button shows their reports.
+
+The provided header declares the copy constructor and copy assignment with = delete, so the compiler rejects any copy of a Vineyard; pass one by reference.
+
+Declare every member exactly as the starter header declares it, including both declarations written = delete. Every member function of Vineyard is defined in vineyard.cc. The data members of Vineyard are yields_, rows_ and vines_, and its constructors and public member functions are those in the table. You may declare private member functions of your own in Vineyard. The autograder sets yields_, rows_ and vines_ directly before each function call, giving the vineyard rows and an array of row pointers it created itself, so every member function must read the state of a vineyard from those data members alone.
+
+vineyard.hpp and vineyard.cc may include only the header "vineyard.hpp".
+
+A member function may call another member function or construct a Vineyard of its own. Four rules are graded checks worth points of their own: code that breaks one loses that check's points, and every test still runs. The constructor initializes rows_ and vines_ in its member initializer list and creates its arrays with new[] in its body, so its member initializer list does not name yields_. Every array is created only with new[] and deleted only with delete[]: a library function or type that obtains or manages memory, and a library container, are not permitted. The loops that copy the yields are your own: a library function that copies, fills, searches, counts, compares, sorts, combines, or removes the elements of an array is not permitted. The keyword try may not appear in your code.
