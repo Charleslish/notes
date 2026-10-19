@@ -1,0 +1,14 @@
+Debugging Memory Mishaps in PushBack()
+In this problem, you will be working with a user-defined type called IntArray that encapsulates a dynamically allocated array, its size, and its capacity. This type manages a collection of integers and is designed to automatically resize as elements are added. The IntArray class provides several member functions and private data members that manage its internal state.
+
+Your task is to debug the provided implementation of the IntArray::PushBack() function in src/solution.cc. Although the overall idea of this function -- adding a new integer to the end of the array and growing to twice the current capacity when needed -- is correct, the logic for handling some array accesses is flawed, causing reads and writes outside the allocated memory. Your goal is to correct the faulty code so that it no longer performs out-of-bounds accesses, while preserving the intended behavior of PushBack(). Fix only the body of PushBack(); do not modify the other member functions or the data members declared in includes/solution.hpp.
+
+Using the Run button
+The Run button compiles src/driver.cc together with your src/solution.cc and runs it under AddressSanitizer. While bugs remain, you will see a sanitizer report instead of the driver's full output. Read two things in the report: the error type near the top (heap-buffer-overflow) and the first stack frame that names solution.cc:LINE -- that line is where the faulty access happens. ASAN stops at the first hard error it hits, so fix that access and run again to check for the next one. When every bug is fixed, the driver prints the array contents and capacities with no sanitizer report.
+
+Constraints
+Your solution must compile with clang++ using the c++20 standard, without errors when using the flags: -Wall -Wextra -Werror -pedantic -Wunused-variable -Wuninitialized.
+
+All data members must be private. Library functions that copy, fill, or move ranges of memory are not permitted; copy the elements yourself.
+
+You may only include the following headers in your solution: "solution.hpp".

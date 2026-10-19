@@ -1,0 +1,22 @@
+Tools for testing and debugging memory issues
+    Memory safety tools help detect memory errors and undefined behavior in C++ programs.
+    AddressSanitizer (ASan)
+        Detects out-of-bounds accesses, use-after-free errors, invalid frees, and other memory errors.
+        Experimental memory leak checking is also available.
+        ASan typically causes a 2–3x slowdown, compared with 10–50x for Valgrind Memcheck.
+        Compile with -fsanitize=address to enable ASan.
+    UndefinedBehaviorSanitizer (UBSan)
+        Detects undefined behavior, including null pointer errors, array out-of-bounds accesses, 
+        division by zero, and signed integer overflow.
+        Compile with -fsanitize=undefined to enable UBSan.
+        ASan and UBSan can be enabled together using -fsanitize=address,undefined.
+    Valgrind
+        Provides debugging and profiling tools to help make programs more correct and efficient.
+        Memcheck detects memory-related errors, including memory leaks, invalid pointer use, 
+        and uninitialized memory accesses.
+        Valgrind Memcheck is slower than ASan but provides useful memory debugging information.
+        Finding Memory Leaks with Valgrind - Memcheck Tool
+        Run Memcheck with valgrind --tool=memcheck ./program_name.
+        Use --leak-check=yes to obtain more detailed memory leak information.
+        If the number of allocations differs from the number of frees, investigate possible memory leaks.
+        definitely lost indicates memory that has been allocated but can no longer be reached through program pointers.
