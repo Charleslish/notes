@@ -41,9 +41,8 @@ def graph_matrix(mat, mat_label=None, show_weights=True, round_digits=3):
     G.layout('dot')
     graphviz_data = G.string()
 
-    buffer = TempFile()
-    G.draw(buffer, format='png')
-    display.display(display.Image(data=buffer.get_bytes(), format='png'))
+    data = G.draw(format='png')
+    display.display(display.Image(data=data, format='png'))
 
 
 
