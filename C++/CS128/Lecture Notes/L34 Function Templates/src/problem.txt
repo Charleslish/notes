@@ -1,0 +1,37 @@
+Make It Work
+A function template lets a single definition work for many types. In this activity you will write a function template named Larger that returns the greater of its two arguments, and then extend a provided Pixel class so that your template works with it. A type cooperates with Larger only when it defines operator>; that is the requirement you will satisfy for Pixel.
+
+Part 1: Implement Larger
+Implement Larger in larger.hpp. Compare the two arguments with operator> and return whichever is larger. When the arguments are equal, return b. Because the definition lives in a header, write the function body directly below the declaration in larger.hpp.
+
+Signature	Description
+template <typename T>
+T Larger(const T& a, const T& b);	Returns whichever argument is larger, compared with operator>. Returns b when the two arguments are equal.
+The provided Student type already defines operator> (comparing by GPA), so Larger works with a Student unchanged. You do not modify Student.
+
+Part 2: Add operator> to Pixel
+The Pixel class in pixel.hpp does not define operator>, so Larger cannot accept a Pixel yet. Add operator> so that one pixel is greater than another when it has the higher total brightness, the sum r_ + g_ + b_. Declare it in pixel.hpp and define its body in pixel.cc.
+
+Public interface
+Signature	Description
+Pixel(int r, int g, int b);	Provided. Constructs a pixel from its red, green, and blue channel values.
+int GetR() const;	Provided. Returns the red channel value.
+int GetG() const;	Provided. Returns the green channel value.
+int GetB() const;	Provided. Returns the blue channel value.
+bool operator>(const Pixel& other) const;	Returns true when this pixel's total brightness (r_ + g_ + b_) exceeds other's.
+friend std::ostream& operator<<(std::ostream& os, const Pixel& p);	Provided. Prints the pixel in the form (r, g, b).
+Private data members
+Member	Type	Description
+r_	int	Provided. Red channel value.
+g_	int	Provided. Green channel value.
+b_	int	Provided. Blue channel value.
+Example
+std::cout << Larger(10, 20) << std::endl;       // 20
+std::cout << Larger(3.14, 2.71) << std::endl;   // 3.14
+
+Pixel p1(255, 0, 0), p2(0, 255, 0);
+Pixel brighter = Larger(p1, p2);
+std::cout << brighter << std::endl;
+// Both have brightness 255, so Larger returns p2: (0, 255, 0)
+Constraints
+Your code must compile with clang++ using the c++20 standard without errors under -Wall -Wextra -Werror -pedantic. You may include only the following headers: "larger.hpp", "pixel.hpp", "student.hpp", <iostream>, <string>.

@@ -1,0 +1,55 @@
+Function Templates
+    Motivation
+        A template is a generic blueprint that tells the compiler how to generate code for different types.
+        Function templates eliminate repeated code when the logic is identical but the types are different.
+        The compiler generates the appropriate function version for the types used.
+    Your first function template
+        The template header declares the template parameter list.
+        typename T declares a type placeholder that the compiler replaces with a concrete type.
+        typename and class mean the same thing in this context.
+            template <typename T>
+            void Swap(T& a, T& b) {
+                T temp = a;
+                a = b;
+                b = temp;
+            }
+            T Max(const T& a, const T& b) {
+                if (a > b) return a;
+                return b;
+            }
+        Explicit template arguments specify the type, as in Swap<int>(x, y).
+        Template argument deduction allows the compiler to infer the type from function arguments.
+        An instantiation is a concrete function generated from a template.
+        The compiler will not generate the same instantiation twice.
+        Arguments contributing to the same template parameter must agree on the deduced type.
+            Swap(x, a) fails when x is int and a is double because T cannot be deduced consistently.
+            Swap<double>(x, a) fails because an int variable cannot bind to a double& parameter.
+            Max<double>(3, 7.5) works because int can convert to double and bind to const double&.
+        A type used to instantiate a template must support every operation used in the function body.
+    Explicit template arguments and reference types
+        Swap takes T&, while Max takes const T&.
+        A const reference can bind to variables, literals, and converted temporary values.
+        A non-const reference T& cannot bind to a temporary value produced by a type conversion.
+            Max<double>(3, 7.5) is valid because int can convert to double and bind to const double&.
+            Swap<double>(x, a) is invalid when x is int because an int cannot bind to double&.
+        Converting x to a temporary double would not allow Swap to modify the original x.
+    Putting it together
+        A function template can use the same logic with different types.
+            template <typename T>
+            void PrintIf(const std::vector<T>& items, const T& threshold) {
+                for (const T& item : items) {
+                    if (item > threshold)
+                        std::cout << item << std::endl;
+                }
+            }
+        The template parameter T must be consistent between std::vector<T> and const T& threshold.
+        The type T must support every operation used in the template body.
+        PrintIf requires operator> for comparison and operator<< for output.
+        std::string compares strings lexicographically using operator>.
+        Generic programming lets the same logic adapt to different types through the operators they define.
+    When does the compiler check your template?
+        The compiler does not fully type-check a template until it is instantiated.
+        A template containing invalid operations may compile if it is never instantiated.
+        Different types can succeed or fail independently with the same template.
+        The type used to instantiate a template must support the operations required by its body.
+        Look for "in instantiation of" in compiler output to identify the call site and the type that triggered the error.
