@@ -1,0 +1,16 @@
+Lookup
+A function template can take more than one type parameter. In this activity you will write a function template named Lookup with two type parameters that searches a vector of key-value pairs for a matching key and returns its associated value, much like looking a name up in a roster. Implement it in solution.hpp; because a template definition must be visible where it is instantiated, write the function body in the header.
+
+Functions to implement
+Signature	Description
+template <typename K, typename V>
+V Lookup(const std::vector<std::pair<K, V>>& entries, const K& key);	Returns the .second of the first pair whose .first equals key (compared with operator==). Throws std::runtime_error when no pair matches.
+Traverse the vector yourself, comparing each pair's .first to key and returning the matching .second as soon as you find it. You may not use any library function that searches or sorts; perform the comparison with operator==.
+
+Example
+std::vector<std::pair<int, std::string>> roster = {
+    {1, "Alice"}, {2, "Bob"}, {3, "Charlie"}};
+std::string name = Lookup(roster, 2);
+// name is "Bob"
+Constraints
+Your code must compile with clang++ using the c++20 standard without errors under -Wall -Wextra -Werror -pedantic. You may include only the following headers: "solution.hpp", <stdexcept>, <utility>, <vector>.

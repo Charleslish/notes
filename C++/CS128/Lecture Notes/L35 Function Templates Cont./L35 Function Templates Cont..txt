@@ -1,0 +1,20 @@
+Function Templates Cont.
+    Function templates and separate compilation
+        Since the compiler generates code for a template only when it is instantiated, 
+            it must be able to see the full definition of the template at the point of instantiation.
+        A declaration alone is not enough.
+        With templates, the compiler must see the full definition to generate code for a specific type.
+        If the template definition is in a .cc file and no instantiation occurs in that translation unit, 
+            the required function code may not be generated, resulting in a linker error.
+        Function template definitions go in header files (.hpp), not source files (.cc).
+    Multiple type parameters
+        You can declare more than one type parameter, separated by commas.
+            template <typename To, typename From>
+            To Convert(const From& value);
+        The type parameter From appears in the function's parameter list, so the compiler can deduce it from the argument.
+        The type parameter To only appears in the return type, so the compiler cannot deduce it from the arguments.
+        You must specify To explicitly at the call site. The compiler can deduce From from the argument.
+            Convert<int>(score) specifies To = int and deduces From from score.
+        The types in the call's angle brackets are matched to the template parameters from left to right.
+        Putting To first lets you specify the target type without spelling out the source type the compiler already knows.
+        You can have as many type parameters as you need, but more than two or three is rare in practice.
