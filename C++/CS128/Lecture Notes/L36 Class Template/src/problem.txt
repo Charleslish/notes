@@ -1,0 +1,23 @@
+The Vault
+The Cartographer's Guild maintains a network of sealed vaults across the realm. Each vault holds exactly one artifact. Guild archivists need to peek at what is inside a vault without removing it, and they need to track how many times each vault has been accessed for auditing purposes.
+
+You have been given a working ArtifactVault class that stores an Artifact. Your task is to convert it into a class template Vault<T> that can store any type.
+
+The Artifact class is provided and should not be written. When you are done, your Vault<T> should work with Artifact, std::string, int, or any other type.
+
+Your converted class must keep the structure of ArtifactVault: the same public interface and the same private data members, with T in place of Artifact.
+
+Vault<T>
+Public interface
+Signature	Description
+void Store(const T& item);	Places an item in the vault, replacing any existing item.
+T Peek();	Returns the stored item; each successful peek counts as an access. Throws a std::runtime_error if the vault is empty; a peek that throws does not count as an access.
+unsigned int GetAccessCount() const;	Returns how many times the vault has been peeked at.
+bool IsEmpty() const;	Returns true if the vault holds no item; false otherwise.
+Private data members
+Member	Type	Description
+item_	T	The stored item.
+has_item_	bool	Whether the vault currently holds an item; initially false.
+access_count_	unsigned int	The number of successful peeks; initially 0.
+Constraints
+Your code must compile with clang++ using the c++20 standard without errors under -Wall -Wextra -Werror -pedantic. You may include only the following headers: "vault.hpp", "artifact.hpp", <stdexcept>, <iostream>, <string>.

@@ -1,0 +1,32 @@
+Class Template
+    Motivation
+        Class templates allow us to write a single class definition that works across multiple types.
+        The compiler generates a concrete version of the class for each type we use it with.
+        Class templates avoid duplicating classes when their data members and behaviors are identical, except for the types they store.
+    Defining a class template
+        Place template <typename T> directly before the class definition.
+        T replaces the type of the stored element in parameters, return types, and data members that hold elements.
+        Data members unrelated to the stored element type, such as indices or counts, keep their original types.
+            template <typename T>
+            class Playlist {
+                std::vector<T> items_;
+                int current_ = 0;
+            };
+        Each member function definition outside the class needs its own template <typename T> header and must use Playlist<T>:: instead of Playlist::.
+        Inside the class body, Playlist by itself refers to Playlist<T>.
+            template <typename T>
+            void Playlist<T>::Add(const T& item) {
+                items_.push_back(item);
+            }
+        Both the class template definition and all member function definitions must reside in the header file 
+            so the compiler can instantiate the template wherever it is used.
+        Each instantiation, such as Playlist<Song> and Playlist<std::string>, is a distinct type. You cannot assign one to the other.
+        Class template instantiations include std::vector<int>, std::map<std::string, int>, and std::set<double>.
+        In this course, class template arguments are specified explicitly, such as Playlist<Song>.
+    When does the compiler check your class template?
+        Instantiating a class does not check every member function.
+        The compiler checks a member function's body only when that specific member function is actually called for that type.
+        A type only needs to support the operations used by the member functions you call.
+        A class template can be fully usable for one type and partially usable for another.
+        For example, Playlist<Event>::Print() requires Event to support operator<<, but Add() and GetNext() do not.
+        If nobody calls a particular member function on any instantiation, errors in its body may go undetected.
