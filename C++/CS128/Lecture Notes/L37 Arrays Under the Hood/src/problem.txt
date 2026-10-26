@@ -1,0 +1,33 @@
+The Exhibit Catalog
+
+The Royal Museum maintains a hall of numbered vaults, each capable of storing one artifact. The order in which visitors view the artifacts (the tour order) is not determined by vault number. Instead, each vault contains an index indicating which vault to visit next. A value of -1 means the tour ends at that vault.
+
+Implement the ExhibitCatalog class. The vault hall is stored as a dynamically allocated array of Vault structs. Empty slots are tracked in a std::set<int>. The head_ index identifies the first vault on the tour (-1 if the tour is empty). When claiming a slot, always use the smallest available index. A std::set keeps its elements in sorted order, so available_.begin() points to the smallest element. Store it in int slot = *available_.begin(); and remove it with available_.erase(available_.begin());. If AddToFront or AddAfter is called when no slots are available, call Resize first. You may assume any vault_index passed to AddAfter or Remove identifies a vault currently on the tour.
+
+Vault (provided; do not modify)
+std::string artifact: the artifact stored in this vault; empty when the slot is unused.
+int next_vault: the index of the next vault on the tour; -1 if this vault ends the tour. Initialized to -1.
+
+ExhibitCatalog public interface
+ExhibitCatalog(int initial_capacity): allocate a vault hall of initial_capacity slots and mark every index available.
+~ExhibitCatalog(): free the vault array.
+ExhibitCatalog(const ExhibitCatalog& other) = delete.
+ExhibitCatalog& operator=(const ExhibitCatalog& other) = delete.
+void AddToFront(const std::string& artifact): claim the smallest available slot, store the artifact, point its next_vault to the current head, update head_ to the new slot, and increment size_.
+void AddAfter(int vault_index, const std::string& artifact): insert immediately after vault_index. Claim the smallest available slot, store the artifact, set its next_vault to the old successor of vault_index, then set vault_index's next_vault to the new slot. Increment size_.
+void Remove(int vault_index): unlink the vault. If it is head_, advance head_ to its successor; otherwise traverse from head_ to its predecessor and link that predecessor to the removed vault's successor. Do not write to vaults that are not on the tour. Clear the removed artifact, return its index to available_, and decrement size_.
+std::vector<std::string> GetTourOrder() const: follow next_vault from head_ to the end and return artifact names in tour order.
+void Resize(): double capacity, allocate a new Vault array, copy every existing Vault in a hand-written loop, free the old array, and add the new indices to available_.
+int GetSize() const: return the number of artifacts on the tour.
+int GetCapacity() const: return the number of slots in the hall.
+int GetHead() const: return the first vault's index, or -1 when empty.
+
+Private data members
+Vault* vaults_ = nullptr: dynamically allocated vault hall.
+int capacity_ = 0: total slot count.
+int size_ = 0: number of artifacts on the tour.
+int head_ = -1: first vault index, or -1 when empty.
+std::set<int> available_: indices of empty slots.
+
+Constraints
+Compile with clang++ using C++20 and -Wall -Wextra -Werror -pedantic. Allowed headers: "exhibit_catalog.hpp", "vault.hpp", <iostream>, <vector>, <set>, <string>, <stdexcept>. Copy and rewire the Vault elements yourself with a hand-written loop; do not use a library routine that copies a block of elements.

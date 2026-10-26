@@ -1,0 +1,24 @@
+Arrays Under the Hood
+    Contiguous memory
+        An array stores its elements in one continuous block of memory, with each element directly next to the previous one.
+        Contiguity lets the compiler calculate an element's address from the base address and its index.
+    Subscripting is pointer arithmetic
+        arr[i] is equivalent to *(arr + i).
+        Pointer arithmetic advances by elements, automatically accounting for sizeof(ElementType).
+        Accessing an element by index takes constant time, independent of the array's size.
+            arr[i]
+            *(arr + i)
+    Where arrays shine
+        Arrays provide constant-time access to any element when its index is known.
+        Binary search uses this constant-time access to repeatedly halve the search space of a sorted array.
+        Binary search takes logarithmic time, while a linear scan takes time proportional to the number of elements.
+    Where arrays struggle
+        Inserting or removing an element in the middle requires shifting later elements to preserve contiguity.
+        The cost is linear in the number of elements that must move; insertion at the end requires no shifting when capacity is available.
+    What if elements did not have to be contiguous?
+        An array slot can store an index to the next slot, so logical order can differ from physical order.
+        Insertion and removal can update a small number of links without shifting elements.
+        Traversal follows the links from the head and takes linear time; direct access by logical position is no longer constant time.
+        The exhibit catalog uses an array of vaults, a head index, and a set of available slots to represent this chain.
+            vaults_[current].next_vault
+            current = vaults_[current].next_vault
