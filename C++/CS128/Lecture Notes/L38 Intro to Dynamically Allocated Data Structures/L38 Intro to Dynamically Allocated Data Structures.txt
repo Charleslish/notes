@@ -1,0 +1,40 @@
+Learning Objectives
+Dynamically allocated objects can be connected by pointers even when they are not contiguous in memory.
+Use pointers and the -> operator to access data in dynamically allocated structures.
+
+Motivation
+Arrays provide constant-time access by index because their elements occupy one contiguous block.
+Insertion or removal away from the end shifts later elements; growing may require copying the entire array.
+Dynamic structures avoid shifting and resizing by linking independently allocated objects with pointers.
+
+A Simple Data Container
+A struct can contain a pointer to another object of its own type, forming a link between objects.
+Student* ptr = new Student;
+ptr->name = "John";
+
+Aside: The -> Operator
+The arrow operator dereferences a pointer and accesses a member in one step.
+ptr->name is equivalent to (*ptr).name.
+
+Linking Two Students
+A pointer member can connect two independently allocated Student objects.
+Each object may live anywhere in memory; the pointer stores the connection.
+
+Mapping out our Memory
+A pointer variable may live on the stack while the object it points to lives on the free store.
+Dynamically allocated objects remain allocated until explicitly deleted.
+The code that owns the chain must delete every allocated object when finished.
+
+Traversing a Chain
+Start at the head and follow each link until the pointer is nullptr.
+Keep a separate traversal pointer so the head pointer remains available.
+Student* current = head;
+while (current != nullptr) current = current->best_friend;
+
+Looking Forward
+A linked structure trades direct indexed access for flexible placement and pointer-based connections.
+Reaching an element requires following each preceding link; linked lists use this structure for efficient insertion and removal.
+
+Programming Activity
+Follow the clue pointers with ->, copy the Prize by value, and delete every helper-allocated object before returning.
+Do not delete first_clue; the caller owns it.

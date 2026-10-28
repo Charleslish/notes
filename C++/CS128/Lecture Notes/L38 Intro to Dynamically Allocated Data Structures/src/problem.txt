@@ -1,0 +1,14 @@
+Dynamic Structures Scavenger Hunt — Graded Playground Autograder
+
+Implement Prize SolveScavengerHunt(FirstClue* first_clue) in src/scavenger.cc. Follow pointers with -> to retrieve the data and return a copy of the Prize by value. Do not delete first_clue; it is owned by the caller.
+
+Required chain:
+1. Call GetSecondClue(first_clue->secret, first_clue->password).
+2. Call GetDecoyThirdClue using the dereferenced hidden_passkey and hidden_character from the SecondClue.
+3. Follow the decoy's true_third_clue pointer to the real ThirdClue.
+4. Dereference its final_passphrase pointer and call GetPrize with that string.
+5. Copy the Prize by value, then release every object allocated by the helper calls before returning.
+
+Memory ownership: delete the returned Prize after copying it; delete the separately allocated final passphrase; delete the real ThirdClue and decoy ThirdClue; delete the hidden passkey and hidden character; delete the SecondClue. Never delete first_clue.
+
+Constraints: C++20; compile with -Wall -Wextra -Werror -pedantic. Allowed headers: "scavenger.hpp", <string>, <iostream>. Do not use new in SolveScavengerHunt. Call all three provided helpers. Do not modify clue_helpers.cc; the grader uses its own copy.
