@@ -1,7 +1,4 @@
 Dynamic Structures Scavenger Hunt
-Graded Playground Autograder
-
-Due Friday, October 30, 2026 at 17:00:00 CDT.
 
 In this activity, you will implement a SolveScavengerHunt function that navigates a chain of dynamically allocated objects using the arrow operator (->). Each clue object lives on the free store and holds pointers to other objects on the free store, including a struct that points to another instance of itself. You must follow the chain using -> and correctly manage memory along the way.
 
