@@ -1,14 +1,59 @@
-Dynamic Structures Scavenger Hunt — Graded Playground Autograder
+Dynamic Structures Scavenger Hunt
+Graded Playground Autograder
 
-Implement Prize SolveScavengerHunt(FirstClue* first_clue) in src/scavenger.cc. Follow pointers with -> to retrieve the data and return a copy of the Prize by value. Do not delete first_clue; it is owned by the caller.
+Due Friday, October 30, 2026 at 17:00:00 CDT.
 
-Required chain:
-1. Call GetSecondClue(first_clue->secret, first_clue->password).
-2. Call GetDecoyThirdClue using the dereferenced hidden_passkey and hidden_character from the SecondClue.
-3. Follow the decoy's true_third_clue pointer to the real ThirdClue.
-4. Dereference its final_passphrase pointer and call GetPrize with that string.
-5. Copy the Prize by value, then release every object allocated by the helper calls before returning.
+In this activity, you will implement a SolveScavengerHunt function that navigates a chain of dynamically allocated objects using the arrow operator (->). Each clue object lives on the free store and holds pointers to other objects on the free store, including a struct that points to another instance of itself. You must follow the chain using -> and correctly manage memory along the way.
 
-Memory ownership: delete the returned Prize after copying it; delete the separately allocated final passphrase; delete the real ThirdClue and decoy ThirdClue; delete the hidden passkey and hidden character; delete the SecondClue. Never delete first_clue.
+The structs and helper functions below are declared in scavenger.hpp and implemented for you in clue_helpers.cc. Do not modify the provided code; the autograder compiles its own copy of clue_helpers.cc, so changes to that file have no effect on your grade. Your task is to implement SolveScavengerHunt in scavenger.cc.
 
-Constraints: C++20; compile with -Wall -Wextra -Werror -pedantic. Allowed headers: "scavenger.hpp", <string>, <iostream>. Do not use new in SolveScavengerHunt. Call all three provided helpers. Do not modify clue_helpers.cc; the grader uses its own copy.
+FirstClue
+Public data members
+- secret — std::string. Provided. The secret word that starts the hunt.
+- password — int. Provided. The starting password.
+
+SecondClue
+Public data members
+- hidden_passkey — int*. Provided. Points to an int allocated separately on the free store.
+- hidden_character — char*. Provided. Points to a char allocated separately on the free store.
+
+ThirdClue
+Public data members
+- true_third_clue — ThirdClue*. Provided. In the decoy, points to the real ThirdClue on the free store; in the real third clue, it is nullptr.
+- final_passphrase — std::string*. Provided. In the real third clue, points to a std::string allocated separately on the free store; in the decoy, it is nullptr.
+
+Prize
+Public data members
+- message — std::string. Provided. The prize message. The graded tests compare the message of the Prize you return against the message produced by the provided helpers.
+
+Provided functions
+- SecondClue* GetSecondClue(std::string secret, int password): Allocates a SecondClue on the free store whose pointer members each point to a separately allocated object derived from secret and password. Returns a pointer to the new clue.
+- ThirdClue* GetDecoyThirdClue(int hidden_passkey, char hidden_character): Allocates two ThirdClue objects on the free store and returns a pointer to the decoy. The decoy's true_third_clue points to the real third clue, whose final_passphrase points to a separately allocated std::string.
+- Prize* GetPrize(std::string final_passphrase): Allocates a Prize on the free store whose message is built from final_passphrase and returns a pointer to it.
+
+Function to implement
+Prize SolveScavengerHunt(FirstClue* first_clue): Follows the chain of clues and returns a copy of the Prize by value. Must correctly free all owned memory before returning. Do not delete first_clue, as it is owned by the caller.
+
+The Clue Chain
+Follow these steps in order inside your implementation:
+1. Call GetSecondClue, passing the appropriate fields of first_clue using the arrow operator.
+2. Call GetDecoyThirdClue, passing the dereferenced values of the pointer members inside the second clue.
+3. The real third clue is not the decoy itself. Look inside the decoy for a pointer to the true ThirdClue.
+4. Retrieve the final passphrase by dereferencing the string pointer inside the real third clue.
+5. Call GetPrize with the passphrase string.
+6. Copy the prize by value.
+7. Free all memory you own before returning the prize.
+
+Memory Management
+Every object that was allocated on your behalf by a helper function is your responsibility to delete. Before returning, trace back through the chain and ask yourself: what was created by each call I made? Remember that the pointer members inside each struct were also allocated separately on the free store. ASAN will tell you if you missed anything or freed something you should not have. One important rule: do not delete first_clue, as it was passed in by the caller and is not yours to free.
+
+Constraints
+Your solution must compile with clang++ using the c++20 standard, without errors when using the flags: -Wall -Wextra -Werror -pedantic. You may only include the following headers: "scavenger.hpp" <string> <iostream>.
+
+Important: Do not use new in your implementation. Only call the provided helper functions. The autograder enforces both rules: a submission whose scavenger.cc uses new, or one that does not call GetSecondClue, GetDecoyThirdClue, and GetPrize, is rejected before grading.
+
+Provided starter files
+includes/scavenger.hpp
+src/clue_helpers.cc
+src/driver.cc
+src/scavenger.cc

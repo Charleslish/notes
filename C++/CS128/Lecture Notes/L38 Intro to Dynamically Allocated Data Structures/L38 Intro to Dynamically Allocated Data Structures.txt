@@ -1,7 +1,4 @@
 Intro to Dynamically Allocated Data Structures
-    Learning Objectives
-        Dynamically allocated objects can be connected by pointers even when they are not contiguous in memory.
-        Use pointers and the -> operator to access data in dynamically allocated structures.
     Motivation
         Arrays provide constant-time access by index because their elements occupy one contiguous block.
         Inserting or removing elements away from the end requires shifting later elements; growing may require copying the entire array.
@@ -28,6 +25,3 @@ Intro to Dynamically Allocated Data Structures
     Looking Forward
         A linked structure trades direct indexed access for flexible placement and pointer-based connections.
         Reaching an element requires following each preceding link; linked lists use this structure for efficient insertion and removal.
-    Programming Activity
-        Follow the clue pointers with ->, copy the Prize by value, and delete every helper-allocated object before returning.
-        Do not delete first_clue; the caller owns it.
