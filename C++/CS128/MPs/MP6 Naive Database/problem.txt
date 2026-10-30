@@ -1,0 +1,32 @@
+MP6: Naive Database
+
+Implement `DbTable` and `Database` using dynamic memory.
+
+DbTable stores column descriptors in `std::vector<std::pair<std::string, DataType>>`
+and maps monotonically increasing row IDs to `void**` row arrays. Each cell is a
+separate dynamically allocated `std::string`, `double`, or `int`, selected by the
+corresponding column descriptor. Row arrays begin with capacity 2 and double when
+an added column would exceed capacity.
+
+Required operations:
+- Add and delete columns, keeping every row aligned with the column descriptor vector.
+- Add and delete rows; row IDs are never reused.
+- Deep-copy `DbTable` and `Database`; release every owned cell, row array, and table.
+- Stream tables with a comma-separated typed header and comma-separated rows.
+- Manage named tables in `Database` and provide a reference to an existing table.
+
+Exceptions:
+- `AddRow` throws `std::invalid_argument` when the number of values differs from
+  the number of columns.
+- `DeleteColumnByIdx` throws `std::out_of_range` for an invalid index and
+  `std::runtime_error` when deleting the only column of a non-empty table.
+- Deleting or retrieving a row/table that does not exist throws an exception.
+
+Constraints:
+- Do not add data members or replace the constructed `rows_`, `col_descs_`, or
+  `tables_` container objects.
+- Compile with `clang++ -std=c++20 -Wall -Wextra -Werror -pedantic`.
+- Allowed headers: `db_table.hpp`, `db.hpp`, `iomanip`, `iostream`, `stdexcept`,
+  `map`, `string`, `initializer_list`, `utility`, and `vector`.
+- PrairieLearn submission files are `db.hpp`, `db.cc`, `db_table.hpp`, and
+  `db_table.cc`.
