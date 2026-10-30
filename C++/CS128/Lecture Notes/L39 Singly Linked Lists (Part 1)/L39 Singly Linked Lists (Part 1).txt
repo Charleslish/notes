@@ -1,0 +1,28 @@
+Singly Linked Lists (Part 1)
+    Motivation
+        A singly linked list formalizes a chain of dynamically allocated objects as reusable nodes managed by a class.
+        It avoids shifting elements, while accessing a position requires following links from the head.
+    The Node
+        Each node stores a value and a pointer to the next node.
+        The last node's next pointer is nullptr, which marks the end of the chain.
+            template <typename T>
+            struct Node {
+                T data;
+                Node<T>* next = nullptr;
+            };
+    The SinglyLinkedList Class
+        head_ points to the first node and tail_ points to the last node.
+        Keeping tail_ makes appending a node constant time instead of traversing the whole list.
+        Both pointers are nullptr when the list is empty.
+    Implementing PushBack
+        PushBack links one new node after tail_ and updates tail_.
+        For an empty list, the new node becomes both head_ and tail_.
+    Implementing PushFront
+        PushFront links one new node before head_ and updates head_.
+        For an empty list, the new node becomes both head_ and tail_; otherwise tail_ stays unchanged.
+    Making it Generic
+        A class template lets Node<T> and SinglyLinkedList<T> store values of different types.
+        Template method definitions must be available in the header when the compiler instantiates the class.
+    Summary
+        A singly linked list connects nodes through next pointers and tracks the chain with head_ and tail_.
+        PushBack and PushFront add nodes by changing links; the empty-list case must initialize both ends.

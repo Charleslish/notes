@@ -1,0 +1,49 @@
+PushBack and PushFront
+
+Implement PushBack and PushFront on a SinglyLinkedList<T> class template. PushBack appends a new node to the end of the list. PushFront adds a new node to the beginning of the list. Each call allocates exactly one new Node<T> on the free store and links it into the chain; the nodes already in the list stay where they are.
+
+Node<T>
+Public interface
+Signature: Node(T data);
+Provided. Initializes data from the argument; next keeps its in-class initializer nullptr.
+
+Public data members
+- data — T. Provided. The value stored in this node.
+- next — Node<T>*. Provided. Pointer to the next node in the chain, or nullptr for the last node. Initialized to nullptr.
+
+SinglyLinkedList<T>
+Public interface
+
+SinglyLinkedList() = default;
+Provided. Default constructor. The in-class initializers leave head_ and tail_ as nullptr.
+
+~SinglyLinkedList();
+Provided. Traverses the list from head_ and deletes every node. You have not been taught this operation yet, so it is implemented for you.
+
+void PushBack(const T& value);
+Creates exactly one new Node<T> on the free store holding value and appends it to the end of the list. Updates head_ and tail_ as needed.
+
+void PushFront(const T& value);
+Creates exactly one new Node<T> on the free store holding value and adds it to the beginning of the list. Updates head_ and tail_ as needed.
+
+Private data members
+- head_ — Node<T>*. Provided. Pointer to the first node, or nullptr for an empty list. The autograder reads and seeds this member directly, so do not rename it, and keep it private.
+- tail_ — Node<T>*. Provided. Pointer to the last node, or nullptr for an empty list. The autograder reads and seeds this member directly, so do not rename it, and keep it private.
+
+Edge cases
+- Pushing onto an empty list: the new node becomes both head_ and tail_.
+- PushBack: tail_ must be updated. head_ does not change (unless the list was empty).
+- PushFront: head_ must be updated. tail_ does not change (unless the list was empty).
+- The last node's next must always be nullptr.
+
+Important notes
+Your submission is also run under AddressSanitizer: allocating more than one node per push, or losing nodes that were already in the list, is reported as a memory error. Implement the pointer manipulation yourself; standard library container or algorithm facilities may not be used to do the work for you.
+
+Constraints
+Your solution must compile with clang++ using the c++20 standard, without errors when using the flags: -Wall -Wextra -Werror -pedantic. You may only include the following headers: "node.hpp" "singly_linked_list.hpp" <iostream>
+
+Starter files
+includes/node.hpp
+includes/singly_linked_list.hpp
+src/driver.cc
+src/singly_linked_list.cc
