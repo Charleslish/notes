@@ -1,0 +1,69 @@
+Priority Queue
+
+Implement the class template PriorityQueue<T>, which maintains a singly linked list of Node<T> objects in ascending order: the smallest value is always at the front. Any type used to instantiate the class template implements the comparison operators (==, !=, <, >, <=, >=). The definition of Node<T> is provided in includes/node.hpp.
+
+Node<T>
+Public interface
+
+Node(T data)
+Provided. Initializes data with the given value; next remains nullptr.
+
+Node(T data, Node<T>* next)
+Provided. Initializes data and next with the given values.
+
+Public data members
+- data — T. Provided. The value stored in the node.
+- next — Node<T>*. Provided. Pointer to the next node in the list; nullptr for the last node.
+
+PriorityQueue<T>
+Public member functions
+
+PriorityQueue() = default;
+Default constructor. Defers to in-class initialization for head_.
+
+PriorityQueue(const PriorityQueue<T>& rhs) = delete;
+Since a destructor is defined for this type, the copy constructor must also be addressed under the rule of three. It is not needed in this problem, so delete it to prevent the compiler from generating a definition.
+
+PriorityQueue<T>& operator=(const PriorityQueue<T>& rhs) = delete;
+Since a destructor is defined for this type, copy assignment must also be addressed under the rule of three. It is not needed in this problem, so delete it to prevent the compiler from generating a definition.
+
+~PriorityQueue();
+Destructor. Frees every dynamically allocated node comprising the singly linked list.
+
+void Enqueue(const T& data);
+Creates a new Node<T> on the free store holding data and inserts it into the singly linked list so that the values remain in ascending order from head_ onward. The new node may become the new front, sit between two existing nodes, or be appended at the back. Equal values are grouped together.
+
+T Dequeue();
+Returns a copy of the data stored in the node pointed to by head_, frees the memory associated with that node, and updates head_ to point to the next node in the sequence. If the queue is empty, throws an exception (e.g., std::runtime_error).
+
+Private data members
+
+head_ — Node<T>*. Pointer to the first (smallest) node; nullptr when the queue is empty. Declare it with in-class initialization, exactly as Node<T>* head_ = nullptr;.
+
+head_ must remain a private data member; this is graded. Do not rename it: the autograder seeds and reads head_ directly when testing each member function in isolation.
+
+Write the class template, including all member function definitions, in includes/solution.hpp. Place each definition below the class declaration with its own template <typename T> header; the qualified names are PriorityQueue<T>::Enqueue and PriorityQueue<T>::Dequeue. Leave src/solution.cc as provided: a class template's definition must be visible in every translation unit that instantiates it, so it belongs in the header.
+
+Edge Cases
+- Enqueue into an empty queue: the new node becomes head_.
+- Enqueue must allocate exactly one new node per call and relink the existing nodes around it; it must not move, copy, or reallocate the nodes already in the queue. The autograder verifies node addresses.
+- Dequeue must save the value before deleting the node, and must deallocate only the removed node; the surviving nodes keep their addresses.
+- Dequeue on an empty queue must throw an exception; this is tested.
+- Popping the last remaining node leaves the queue empty (head_ becomes nullptr).
+
+Constraints
+Your solution must compile with clang++ using the c++20 standard, without errors when using the flags: -Wall -Wextra -Werror -pedantic.
+
+You may only include the following headers in your solution:
+"node.hpp"
+"solution.hpp"
+<iostream>
+<stdexcept>
+
+Important: build the priority queue yourself as a sorted linked list. You may not use a standard library container or container adaptor, nor a library algorithm, to do the work for you.
+
+Starter files
+includes/node.hpp
+includes/solution.hpp
+src/driver.cc
+src/solution.cc

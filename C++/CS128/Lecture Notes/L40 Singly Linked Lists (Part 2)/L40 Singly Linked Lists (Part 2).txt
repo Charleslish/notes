@@ -1,0 +1,26 @@
+Singly Linked Lists (Part 2)
+    Motivation
+        Singly linked lists support traversal, insertion, and removal by following and rewiring node pointers.
+    Traversing a linked list
+        Start at head_ and follow next one node at a time until finding the target or reaching nullptr.
+        Use a separate current pointer so traversal does not destroy the list's entry point.
+    Do not use head_ to traverse the linked list
+        Moving head_ during traversal loses access to the front of the list and can prevent the destructor from freeing its nodes.
+            Node<T>* current = head_;
+            current = current->next;
+    Deleting allocated memory from a linked list
+        Every dynamically allocated node must be deleted individually; deleting head_ alone does not delete the chain.
+        Save the next pointer before deleting the current node, then clear head_ when cleanup is complete.
+    Code walkthrough: Linked list destructor
+        Traverse from head_, save each node's next pointer, delete the current node, and continue using the saved pointer.
+    Insert after a particular value in the list
+        Find the predecessor, then set new_node->next before changing current->next so the rest of the chain stays reachable.
+            new_node->next = current->next;
+            current->next = new_node;
+        For a sorted list, traverse to the correct position and use the same pointer rewiring.
+    Removing a single node
+        To remove a middle node, link its predecessor to the target's successor, then delete the target.
+        To remove the head, advance head_ first and delete the saved old head.
+    Summary
+        Traversal preserves head_; insertion and removal preserve the chain by ordering pointer updates carefully.
+        Each removed or destroyed node must be deleted exactly once.
