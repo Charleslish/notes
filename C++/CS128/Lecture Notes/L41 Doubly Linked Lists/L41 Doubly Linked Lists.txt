@@ -1,0 +1,28 @@
+Doubly Linked Lists
+    Motivation
+        A prev pointer gives direct access to a node's predecessor, simplifying removal and enabling backward traversal at the cost of extra memory.
+    The DNode and the DoublyLinkedList
+        Each DNode stores data, next, and prev; the first node's prev and the last node's next are nullptr.
+        head_ points to the first node and tail_ points to the last node.
+    Traversing a doubly linked list
+        Traverse forward from head_ through next, or backward from tail_ through prev.
+            DNode<T>* current = tail_;
+            current = current->prev;
+        Use a temporary pointer so traversal preserves head_ and tail_.
+    Inserting a node
+        Connect the new node to its successor and predecessor, then update both neighbors to point to the new node.
+            new_node->next = current;
+            new_node->prev = current->prev;
+            current->prev->next = new_node;
+            current->prev = new_node;
+        Update head_ or tail_ when insertion occurs at an end.
+    Code walkthrough: Insert value at index
+        Handle invalid positions and empty, front, back, and middle insertion separately; update head_ and tail_ at the ends.
+    Deleting a node
+        Link the target's predecessor to its successor in both directions, then delete the target.
+        Update head_ and tail_ when deleting an end node; clear both when the list becomes empty.
+    Code walkthrough: Delete last occurrence of a value
+        Start at tail_ and walk backward to find the last matching value, then delete that node.
+    Summary
+        A prev pointer enables backward traversal and direct predecessor access, while each insertion or deletion must preserve both link directions.
+        Each node uses extra memory for prev.
