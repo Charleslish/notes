@@ -1,0 +1,42 @@
+Introduction to Binary Search Trees (BSTs)
+    Motivation
+        Searching an unsorted linked list can visit every node, and sorted insertion also scans the list to find its position.
+        A tree branches so comparisons can direct the search and skip parts of the data.
+    One More Pointer
+        A node with left and right pointers can branch to two successors, turning a linear chain into a tree.
+    Tree Terminology
+    Root
+        The root is the tree's entry point; every other node is reachable by following left and right pointers.
+    Edge
+        Each edge connects a parent to a child; a tree with n nodes has n - 1 edges.
+    Parent, Child, and Sibling
+        A child is linked from its parent, and nodes with the same parent are siblings.
+    Leaf and Internal Node
+        A leaf has no children; an internal node has at least one child.
+    Path
+        A path is a sequence of nodes connected by edges; a tree has exactly one path between any two nodes.
+    Subtree
+        A node and all its descendants form a subtree, which is itself a tree.
+    Level
+        The root is at level 0; each step away from the root increases the level by one.
+    Depth
+        A node's depth is the number of edges from the root; it equals its level.
+    Height
+        A node's height is the longest downward path to a leaf; a leaf has height 0, and the tree's height is the root's height.
+    The Binary Search Tree Property
+        Every value in a node's left subtree is smaller than that node; every value in its right subtree is greater than or equal to it.
+        The property holds recursively for every subtree, enabling ordered insertion and search.
+    Searching a Binary Search Tree
+        Compare the target with the current node: go left if smaller, right if larger, and stop if equal.
+        Search visits at most height + 1 nodes; balanced trees have logarithmic height, while a degenerate tree can take linear time.
+    Tree Shape and Performance
+        The same values can form trees of different heights, and search cost depends on the tree's shape.
+    The Balance Factor
+        balance factor = height(left subtree) - height(right subtree)
+        A node is balanced when its balance factor is -1, 0, or +1; larger magnitude indicates imbalance.
+    Shape determines performance
+        A balanced tree of 15 values has height 3 and visits at most 4 nodes; a degenerate tree has height 14 and may visit 15.
+        A degenerate BST is a linked list in shape; self-balancing trees control this worst case.
+    Summary
+        Two child pointers create branching, and the BST ordering lets search discard a subtree at each step.
+        Balanced shape yields fast search; the BST property alone does not guarantee balance.

@@ -1,0 +1,51 @@
+Tracing BST Search
+
+A binary tree extends the linked list. Recall how a linked-list node carries a single next pointer, so traversal has only one direction to go. A tree node carries two pointers, left and right, and traversal must choose between them at every step. This activity grounds that choice in a concrete scenario: a forest trail that branches at each landmark, and a route that names which landmarks to visit in order. Your task is to traverse the tree, taking the fork that leads to the next landmark on the route.
+
+PathNode
+The trail is built from provided PathNode nodes. You receive a pointer to the starting node and traverse its children; you do not allocate or write nodes.
+
+Public data members
+- landmark — std::string. Provided. The landmark's name.
+- left — PathNode*. Provided. The left child landmark, or nullptr.
+- right — PathNode*. Provided. The right child landmark, or nullptr.
+
+Provided helpers
+PathNode* ForestTrail::start() const;
+Provided. Returns a pointer to the first landmark in the trail. The starter ships forest_trail.cc with a working implementation; you do not write it. The autograder compiles its own copy of forest_trail.cc, so any changes made to that file are ignored.
+
+Functions to implement
+std::vector<std::string> FollowTrail(const PathNode* start, const std::vector<std::string>& route);
+Traverses the trail from start, taking the fork whose landmark matches the next entry in route. Returns the sequence of landmarks visited.
+
+How FollowTrail works
+Consider the trail as a tree rooted at start. Begin at the root and record its landmark. For each subsequent name in route, examine the current node's left and right children. If one of them matches the next name, advance to that child and record its landmark; otherwise, stop. The function returns whatever landmarks were collected before the traversal halted.
+
+Three cases halt the traversal early. An empty route returns an empty vector. A null start pointer returns an empty vector. A name in route that matches neither child of the current node ends the traversal, and the function returns the landmarks collected up to that point.
+
+Example
+Consider this trail:
+          Maple Ridge
+         /           \
+   Birch Bridge    Pine Summit
+    /       \       /        \
+Aspen Grove Cedar Falls Oak Clearing Willow Bend
+
+With route = {"Maple Ridge", "Pine Summit", "Willow Bend"}, the traversal starts at Maple Ridge, takes the right fork to Pine Summit (whose name matches the next entry), then takes the right fork again to Willow Bend. The function returns {"Maple Ridge", "Pine Summit", "Willow Bend"}.
+
+With route = {"Maple Ridge", "Birch Bridge", "Nonexistent"}, the traversal reaches Birch Bridge but neither of its children is named "Nonexistent". The traversal halts and the function returns {"Maple Ridge", "Birch Bridge"}.
+
+Constraints
+Your code must compile with clang++ using the c++20 standard without errors under -Wall -Wextra -Werror -pedantic.
+
+You may include only the following headers: "path_node.hpp", "forest_trail.hpp", "follow_trail.hpp", <string>, <vector>, <iostream>.
+
+Traverse the trail yourself by following the node pointers and comparing landmark names directly; you may not use standard library algorithm functions to do the work for you.
+
+Starter files
+includes/follow_trail.hpp
+includes/forest_trail.hpp
+includes/path_node.hpp
+src/driver.cc
+src/follow_trail.cc
+src/forest_trail.cc
