@@ -1,0 +1,66 @@
+BST Insert with Grandparent
+
+Recall how moving from a singly linked list to a doubly linked list added one extra pointer per node, paid for during every insertion and removal. This activity applies the same idea to a binary search tree: each node carries an extra grandparent pointer, and the insertion routine sets it as the new node is attached. The skill exercises the same three-pointer traversal used by parent-pointer BSTs, with the bookkeeping pushed up one level.
+
+TNode<T>
+Each node in the tree is a provided TNode<T>. Alongside the usual value, left, and right pointers, it carries a grandparent pointer that InsertWithGrandparent sets.
+
+Public interface
+TNode(T value);
+Provided. Constructs a node holding value; left, right, and grandparent initialize to nullptr. Allocate nodes with new TNode<T>(value).
+
+Public data members
+value: T. Provided. The value stored in the node.
+left: TNode<T>*. Provided. Left child, or nullptr.
+right: TNode<T>*. Provided. Right child, or nullptr.
+grandparent: TNode<T>*. Provided. Pointer to the node two levels up, or nullptr when there is no grandparent. InsertWithGrandparent sets this field.
+
+GrandparentBST<T>
+Public interface
+GrandparentBST() = default;
+Provided. Default constructor; root_ initializes to nullptr.
+~GrandparentBST();
+Provided. Destructor delegates to Clear(root_) and traverses the tree to free every node.
+GrandparentBST(const GrandparentBST& other) = delete;
+Provided. Copy construction is disabled for this activity.
+GrandparentBST& operator=(const GrandparentBST& other) = delete;
+Provided. Copy assignment is disabled for this activity.
+void InsertWithGrandparent(const T& value);
+Inserts value into the BST and sets the new node's grandparent pointer to the parent's parent (or nullptr when no grandparent exists).
+void PrintTree() const;
+Provided. Prints the tree to std::cout for debugging.
+
+Private member functions
+void Clear(TNode<T>* node);
+Provided. Postorder destruction of the subtree rooted at node.
+void PrintTree(TNode<T>* node, int depth) const;
+Provided. Recursive helper for the public PrintTree.
+
+Private data members
+root_: TNode<T>*. Provided. Pointer to the root, or nullptr when the tree is empty. root_ must remain a private data member; this is graded.
+
+How InsertWithGrandparent works
+Allocate a new TNode with the given value. If the tree is empty, attach it as root_ and return. Otherwise, traverse down the tree from the root, taking the left fork when value is less than the current node's value and the right fork otherwise (equal values take the right fork); track three pointers along the way: the current node, the node one step behind it (the parent), and the node two steps behind it (the grandparent). When the traversal reaches a null position, attach the new node there as the parent's appropriate child, and set the new node's grandparent field to the recorded grandparent.
+
+The grandparent pointer reduces to nullptr in two cases. The first case occurs when the new node becomes the root: there is no parent, so there is no grandparent. The second case occurs when the new node's parent is the root: there is exactly one ancestor, the root, and the grandparent slot remains empty. In every other case, the recorded grandparent is the node two levels above the new node.
+
+Example
+Insert 10: 10 becomes the root. 10.grandparent = nullptr.
+Insert 5: 5 attaches as 10's left child. 5.grandparent = nullptr.
+Insert 15: 15 attaches as 10's right child. 15.grandparent = nullptr.
+Insert 3: 3 attaches as 5's left child. 3.grandparent = 10.
+Insert 7: 7 attaches as 5's right child. 7.grandparent = 10.
+Insert 12: 12 attaches as 15's left child. 12.grandparent = 10.
+Insert 20: 20 attaches as 15's right child. 20.grandparent = 10.
+
+Constraints
+Your code must compile with clang++ using the C++20 standard without errors under -Wall -Wextra -Werror -pedantic.
+You may include only the following headers: "tnode.hpp", "grandparent_bst.hpp", <iostream>.
+Insert into the tree yourself with the three-pointer traversal; you may not use standard library algorithm functions to do the work for you.
+
+Starter files
+includes/grandparent_bst.hpp
+includes/tnode.hpp
+src/driver.cc
+src/grandparent_bst.cc
+src/tnode.cc

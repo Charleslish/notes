@@ -1,0 +1,20 @@
+Building a BST
+    From Linked List Nodes to Tree Nodes
+        A tree node stores a value and left and right child pointers; allocation and deletion still use the same free-store rules as linked lists.
+        TNode<T> adds branching pointers to the familiar node representation.
+    Wrapping It in a Class
+        BinarySearchTree manages dynamic nodes through one root_ pointer, which is nullptr when the tree is empty.
+    The Insert Algorithm
+        Insert finds the null child position by comparing down from the root, then attaches the new value there as a leaf.
+            if (value < current->value) go left; otherwise go right.
+        Track the parent while walking so the new node can be linked to its parent.
+    Insertion Order and Tree Shape
+        The same values can produce different tree shapes depending on insertion order.
+        Sorted input creates a one-sided chain; balanced order creates a shorter tree.
+        Self-balancing trees such as AVL and red-black trees maintain balance for arbitrary insertion orders.
+    Making It Generic
+        Templating TNode and BinarySearchTree lets the same pointer and comparison logic work with any type that supports <.
+        Template method definitions belong in the header so the compiler can instantiate them.
+    Summary
+        A BST class owns its nodes through root_; insertion follows comparisons to a null child and links the new leaf.
+        Insertion order controls height, and templates generalize the structure beyond integers.
