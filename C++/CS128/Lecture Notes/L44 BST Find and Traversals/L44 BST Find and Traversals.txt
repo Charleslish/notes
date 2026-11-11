@@ -1,0 +1,33 @@
+BST Find and Traversals
+    Finding a Value in a BST
+        Compare the target with each node and follow the left or right child until a match or nullptr.
+        Find takes O(h + 1) time for tree height h; balance determines whether search is logarithmic or linear.
+    From linked list Find to BST Find
+        BST Find follows the linked-list traversal pattern, choosing left or right instead of always following next.
+    What should the Find function return, and what should we call it?
+        Find returns const T* pointing to the stored value, or nullptr when the value is absent.
+    Why const T* and not T*?
+        A const pointer to the value prevents callers from changing a key and breaking the BST ordering invariant.
+    Why not return the node itself?
+        Hiding the node and its child pointers preserves encapsulation and protects the tree structure.
+    The recursive approach
+        A recursive Find checks the current node and searches the appropriate subtree, stopping at nullptr.
+    FindMin and FindMax
+        The smallest value is at the leftmost node and the largest at the rightmost node; an empty tree returns nullptr.
+    Computing Height
+        Height is the number of edges on the longest downward path; an empty tree has height -1 and a leaf has height 0.
+            height(node) = 1 + max(height(node->left), height(node->right))
+    Traversals
+        A traversal visits every node, with the visit order determined by when the current node is processed.
+    Inorder: Left, Node, Right
+        Inorder visits the left subtree, the node, then the right subtree; in a BST it produces sorted output.
+    Why this matters
+        BST insertion establishes ordering, so inorder reads the values in sorted order without a separate sort.
+    Preorder: Node, Left, Right
+        Preorder visits the node before its subtrees; the root appears first and parents precede children.
+    Postorder: Left, Right, Node
+        Postorder visits both subtrees before the node; it is useful for freeing children before their parent.
+    Comparing the three traversals
+        Each traversal visits every node once, requiring O(n) time and O(h + 1) recursive stack space.
+    Summary
+        Find follows one search path; height and traversals recursively process both subtrees.

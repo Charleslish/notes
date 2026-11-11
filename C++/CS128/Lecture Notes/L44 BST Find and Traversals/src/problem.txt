@@ -1,0 +1,83 @@
+BST Find and Traversals
+
+Recall how a BST insertion routes by comparing the new value to each visited node and choosing the left or right fork; the same descent logic, retargeted, drives lookup. This activity collects the query and traversal methods that a useful BST exposes: a search by value, a minimum and maximum, a height query, and the three classical orderings (inorder, preorder, postorder). Each builds on the same recursive shape applied to a different ordering of the visit.
+
+TNode<T>
+Each node in the tree is a provided TNode<T> holding a value and left and right child pointers. Your query and traversal code reads these fields as it traverses the tree.
+
+Public data members
+value | T | Provided. The value stored in the node.
+left | TNode<T>* | Provided. Left child, or nullptr.
+right | TNode<T>* | Provided. Right child, or nullptr.
+
+FindBST<T>
+Public interface
+FindBST() = default; | Provided. Default constructor; root_ initializes to nullptr.
+~FindBST(); | Provided. Destructor delegates to Clear(root_) and traverses the tree to free every node.
+FindBST(const FindBST& other) = delete; | Provided. Copy construction is disabled for this activity.
+FindBST& operator=(const FindBST& other) = delete; | Provided. Copy assignment is disabled for this activity.
+void Insert(const T& value); | Provided. BST insertion; values less than the current node go left, values greater than or equal go right.
+void PrintTree() const; | Provided. Prints the tree to std::cout for debugging.
+const T* Find(const T& target) const; | Returns a pointer to the stored value matching target, or nullptr when no match exists.
+const T* FindMin() const; | Returns a pointer to the smallest stored value, or nullptr when the tree is empty.
+const T* FindMax() const; | Returns a pointer to the largest stored value, or nullptr when the tree is empty.
+int Height() const; | Provided. Returns the height of the tree by delegating to the private Height helper, which you implement. The height is the number of edges on the longest root-to-leaf path; an empty tree has height -1 and a single-node tree has height 0.
+std::vector<T> InorderTraversal() const; | Provided. Returns the stored values in inorder (left, current, right) by delegating to the private Inorder helper, which you implement. For a BST, this is sorted order.
+std::vector<T> PreorderTraversal() const; | Provided. Returns the stored values in preorder (current, left, right) by delegating to the private Preorder helper, which you implement. The first element is always the root.
+std::vector<T> PostorderTraversal() const; | Provided. Returns the stored values in postorder (left, right, current) by delegating to the private Postorder helper, which you implement. The last element is always the root.
+
+Private member functions
+int Height(TNode<T>* node) const; | Recursive helper invoked by the public Height. Returns -1 for nullptr, otherwise 1 + max(Height(left), Height(right)).
+void Inorder(TNode<T>* node, std::vector<T>& result) const; | Recursive helper that appends an inorder traversal of the subtree rooted at node to result.
+void Preorder(TNode<T>* node, std::vector<T>& result) const; | Recursive helper that appends a preorder traversal of the subtree rooted at node to result.
+void Postorder(TNode<T>* node, std::vector<T>& result) const; | Recursive helper that appends a postorder traversal of the subtree rooted at node to result.
+void Clear(TNode<T>* node); | Provided. Postorder destruction of the subtree rooted at node.
+void PrintTree(TNode<T>* node, int depth) const; | Provided. Recursive helper for the public PrintTree.
+
+Private data members
+root_ | TNode<T>* | Provided. Pointer to the root, or nullptr when the tree is empty.
+root_ must remain a private data member; this is graded.
+
+How Find works
+Traverse from the root, comparing target with the current node's value. When they match, return &current->value. When target is less, follow current->left; when greater, follow current->right. A traversal that reaches nullptr has exhausted the search; return nullptr to signal "not found".
+
+How FindMin and FindMax work
+The smallest value in a BST sits at the leftmost node, and the largest at the rightmost. Starting at the root, follow left pointers until none remain (for the minimum) or follow right pointers until none remain (for the maximum); return a pointer to that node's value. An empty tree has no such node and returns nullptr.
+
+Why const T* rather than bool or T
+Returning a pointer lets a single value distinguish "found" from "not found" while also handing the caller a handle to the stored value. A plain bool answers only the existence question; a plain T cannot represent "there is no value to return" for an empty tree without inventing a sentinel. The pointer is const so the caller cannot edit the stored value through it; mutating a node's value in place would silently break the BST ordering invariant.
+
+How the traversals work
+Each traversal visits every node exactly once, distinguished only by the relative order of three steps: visiting the current node, recursing on the left subtree, and recursing on the right subtree. Inorder produces left, current, right; preorder produces current, left, right; postorder produces left, right, current. For a BST, the inorder traversal produces the stored values in sorted order; preorder produces the root first; postorder produces the root last.
+
+How Height works
+Height is defined recursively over subtrees. The empty subtree has height -1 by convention, which makes the recurrence work cleanly for leaves. Any non-empty subtree's height equals one more than the larger of its children's heights. The public method delegates to the private helper passing root_; the helper returns -1 for nullptr, otherwise 1 + max(Height(node->left), Height(node->right)).
+
+Example
+Insert 10, 5, 15, 3, 7, 12, 20:
+       10
+      /  \
+     5    15
+    / \   / \
+   3   7 12  20
+
+Find(7)        -> pointer to 7
+Find(8)        -> nullptr
+FindMin()      -> pointer to 3
+FindMax()      -> pointer to 20
+Height()       -> 2
+InorderTraversal()   -> [3, 5, 7, 10, 12, 15, 20]
+PreorderTraversal()  -> [10, 5, 3, 7, 15, 12, 20]
+PostorderTraversal() -> [3, 7, 5, 12, 20, 15, 10]
+
+Constraints
+Your code must compile with clang++ using the c++20 standard without errors under -Wall -Wextra -Werror -pedantic.
+You may include only the following headers: "tnode.hpp", "find_bst.hpp", <iostream>, <vector>.
+Search the tree and compute the traversals, minimum, maximum, and height yourself by traversing the nodes; you may not use library search or algorithm functions to do the work for you.
+
+Starter files
+includes/find_bst.hpp
+includes/tnode.hpp
+src/driver.cc
+src/find_bst.cc
+src/tnode.cc
