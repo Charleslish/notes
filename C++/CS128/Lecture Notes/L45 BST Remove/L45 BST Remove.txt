@@ -1,0 +1,21 @@
+BST Remove
+    Removing Nodes
+        Removal must preserve the BST property and keep all remaining nodes connected.
+        The three cases depend on whether the target has zero, one, or two children.
+    The FindNode helper
+        FindNode searches iteratively and returns the matching internal node or nullptr; it is private.
+    Case 1: The node is a leaf
+        Clear the corresponding parent pointer, or root_ for a root leaf, then delete the node.
+    Case 2: The node has one child
+        Promote the child into the target's position and update both its parent pointer and the parent's child pointer.
+        If the target is the root, update root_ and set the promoted child's parent to nullptr.
+    Case 3: The node has two children
+        The inorder successor is the leftmost node of the right subtree and has no left child.
+        Physically move the successor into the target's position to preserve the addresses of remaining nodes.
+        If the successor is deeper, replace it at its old position with its right child before attaching the target's right subtree.
+        If the successor is the direct right child, retain its existing right subtree.
+        Attach the target's left subtree, reconnect its parent or root_, update parent pointers, and delete the target.
+    Putting it all together
+        Remove finds the target and dispatches to the helper for its number of children; an absent value changes nothing.
+    Summary
+        Leaf removal detaches; one-child removal promotes; two-child removal relinks the inorder successor.

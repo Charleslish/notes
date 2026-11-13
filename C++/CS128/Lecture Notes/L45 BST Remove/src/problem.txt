@@ -1,0 +1,71 @@
+BST Remove
+
+Recall how a BST search descends one fork per node by comparing the target with the current value. Removal extends that descent: locate the target, then relink the surrounding pointers so the rest of the tree remains a valid BST. Three structural cases cover every removal. A leaf detaches with one pointer change. A node with one child gets its child promoted into its slot. A node with two children is replaced by its inorder successor, which is found by traversing once to the leftmost node of the right subtree. Throughout, the node is moved by relinking pointers, not by copying values: addresses are preserved so external references to nodes remain valid.
+
+Each TNode carries a parent pointer in addition to left and right. The provided Insert sets all three pointers when it adds a node; every removal must keep the parent invariant intact afterward, so a subsequent traversal in any direction lands on the correct node.
+
+TNode<T>
+Each node is a provided TNode<T> carrying its value and three pointers. Removal relinks these pointers directly; the provided Insert allocates nodes, so you never construct one yourself.
+
+Public data members
+value | T | Provided. The value stored in the node.
+left | TNode<T>* | Provided. Left child, or nullptr.
+right | TNode<T>* | Provided. Right child, or nullptr.
+parent | TNode<T>* | Provided. Parent node, or nullptr for the root. Every removal must keep this pointer consistent.
+
+BinarySearchTree<T>
+Public interface
+BinarySearchTree() = default; | Provided. Default constructor; leaves root_ at nullptr.
+~BinarySearchTree(); | Provided. Destructor; postorder-deletes every node via Clear.
+BinarySearchTree(const BinarySearchTree&) = delete; BinarySearchTree& operator=(const BinarySearchTree&) = delete; | Provided. Copy and copy-assignment are deleted.
+void Insert(const T& value); | Provided. Inserts value in BST order and sets left, right, and parent on the new node.
+void PrintTree() const; | Provided. Prints the tree sideways for debugging.
+void Remove(const T& value); | Removes the node whose value equals the argument, if one exists. Dispatches to the correct private helper based on how many children the target has. Does nothing when the tree is empty or the value is absent.
+
+Private member functions
+TNode<T>* FindMin(TNode<T>* node) const; | Provided. Returns the leftmost descendant of node.
+void Clear(TNode<T>* node); | Provided. Postorder-deletes node and its subtree.
+void PrintTree(TNode<T>* node, int depth) const; | Provided. Recursive helper for the public PrintTree.
+TNode<T>* FindNode(const T& value); | Traverses the tree iteratively from root_, descending left when the target is smaller and right when larger. Returns the matching node, or nullptr when the value is absent.
+void RemoveLeaf(TNode<T>* node); | Detaches a node with no children: clears the appropriate pointer on the parent (or sets root_ to nullptr), then deletes the node.
+void RemoveOneChild(TNode<T>* node); | Promotes the single child into the node's slot: updates the child's parent and the parent's child pointer (or root_), then deletes the node.
+void RemoveTwoChildren(TNode<T>* node); | Replaces the node with its inorder successor by relinking pointers. The successor is the leftmost node of the right subtree, found via FindMin. Address preservation matters: do not copy the successor's value into the node and delete the successor; physically move the successor node.
+
+Private data members
+root_ | TNode<T>* | Provided. Pointer to the root node, or nullptr when the tree is empty.
+root_ must remain a private data member; this is graded.
+
+How Remove works
+Call FindNode first. When it returns nullptr, the value is not in the tree; return immediately. Otherwise, inspect the children of the returned node and dispatch to the matching helper.
+Both child pointers are nullptr: call RemoveLeaf.
+Exactly one child pointer is nullptr: call RemoveOneChild.
+Both child pointers are non-null: call RemoveTwoChildren.
+
+How RemoveTwoChildren works
+Find the inorder successor by calling FindMin on the node's right subtree. The successor is the smallest value greater than the node's value, and by construction it has no left child. The relink splits into two sub-situations based on where the successor sits.
+Sub-situation A: the successor is the node's direct right child. Its existing right subtree stays attached. The successor takes over the node's left subtree and slides up into the node's parent slot.
+Sub-situation B: the successor is deeper in the right subtree. Detach it from its current parent first; the successor's right child (which may be nullptr) becomes the new left child of the successor's previous parent. The successor then inherits the node's right subtree as its own right child.
+After the sub-situation is handled, the successor inherits the node's left subtree and parent, and the node's parent slot (or root_) is updated to point at the successor. Delete the original node last. Every reattached node has its parent pointer updated to match.
+
+Example
+Tree built from: 20, 10, 30, 5, 15, 25, 35
+       20
+      /  \
+     10   30
+    / \   / \
+   5  15 25 35
+Remove(5): Leaf. RemoveLeaf sets 10->left to nullptr and deletes 5.
+Remove(10): One child (15). RemoveOneChild promotes 15 into 10's slot: 15->parent becomes 20, 20->left becomes 15, then 10 is deleted.
+Remove(20): Two children. RemoveTwoChildren finds the successor 25 by calling FindMin(30). 25 is not 20's direct right child (sub-situation B), so 25 detaches from 30: 30->left becomes nullptr (25 had no right child). 25->right becomes 30, with 30->parent set to 25. 25->left becomes 15, with 15->parent set to 25. 25->parent becomes nullptr, root_ becomes 25, and 20 is deleted.
+
+Constraints
+Your code must compile with clang++ using the c++20 standard without errors under -Wall -Wextra -Werror -pedantic.
+You may include only the following headers: "tnode.hpp", "binary_search_tree.hpp", <iostream>, <vector>.
+Locate and relink the nodes yourself by traversing the tree and updating pointers; you may not use library search or algorithm functions to do the work for you.
+
+Starter files
+includes/binary_search_tree.hpp
+includes/tnode.hpp
+src/binary_search_tree.cc
+src/driver.cc
+src/tnode.cc
