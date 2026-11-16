@@ -1,0 +1,23 @@
+BST Rule of Three
+    Managing a BST's Memory
+        A BST owning dynamically allocated nodes needs a destructor, copy constructor, and copy assignment operator.
+    Clearing a Tree
+        Clear deletes both subtrees before their parent and is reused by the destructor and assignment.
+    What order do we delete the nodes in?
+        Postorder deletion preserves access to each node's children until both subtrees are freed.
+    The Clear helper
+        Return for nullptr; recursively clear left and right, then delete the node.
+    The Destructor
+        The destructor releases the entire tree by calling Clear(root_).
+    Copying a Tree
+        Compiler-generated copying of root_ shares nodes and can cause dangling pointers and double deletion.
+    Why a shallow copy fails
+        A deep copy allocates independent nodes so each tree owns its own memory.
+    The CopyTree helper
+        CopyTree allocates a node, sets its parent, and recursively copies both children; nullptr returns nullptr.
+    The Copy Constructor
+        Initialize root_ with CopyTree(other.root_, nullptr) to create an independent tree.
+    The Copy Assignment Operator
+        Handle self-assignment, release the old tree, copy the source, and return *this.
+    Summary
+        Clear uses postorder; CopyTree allocates independent nodes in preorder; assignment replaces existing contents.
