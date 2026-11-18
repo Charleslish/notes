@@ -1,0 +1,48 @@
+Graph Builder
+
+Recall how a graph stores vertices and edges to model relationships between things. This activity uses a provided GraphAdjList class as a black box: you do not implement the graph, only its construction. Each function builds a graph that satisfies a specific structural requirement (directed or undirected, a target vertex count, a target edge count, a specific connectivity pattern, the presence or absence of a cycle). The grading checks structural properties, not exact contents, so any graph that satisfies the requirements earns full credit. The autograder always compiles against its own copy of graph_adj_list.hpp; leave your copy of that file unchanged.
+
+Provided types
+The GraphAdjList<VertexType> class template provides the members below. The graph cannot be copied; construct it inside your function and return it by value, as the example shows.
+
+Signature | Description
+GraphAdjList(bool directed); | Provided. Constructs an empty graph. Pass false for an undirected graph or true for a directed graph.
+void AddVertex(VertexType label); | Provided. Adds a vertex with the given label. Throws if a vertex with that label already exists.
+void AddEdge(VertexType from, VertexType to); | Provided. Adds an edge from from to to. In an undirected graph, also adds the reverse edge. Throws if either vertex is missing.
+bool VertexExists(VertexType label) const; | Provided. Returns true when a vertex with the given label exists.
+bool IsDirected() const; | Provided. Returns the directed flag the graph was constructed with.
+std::vector<VertexType> GetVertices() const; | Provided. Returns every vertex label in the graph.
+std::vector<VertexType> GetNeighbors(VertexType label) const; | Provided. Returns the labels of the given vertex's neighbors: the vertices one edge away, which in a directed graph are its out-neighbors. Throws if the vertex does not exist.
+operator<< | Provided. Streams the adjacency list, one vertex per line; the driver uses it to print each graph.
+
+Functions to implement
+GraphAdjList<std::string> BuildUndirected();
+Returns an undirected graph with at least 5 vertices and at least 6 edges.
+GraphAdjList<std::string> BuildDirected();
+Returns a directed graph with at least 4 vertices and at least 5 edges.
+GraphAdjList<std::string> BuildTwoComponents();
+Returns an undirected graph with exactly 2 connected components, each containing at least 2 vertices.
+GraphAdjList<std::string> BuildWithCycle();
+Returns an undirected graph with at least 4 vertices that contains at least one cycle.
+GraphAdjList<std::string> BuildConnectedNoCycle();
+Returns an undirected graph with at least 4 vertices that is connected (one component) and contains no cycles. A connected acyclic graph on V vertices has exactly V - 1 edges.
+
+Example
+GraphAdjList<std::string> g(false);  // undirected
+g.AddVertex("A");
+g.AddVertex("B");
+g.AddVertex("C");
+g.AddEdge("A", "B");              // adds A-B and B-A
+g.AddEdge("B", "C");              // adds B-C and C-B
+return g;                         // satisfies "at least 3 vertices,
+                                  // at least 2 edges"
+
+Constraints
+Your code must compile with clang++ using the c++20 standard without errors under -Wall -Wextra -Werror -pedantic.
+You may include only the following headers: "graph_adj_list.hpp", "graph_builder.hpp", <string>.
+
+Starter files
+includes/graph_adj_list.hpp
+includes/graph_builder.hpp
+src/driver.cc
+src/graph_builder.cc

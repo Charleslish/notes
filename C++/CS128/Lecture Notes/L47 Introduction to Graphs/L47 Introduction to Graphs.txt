@@ -1,0 +1,52 @@
+Introduction to Graphs
+    Motivation
+        Graphs model objects whose relationships can include many connections, cycles, and multiple paths.
+    What Is a Graph?
+        A graph consists of vertices representing objects and edges representing relationships.
+        Simple graphs have no self-loops or repeated edges in the same direction.
+    Paths, Cycles, and Adjacency
+        Adjacent vertices share an edge; a path follows edges without repeating vertices.
+        A cycle returns to its starting vertex without repeating other vertices or edges.
+    Connected Components
+        A connected component is a maximal group of mutually reachable vertices in an undirected graph.
+        An isolated vertex forms its own component.
+    Unweighted and Weighted Graphs
+        Edges can represent connections alone or carry numerical weights.
+    Unweighted Graphs
+        Path length is the number of edges traversed.
+    Weighted Graphs
+        A path's length usually means the sum of its edge weights.
+    Undirected and Directed Graphs
+        Edge direction determines which paths are available.
+    Undirected Graphs
+        An undirected edge can be followed in either direction.
+    Directed Graphs
+        Directed paths must follow the arrows; a reverse edge is a separate relationship.
+    Relating Graphs to Familiar Structures
+        Linked lists and trees are graphs with additional structural constraints.
+    Linked Lists
+        A singly linked list forms a directed path; bidirectional links can be modeled as undirected edges.
+    Trees
+        A tree is a connected undirected graph without cycles and has exactly one path between any two vertices.
+        A tree with V vertices has V - 1 edges.
+    Adding and Removing Vertices and Edges
+        Graph operations modify both size and connectivity.
+    Adding a Vertex
+        A new isolated vertex begins as a separate component.
+    Adding an Edge
+        An edge creates a relationship between existing vertices.
+    Removing an Edge
+        Removing an edge preserves its endpoints.
+    Removing a Vertex
+        Removing a vertex also removes all incident edges.
+    What These Operations Change
+        Joining different components merges them; adding a new edge within a component creates a cycle.
+        Removing a bridge splits a component; removing a cycle edge leaves its component connected.
+    Getting a Vertex's Neighbors
+        Neighbors are one edge away; directed graphs distinguish out-neighbors from in-neighbors.
+        GetNeighbors returns out-neighbors when direction is unspecified.
+    Degree
+        Degree counts neighbors; directed graphs distinguish out-degree and in-degree.
+        In an undirected graph, the sum of all degrees equals 2E.
+    Summary
+        Vertices, edges, paths, cycles, components, direction, weights, and degree describe graph structure.
