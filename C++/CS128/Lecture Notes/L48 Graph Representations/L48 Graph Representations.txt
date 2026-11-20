@@ -1,0 +1,47 @@
+Graph Representations
+    Formalizing Graph Storage and Operations
+        Vertices and edges may store different types, configured by VertexType and EdgeType.
+        Every function identifies a vertex by its unique label; a numeric edge label can store a weight.
+    Adding and Removing Vertices
+        AddVertex throws if the vertex already exists.
+        RemoveVertex removes the vertex and all attached edges; it throws if the vertex does not exist.
+    Adding and Removing Edges
+        AddEdge requires existing, different endpoints and leaves an existing edge unchanged.
+        RemoveEdge throws if either endpoint or the edge does not exist.
+    Finding Neighbors
+        GetNeighbors returns vertices one edge away; in a directed graph, these are out-neighbors.
+    Utilities
+        VertexExists checks for a vertex; EdgeExists checks for an edge; GetEdge returns its label.
+        Undirected graphs store and remove each edge in both directions.
+        GetVertices returns every vertex, and IsDirected returns the graph's direction setting.
+    Representation 1: Adjacency List
+        An adjacency list stores each vertex's neighbors and the labels of its existing edges.
+    Retrieving Vertices and Edges
+        VertexExists searches the vertex map; EdgeExists and GetEdge search the source vertex's neighbor list.
+    Adding and Removing Vertices and Edges
+        Adding a vertex inserts a key with an empty list; adding an edge adds a neighbor and its edge label.
+        Removing a vertex also requires removing edges leading to it from other vertices' lists.
+    Finding Neighbors of a Vertex
+        The neighbors of a vertex are stored directly in its adjacency list.
+    Putting it all Together
+        All public operations preserve the correspondence between vertex entries and existing edges.
+    Representation 2: Adjacency Matrix
+        An adjacency matrix reserves a cell for every pair of vertices and maps vertex labels to indices.
+        An optional edge label distinguishes an absent edge from a valid zero-valued label.
+    Retrieving Vertices and Edges
+        Find the vertex indices, then inspect the corresponding cell to test or retrieve an edge.
+    Adding and Removing Vertices and Edges
+        Adding a vertex expands every row and adds a new row; adding an edge sets a cell.
+        The course implementation leaves a removed vertex's row and column allocated and stops using them.
+    Finding Neighbors of a Vertex
+        Read the vertex's row and return existing vertices whose cells hold edge labels.
+        Skip columns corresponding to removed vertices.
+    Putting it all Together
+        Matrix indices and active vertex labels must remain consistent through graph modifications.
+    Tradeoffs
+        Adjacency lists store only existing edges and are space-efficient for sparse graphs.
+        Adjacency matrices reserve quadratic space but allow direct cell lookup once indices are known.
+        Searching for an edge may scan a neighbor list; matrix neighbor enumeration scans all active vertices.
+        Matrix vertex insertion is expensive; leaving removed rows and columns does not reclaim space.
+    Summary
+        Both representations expose the same operations; their internal layout determines space and operation costs.

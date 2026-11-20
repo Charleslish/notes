@@ -1,0 +1,69 @@
+Representation Converter
+
+Recall how a graph can be stored in two different layouts: an adjacency list, where each vertex carries the list of its neighbors, and an adjacency matrix, where a row-column lookup answers whether an edge exists. Both representations describe the same graph; the trade-off is between space and lookup time. This activity converts between the two representations and produces an edge-list view that drops the per-vertex grouping. Both GraphAdjList and GraphAdjMatrix are provided in full, parameterized on vertex and edge label types. Every conversion uses the public interface only, so the work reduces to traversing the source's vertices and edges and writing them into the target.
+
+Provided types
+
+Both class templates expose the same public interface, shown below. Neither graph can be copied; each conversion constructs its target locally and returns it by value. The autograder always compiles against its own copies of GraphAdjList.hpp and GraphAdjMatrix.hpp; leave your copies of those files unchanged.
+
+Signature	Description
+GraphAdjList(bool directed);
+GraphAdjMatrix(bool directed);
+Provided. Constructs an empty graph in the matching representation. Pass false for an undirected graph or true for a directed graph.
+
+void AddVertex(VertexType label);
+Provided. Adds a vertex with the given label. Throws if a vertex with that label already exists.
+
+void AddEdge(VertexType from, VertexType to, EdgeType label);
+Provided. Adds an edge with the given label. In an undirected graph, also stores the reverse direction. A duplicate insertion is a no-op.
+
+bool VertexExists(VertexType label) const;
+bool EdgeExists(VertexType from, VertexType to) const;
+Provided. Membership queries for vertices and edges.
+
+EdgeType GetEdge(VertexType from, VertexType to) const;
+Provided. Returns the edge label between the two endpoints.
+
+std::vector<VertexType> GetVertices() const;
+std::vector<VertexType> GetNeighbors(VertexType label) const;
+Provided. Reads vertex labels and adjacency from the graph.
+
+bool IsDirected() const;
+Provided. Returns the directed flag the graph was constructed with.
+
+void RemoveVertex(VertexType label);
+void RemoveEdge(VertexType from, VertexType to);
+Provided. Removal operations; the conversions do not need them.
+
+Functions to implement
+
+std::vector<std::tuple<std::string, std::string, int>>
+ToEdgeList(const GraphAdjList<std::string, int>& g);
+Returns every adjacency entry as a (from, to, label) tuple. A directed graph with E edges produces E tuples; an undirected graph with E edges produces 2E tuples because each edge is stored in both directions. The order of tuples does not matter.
+
+GraphAdjMatrix<std::string, int>
+ListToMatrix(const GraphAdjList<std::string, int>& g);
+Returns an adjacency-matrix copy of g: same vertices, same edges with the same labels, same directed flag.
+
+GraphAdjList<std::string, int>
+MatrixToList(const GraphAdjMatrix<std::string, int>& g);
+Returns an adjacency-list copy of g: same vertices, same edges with the same labels, same directed flag.
+
+How the conversions work
+
+Each function follows the same pattern: read the source through its public interface, and write the target through its public interface. GetVertices() traverses every vertex; GetNeighbors(v) traverses every neighbor of a vertex; GetEdge(from, to) reads the edge label. To populate the target, AddVertex registers a vertex and AddEdge registers an edge. Construct the target with the matching directed flag (g.IsDirected()). For undirected graphs, AddEdge stores both directions internally; calling it twice for the same pair is a no-op, but be careful not to confuse that with the explicit reverse-direction tuple that ToEdgeList must report.
+
+In the matrix layout, row i, column j represents an edge from vertex i to vertex j. EdgeExists("A", "B") checks the cell at row A, column B. For an undirected matrix, both adj_[i][j] and adj_[j][i] hold the same value, but every read still goes through EdgeExists and GetEdge.
+
+Constraints
+
+Your code must compile with clang++ using the c++20 standard without errors under -Wall -Wextra -Werror -pedantic.
+
+You may include only the following headers: "GraphAdjList.hpp", "GraphAdjMatrix.hpp", "converter.hpp", <string>, <vector>, <map>, <tuple>.
+
+Files
+includes/GraphAdjList.hpp
+includes/GraphAdjMatrix.hpp
+includes/converter.hpp
+src/converter.cc
+src/driver.cc
